@@ -31,6 +31,7 @@
  * @heap_devt		heap device node
  * @list		list head connecting to list of heaps
  * @heap_cdev		heap char device
+ * @heap_dev		heap device struct
  *
  * Represents a heap of memory from which buffers can be made.
  */
@@ -42,6 +43,7 @@ struct dma_heap {
 	struct list_head list;
 	struct cdev heap_cdev;
 	struct kref refcount;
+	struct device *heap_dev;
 };
 
 static LIST_HEAD(heap_list);
@@ -241,6 +243,18 @@ void *dma_heap_get_drvdata(struct dma_heap *heap)
 EXPORT_SYMBOL_GPL(dma_heap_get_drvdata);
 
 /**
+ * dma_heap_get_dev() - get device struct for the heap
+ * @heap: DMA-Heap to retrieve device struct from
+ *
+ * Returns:
+ * The device struct for the heap.
+ */
+struct device *dma_heap_get_dev(struct dma_heap *heap)
+{
+	return heap->heap_dev;
+}
+
+/**
  * dma_heap_get_name() - get heap name
  * @heap: DMA-Heap to retrieve private data for
  *
@@ -282,7 +296,6 @@ void dma_heap_put(struct dma_heap *h)
 struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
 {
 	struct dma_heap *heap, *h, *err_ret;
-	struct device *dev_ret;
 	unsigned int minor;
 	int ret;
 
@@ -325,16 +338,19 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
 		goto err1;
 	}
 
-	dev_ret = device_create(dma_heap_class,
-				NULL,
-				heap->heap_devt,
-				NULL,
-				heap->name);
-	if (IS_ERR(dev_ret)) {
+	heap->heap_dev = device_create(dma_heap_class,
+				       NULL,
+				       heap->heap_devt,
+				       NULL,
+				       heap->name);
+	if (IS_ERR(heap->heap_dev)) {
 		pr_err("dma_heap: Unable to create device\n");
-		err_ret = ERR_CAST(dev_ret);
+		err_ret = ERR_CAST(heap->heap_dev);
 		goto err2;
 	}
+
+	/* Make sure it doesn't disappear on us */
+	heap->heap_dev = get_device(heap->heap_dev);
 
 	mutex_lock(&heap_list_lock);
 	/* check the name is unique */
