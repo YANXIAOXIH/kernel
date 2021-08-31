@@ -617,6 +617,18 @@ struct drm_display_info {
 	 * @luminance_range: Luminance range supported by panel
 	 */
 	struct drm_luminance_range_info luminance_range;
+
+	/**
+	 * @mso_stream_count: eDP Multi-SST Operation (MSO) stream count from
+	 * the DisplayID VESA vendor block. 0 for conventional Single-Stream
+	 * Transport (SST), or 2 or 4 MSO streams.
+	 */
+	u8 mso_stream_count;
+
+	/**
+	 * @mso_pixel_overlap: eDP MSO segment pixel overlap, 0-8 pixels.
+	 */
+	u8 mso_pixel_overlap;
 };
 
 int drm_display_info_set_bus_formats(struct drm_display_info *info,
