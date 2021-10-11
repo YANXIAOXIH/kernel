@@ -6259,7 +6259,6 @@ static struct platform_driver kbase_platform_driver = {
 		   .name = KBASE_DRV_NAME,
 		   .pm = &kbase_pm_ops,
 		   .of_match_table = of_match_ptr(kbase_dt_ids),
-		   .probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},
 };
 
