@@ -959,12 +959,9 @@ static int soc_pcm_hw_clean(struct snd_soc_pcm_runtime *rtd,
 	snd_soc_pcm_component_hw_free(substream, rollback);
 
 	/* now free hw params for the DAIs  */
-	for_each_rtd_dais(rtd, i, dai) {
-		if (!snd_soc_dai_stream_valid(dai, substream->stream))
-			continue;
-
-		snd_soc_dai_hw_free(dai, substream, rollback);
-	}
+	for_each_rtd_dais(rtd, i, dai)
+		if (snd_soc_dai_stream_valid(dai, substream->stream))
+			snd_soc_dai_hw_free(dai, substream, rollback);
 
 	return 0;
 }
