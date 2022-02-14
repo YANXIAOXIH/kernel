@@ -646,7 +646,7 @@ static phys_addr_t mtk_iommu_iova_to_phys(struct iommu_domain *domain,
 static struct iommu_device *mtk_iommu_probe_device(struct device *dev)
 {
 	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(dev);
-	struct mtk_iommu_data *data;
+	struct mtk_iommu_data *data, *curdata;
 	struct device_link *link;
 	struct device *larbdev;
 	unsigned int larbid, larbidx, i;
@@ -657,30 +657,36 @@ static struct iommu_device *mtk_iommu_probe_device(struct device *dev)
 	data = dev_iommu_priv_get(dev);
 
 	/*
-	 * Link the consumer device with the smi-larb device(supplier).
-	 * The device that connects with each a larb is a independent HW.
-	 * All the ports in each a device should be in the same larbs.
+	 * Link the consumer device with the smi-larb device(supplier)
+	 * The device in each a larb is a independent HW. thus only link
+	 * one larb here.
 	 */
 	larbid = MTK_M4U_TO_LARB(fwspec->ids[0]);
 	if (larbid >= MTK_LARB_NR_MAX)
 		return ERR_PTR(-EINVAL);
 
-	for (i = 1; i < fwspec->num_ids; i++) {
-		larbidx = MTK_M4U_TO_LARB(fwspec->ids[i]);
-		if (larbid != larbidx) {
-			dev_err(dev, "Can only use one larb. Fail@larb%d-%d.\n",
-				larbid, larbidx);
+	if (MTK_IOMMU_IS_TYPE(data->plat_data, MTK_IOMMU_TYPE_MM)) {
+		larbid = MTK_M4U_TO_LARB(fwspec->ids[0]);
+		if (larbid >= MTK_LARB_NR_MAX)
 			return ERR_PTR(-EINVAL);
-		}
-	}
-	larbdev = data->larb_imu[larbid].dev;
-	if (!larbdev)
-		return ERR_PTR(-EINVAL);
 
-	link = device_link_add(dev, larbdev,
-			       DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
-	if (!link)
-		dev_err(dev, "Unable to link %s\n", dev_name(larbdev));
+		for (i = 1; i < fwspec->num_ids; i++) {
+			larbidx = MTK_M4U_TO_LARB(fwspec->ids[i]);
+			if (larbid != larbidx) {
+				dev_err(dev, "Can only use one larb. Fail@larb%d-%d.\n",
+					larbid, larbidx);
+				return ERR_PTR(-EINVAL);
+			}
+		}
+		larbdev = data->larb_imu[larbid].dev;
+		if (!larbdev)
+			return ERR_PTR(-EINVAL);
+
+		link = device_link_add(dev, larbdev,
+				DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
+		if (!link)
+			dev_err(dev, "Unable to link %s\n", dev_name(larbdev));
+	}
 	return &data->iommu;
 }
 
@@ -695,9 +701,12 @@ static void mtk_iommu_release_device(struct device *dev)
 		return;
 
 	data = dev_iommu_priv_get(dev);
-	larbid = MTK_M4U_TO_LARB(fwspec->ids[0]);
-	larbdev = data->larb_imu[larbid].dev;
-	device_link_remove(dev, larbdev);
+
+	if (MTK_IOMMU_IS_TYPE(data->plat_data, MTK_IOMMU_TYPE_MM)) {
+		larbid = MTK_M4U_TO_LARB(fwspec->ids[0]);
+		larbdev = data->larb_imu[larbid].dev;
+		device_link_remove(dev, larbdev);
+	}
 
 	iommu_fwspec_free(dev);
 }
@@ -931,7 +940,7 @@ static int mtk_iommu_mm_dts_parse(struct device *dev,
 			id = i;
 
 		plarbdev = of_find_device_by_node(larbnode);
-		if (!plarbdev) {
+		if (!plarbdev || !plarbdev->dev.driver) {
 			of_node_put(larbnode);
 			return -EPROBE_DEFER;
 		}
