@@ -14,7 +14,10 @@
 #include <linux/of_graph.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/platform_device.h>
+#include <linux/reset.h>
 #include <linux/types.h>
+#include <linux/regmap.h>
+#include <linux/mfd/syscon.h>
 
 #include <video/videomode.h>
 
@@ -28,6 +31,7 @@
 
 #include "mtk_disp_drv.h"
 #include "mtk_dpi_regs.h"
+#include "mtk_mt8195_dpi_regs.h"
 #include "mtk_drm_ddp_comp.h"
 
 enum mtk_dpi_out_bit_num {
@@ -65,11 +69,13 @@ struct mtk_dpi {
 	struct drm_bridge *next_bridge;
 	struct drm_connector *connector;
 	void __iomem *regs;
+	struct reset_control *reset_ctl;
 	struct device *dev;
 	struct clk *engine_clk;
 	struct clk *pixel_clk;
 	struct clk *dpi_sel_clk;
 	struct clk *tvd_clk;
+	struct clk *hdmi_cg;
 	int irq;
 	struct drm_display_mode mode;
 	const struct mtk_dpi_conf *conf;
@@ -133,6 +139,8 @@ struct mtk_dpi_conf {
 	u32 yuv422_en_bit;
 	u32 csc_enable_bit;
 	const struct mtk_dpi_yc_limit *limit;
+	// True if this DPI block is directly connected to SoC internal HDMI block
+	bool is_internal_hdmi;
 };
 
 static void mtk_dpi_mask(struct mtk_dpi *dpi, u32 offset, u32 val, u32 mask)
@@ -416,9 +424,13 @@ static void mtk_dpi_power_off(struct mtk_dpi *dpi)
 		return;
 
 	mtk_dpi_disable(dpi);
+
+	reset_control_rearm(dpi->reset_ctl);
+
 	clk_disable_unprepare(dpi->pixel_clk);
 	clk_disable_unprepare(dpi->engine_clk);
 	clk_disable_unprepare(dpi->dpi_sel_clk);
+	clk_disable_unprepare(dpi->hdmi_cg);
 }
 
 static int mtk_dpi_power_on(struct mtk_dpi *dpi)
@@ -440,15 +452,25 @@ static int mtk_dpi_power_on(struct mtk_dpi *dpi)
 		goto err_engine;
 	}
 
+	ret = clk_prepare_enable(dpi->hdmi_cg);
+	if (ret) {
+		dev_err(dpi->dev, "Failed to enable hdmi_cg clock: %d\n", ret);
+		goto err_hdmi_cg;
+	}
+
 	ret = clk_prepare_enable(dpi->pixel_clk);
 	if (ret) {
 		dev_err(dpi->dev, "Failed to enable pixel clock: %d\n", ret);
 		goto err_pixel;
 	}
 
+	reset_control_reset(dpi->reset_ctl);
+
 	return 0;
 
 err_pixel:
+	clk_disable_unprepare(dpi->hdmi_cg);
+err_hdmi_cg:
 	clk_disable_unprepare(dpi->engine_clk);
 err_engine:
 	clk_disable_unprepare(dpi->dpi_sel_clk);
@@ -547,7 +569,16 @@ static int mtk_dpi_set_display_mode(struct mtk_dpi *dpi,
 	mtk_dpi_config_yc_map(dpi, dpi->yc_map);
 	mtk_dpi_config_color_format(dpi, dpi->color_format);
 	mtk_dpi_config_2n_h_fre(dpi);
-	mtk_dpi_dual_edge(dpi);
+	// DPI could be connecting to external bridge
+	// or internal HDMI encoder.
+	if (dpi->conf->is_internal_hdmi) {
+		mtk_dpi_mask(dpi, DPI_CON, DPI_OUTPUT_1T1P_EN,
+				DPI_OUTPUT_1T1P_EN);
+		mtk_dpi_mask(dpi, DPI_CON, DPI_INPUT_2P_EN,
+				DPI_INPUT_2P_EN);
+	} else {
+		mtk_dpi_dual_edge(dpi);
+	}
 	mtk_dpi_config_disable_edge(dpi);
 	mtk_dpi_sw_reset(dpi, false);
 
@@ -654,7 +685,7 @@ static void mtk_dpi_bridge_disable(struct drm_bridge *bridge)
 {
 	struct mtk_dpi *dpi = bridge_to_dpi(bridge);
 
-	mtk_dpi_power_off(dpi);
+	mtk_dpi_disable(dpi);
 
 	if (dpi->pinctrl && dpi->pins_gpio)
 		pinctrl_select_state(dpi->pinctrl, dpi->pins_gpio);
@@ -815,6 +846,11 @@ static unsigned int mt8365_calculate_factor(int clock)
 		return 2;
 }
 
+static unsigned int mt8195_calculate_factor(int clock)
+{
+	return 1;
+}
+
 static const u32 mt8173_output_fmts[] = {
 	MEDIA_BUS_FMT_RGB888_1X24,
 };
@@ -912,6 +948,23 @@ static const struct mtk_dpi_conf mt8365_conf = {
 	.limit = &mtk_dpi_limit,
 };
 
+static const struct mtk_dpi_conf mt8195_conf = {
+	.cal_factor = mt8195_calculate_factor,
+	.max_clock_khz = 594000,
+	.reg_h_fre_con = 0xe0,
+	.output_fmts = mt8183_output_fmts,
+	.num_output_fmts = ARRAY_SIZE(mt8183_output_fmts),
+	.is_ck_de_pol = true,
+	.swap_input_support = true,
+	.dimension_mask = HPW_MASK,
+	.hvsize_mask = HSIZE_MASK,
+	.channel_swap_shift = CH_SWAP,
+	.yuv422_en_bit = YUV422_EN,
+	.csc_enable_bit = CSC_ENABLE,
+	.limit = &mtk_dpi_limit,
+	.is_internal_hdmi = true,
+};
+
 static int mtk_dpi_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
@@ -955,6 +1008,12 @@ static int mtk_dpi_probe(struct platform_device *pdev)
 		return ret;
 	}
 
+	dpi->reset_ctl = devm_reset_control_get_optional_exclusive(dev, "dpi_on");
+	if (IS_ERR(dpi->reset_ctl)) {
+		dev_err(dev, "Failed to get reset_ctl: %ld\n", PTR_ERR(dpi->reset_ctl));
+		return PTR_ERR(dpi->reset_ctl);
+	}
+
 	dpi->engine_clk = devm_clk_get(dev, "engine");
 	if (IS_ERR(dpi->engine_clk)) {
 		ret = PTR_ERR(dpi->engine_clk);
@@ -964,7 +1023,17 @@ static int mtk_dpi_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	dpi->pixel_clk = devm_clk_get(dev, "pixel");
+	dpi->hdmi_cg = devm_clk_get_optional(dev, "hdmi_cg");
+	if (IS_ERR(dpi->hdmi_cg)) {
+		ret = PTR_ERR(dpi->hdmi_cg);
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "Failed to get hdmi_cg clock: %d\n",
+					ret);
+
+		return ret;
+	}
+
+	dpi->pixel_clk = devm_clk_get_optional(dev, "pixel");
 	if (IS_ERR(dpi->pixel_clk)) {
 		ret = PTR_ERR(dpi->pixel_clk);
 		if (ret != -EPROBE_DEFER)
@@ -973,7 +1042,8 @@ static int mtk_dpi_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	dpi->tvd_clk = devm_clk_get(dev, "pll");
+	//TODO: optional for HDMI, not for DP
+	dpi->tvd_clk = devm_clk_get_optional(dev, "pll");
 	if (IS_ERR(dpi->tvd_clk)) {
 		ret = PTR_ERR(dpi->tvd_clk);
 		if (ret != -EPROBE_DEFER)
@@ -985,7 +1055,7 @@ static int mtk_dpi_probe(struct platform_device *pdev)
 	dpi->dpi_sel_clk = devm_clk_get_optional(dev, "dpi_sel");
 	if (IS_ERR(dpi->dpi_sel_clk)) {
 		ret = PTR_ERR(dpi->dpi_sel_clk);
-		dev_err_probe(dev, ret, "Failed to get tvdpll clock: %d\n", ret);
+		dev_err_probe(dev, ret, "Failed to get dpi_Sel_clk clock: %d\n", ret);
 
 		return ret;
 	}
@@ -1057,6 +1127,9 @@ static const struct of_device_id mtk_dpi_of_ids[] = {
 	},
 	{ .compatible = "mediatek,mt8365-dpi",
 	  .data = &mt8365_conf,
+	},
+	{ .compatible = "mediatek,mt8195-dpi",
+	  .data = &mt8195_conf,
 	},
 	{ },
 };
