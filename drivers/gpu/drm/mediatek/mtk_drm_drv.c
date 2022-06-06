@@ -599,6 +599,8 @@ err_deinit:
 err_free:
 	private->drm = NULL;
 	drm_dev_put(drm);
+	private->drm_master = false;
+
 	return ret;
 }
 
