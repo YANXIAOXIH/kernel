@@ -46,6 +46,7 @@
 #define DPI_EXT_VSYNC_EN		BIT(26)
 #define DPI_RGB565_EN			BIT(27)
 #define DPI_RGB880_EN			BIT(28)
+#define DPINTF_INPUT_2P_EN		BIT(29)
 
 #define DPI_OUTPUT_SETTING	0x14
 #define CH_SWAP				0

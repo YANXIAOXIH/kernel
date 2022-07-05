@@ -134,6 +134,8 @@ struct mtk_dpi_yc_limit {
  * @output_fmts: Array of supported output formats.
  * @num_output_fmts: Quantity of supported output formats.
  * @support_direct_pin: IP supports direct connection to dpi panels.
+ * @input_2pixel: Input pixel of dp_intf is 2 pixel per round, so enable this
+ *		  config to enable this feature.
  */
 struct mtk_dpi_conf {
 	unsigned int (*cal_factor)(int clock);
@@ -145,6 +147,7 @@ struct mtk_dpi_conf {
 	bool is_ck_de_pol;
 	bool swap_input_support;
 	bool support_direct_pin;
+	bool input_2pixel;
 	// Mask used for HWIDTH, HPORCH, VSYNC_WIDTH and VSYNC_PORCH (no shift)
 	u32 dimension_mask;
 	// Mask used for HSIZE and VSIZE (no shift)
@@ -609,6 +612,10 @@ static int mtk_dpi_set_display_mode(struct mtk_dpi *dpi,
 			mtk_dpi_dual_edge(dpi);
 		}
 		mtk_dpi_config_disable_edge(dpi);
+	}
+	if (dpi->conf->input_2pixel) {
+		mtk_dpi_mask(dpi, DPI_CON, DPINTF_INPUT_2P_EN,
+			     DPINTF_INPUT_2P_EN);
 	}
 	mtk_dpi_sw_reset(dpi, false);
 
