@@ -133,6 +133,7 @@ struct mtk_dpi_yc_limit {
  * @edge_sel_en: Enable of edge selection.
  * @output_fmts: Array of supported output formats.
  * @num_output_fmts: Quantity of supported output formats.
+ * @support_direct_pin: IP supports direct connection to dpi panels.
  */
 struct mtk_dpi_conf {
 	unsigned int (*cal_factor)(int clock);
@@ -143,6 +144,7 @@ struct mtk_dpi_conf {
 	u32 num_output_fmts;
 	bool is_ck_de_pol;
 	bool swap_input_support;
+	bool support_direct_pin;
 	// Mask used for HWIDTH, HPORCH, VSYNC_WIDTH and VSYNC_PORCH (no shift)
 	u32 dimension_mask;
 	// Mask used for HSIZE and VSIZE (no shift)
@@ -592,20 +594,22 @@ static int mtk_dpi_set_display_mode(struct mtk_dpi *dpi,
 	mtk_dpi_config_channel_limit(dpi);
 	mtk_dpi_config_bit_num(dpi, dpi->bit_num);
 	mtk_dpi_config_channel_swap(dpi, dpi->channel_swap);
-	mtk_dpi_config_yc_map(dpi, dpi->yc_map);
 	mtk_dpi_config_color_format(dpi, dpi->color_format);
-	mtk_dpi_config_2n_h_fre(dpi);
-	// DPI could be connecting to external bridge
-	// or internal HDMI encoder.
-	if (dpi->conf->is_internal_hdmi) {
-		mtk_dpi_mask(dpi, DPI_CON, DPI_OUTPUT_1T1P_EN,
-				DPI_OUTPUT_1T1P_EN);
-		mtk_dpi_mask(dpi, DPI_CON, dpi->is_2p_input ? DPI_INPUT_2P_EN : 0,
-				DPI_INPUT_2P_EN);
-	} else {
-		mtk_dpi_dual_edge(dpi);
+	if (dpi->conf->support_direct_pin) {
+		mtk_dpi_config_yc_map(dpi, dpi->yc_map);
+		mtk_dpi_config_2n_h_fre(dpi);
+		// DPI could be connecting to external bridge
+		// or internal HDMI encoder.
+		if (dpi->conf->is_internal_hdmi) {
+			mtk_dpi_mask(dpi, DPI_CON, DPI_OUTPUT_1T1P_EN,
+					DPI_OUTPUT_1T1P_EN);
+			mtk_dpi_mask(dpi, DPI_CON, dpi->is_2p_input ? DPI_INPUT_2P_EN : 0,
+					DPI_INPUT_2P_EN);
+		} else {
+			mtk_dpi_dual_edge(dpi);
+		}
+		mtk_dpi_config_disable_edge(dpi);
 	}
-	mtk_dpi_config_disable_edge(dpi);
 	mtk_dpi_sw_reset(dpi, false);
 
 	return 0;
@@ -937,6 +941,7 @@ static const struct mtk_dpi_conf mt8173_conf = {
 	.num_output_fmts = ARRAY_SIZE(mt8173_output_fmts),
 	.is_ck_de_pol = true,
 	.swap_input_support = true,
+	.support_direct_pin = true,
 	.dimension_mask = HPW_MASK,
 	.hvsize_mask = HSIZE_MASK,
 	.channel_swap_shift = CH_SWAP,
@@ -954,6 +959,7 @@ static const struct mtk_dpi_conf mt2701_conf = {
 	.num_output_fmts = ARRAY_SIZE(mt8173_output_fmts),
 	.is_ck_de_pol = true,
 	.swap_input_support = true,
+	.support_direct_pin = true,
 	.dimension_mask = HPW_MASK,
 	.hvsize_mask = HSIZE_MASK,
 	.channel_swap_shift = CH_SWAP,
@@ -970,6 +976,7 @@ static const struct mtk_dpi_conf mt8183_conf = {
 	.num_output_fmts = ARRAY_SIZE(mt8183_output_fmts),
 	.is_ck_de_pol = true,
 	.swap_input_support = true,
+	.support_direct_pin = true,
 	.dimension_mask = HPW_MASK,
 	.hvsize_mask = HSIZE_MASK,
 	.channel_swap_shift = CH_SWAP,
@@ -986,6 +993,7 @@ static const struct mtk_dpi_conf mt8192_conf = {
 	.num_output_fmts = ARRAY_SIZE(mt8183_output_fmts),
 	.is_ck_de_pol = true,
 	.swap_input_support = true,
+	.support_direct_pin = true,
 	.dimension_mask = HPW_MASK,
 	.hvsize_mask = HSIZE_MASK,
 	.channel_swap_shift = CH_SWAP,
@@ -1017,6 +1025,7 @@ static const struct mtk_dpi_conf mt8195_conf = {
 	.num_output_fmts = ARRAY_SIZE(mt8183_output_fmts),
 	.is_ck_de_pol = true,
 	.swap_input_support = true,
+	.support_direct_pin = true,
 	.dimension_mask = HPW_MASK,
 	.hvsize_mask = HSIZE_MASK,
 	.channel_swap_shift = CH_SWAP,
