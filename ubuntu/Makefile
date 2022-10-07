@@ -15,6 +15,10 @@
 ##
 ##
 ##
+obj-y += mtk-apusys-driver/
+##
+##
+##
 obj-y += mtk-mt76/
 ##
 ##

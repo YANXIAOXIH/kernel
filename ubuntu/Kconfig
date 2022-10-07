@@ -16,6 +16,11 @@ config UBUNTU_ODM_DRIVERS
 ##
 ##
 ##
+##
+source "ubuntu/mtk-apusys-driver/Kconfig"
+##
+##
+##
 if WLAN_VENDOR_MEDIATEK
 source "ubuntu/mtk-mt76/Kconfig"
 endif # WLAN_VENDOR_MEDIATEK
