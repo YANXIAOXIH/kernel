@@ -445,7 +445,7 @@ static inline void mtk_star_nic_disable_pd(struct mtk_star_priv *priv)
 static inline void
 mtk_star_enable_dma_irq(struct mtk_star_priv *priv, bool rx, bool tx)
 {
-	u32 value;
+	u32 value = 0;
 
 	regmap_read(priv->regs, MTK_STAR_REG_INT_MASK, &value);
 
@@ -460,7 +460,7 @@ mtk_star_enable_dma_irq(struct mtk_star_priv *priv, bool rx, bool tx)
 static inline void
 mtk_star_disable_dma_irq(struct mtk_star_priv *priv, bool rx, bool tx)
 {
-	u32 value;
+	u32 value = 0;
 
 	regmap_read(priv->regs, MTK_STAR_REG_INT_MASK, &value);
 
