@@ -4819,7 +4819,7 @@ int power_control_init(struct kbase_device *kbdev)
 
 		if (IS_ERR(kbdev->opp_table)) {
 			err = PTR_ERR(kbdev->opp_table);
-			goto regulators_probe_defer;
+			return err;
 		}
 	}
 #endif /* (KERNEL_VERSION(6, 0, 0) <= LINUX_VERSION_CODE) */
@@ -4871,8 +4871,6 @@ void power_control_term(struct kbase_device *kbdev)
 
 	for (i = 0; i < BASE_MAX_NR_CLOCKS_REGULATORS; i++) {
 		if (kbdev->clocks[i]) {
-			if (__clk_is_enabled(kbdev->clocks[i]))
-				clk_disable_unprepare(kbdev->clocks[i]);
 			clk_put(kbdev->clocks[i]);
 			kbdev->clocks[i] = NULL;
 		} else
