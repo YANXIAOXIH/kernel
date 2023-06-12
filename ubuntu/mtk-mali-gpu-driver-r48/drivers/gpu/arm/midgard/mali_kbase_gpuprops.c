@@ -52,6 +52,9 @@ int kbase_gpuprops_get_curr_config_props(struct kbase_device *kbdev,
 					 struct curr_config_props *const curr_config)
 {
 	struct kbase_current_config_regdump curr_config_regdump;
+	struct mtk_platform_context *context =
+		(struct mtk_platform_context *) kbdev->platform_context;
+	u64 force_shader_present = context->shader_present;
 	int err;
 
 	if (WARN_ON(!kbdev) || WARN_ON(!curr_config))
@@ -73,6 +76,25 @@ int kbase_gpuprops_get_curr_config_props(struct kbase_device *kbdev,
 	curr_config->l2_present = curr_config_regdump.l2_present;
 
 	curr_config->shader_present = curr_config_regdump.shader_present;
+
+	/*
+	 * Different platforms may use the same GPU but run on different numbers of cores
+	 *
+	 * In mediatek platform code, we will check efuse segment id field to determine how
+	 * many cores are enabled on current platform.
+	 * Then we will setup correct numbers of power domains in mediatek platform code and
+	 * setup(overwrite) correct cores number in the following
+	 * code.
+	 */
+	if (force_shader_present != 0 &&
+		(force_shader_present != curr_config->shader_present) &&
+		(force_shader_present & curr_config->shader_present)) {
+		dev_info(kbdev->dev, "Force curr_config shader_present from 0x%llX to 0x%llX",
+			curr_config->shader_present,
+			force_shader_present & curr_config->shader_present);
+
+		curr_config->shader_present &= force_shader_present;
+	}
 
 	curr_config->num_cores = hweight64(curr_config->shader_present);
 
@@ -217,7 +239,9 @@ static int kbase_gpuprops_get_props(struct kbase_device *kbdev)
 {
 	struct kbase_gpu_props *gpu_props;
 	struct kbasep_gpuprops_regdump *regdump;
-
+	struct mtk_platform_context *context =
+		(struct mtk_platform_context *) kbdev->platform_context;
+	const u64 force_shader_present = context->shader_present;
 	int i, err;
 
 	if (WARN_ON(kbdev == NULL) || WARN_ON(kbdev->gpu_props.priv_data == NULL))
@@ -230,6 +254,24 @@ static int kbase_gpuprops_get_props(struct kbase_device *kbdev)
 	err = kbase_backend_gpuprops_get(kbdev, regdump);
 	if (err)
 		return err;
+
+	/*
+	 * Different platforms may use the same GPU but run on different numbers of cores
+	 *
+	 * In mediatek platform code, we will check efuse segment id field to determine how
+	 * many cores are enabled on current platform.
+	 * Then we will setup correct numbers of power domains in mediatek platform code and
+	 * setup(overwrite) correct cores number in the following
+	 * code.
+	 */
+	if ((force_shader_present != 0) &&
+	    (force_shader_present != regdump->shader_present) &&
+	    (force_shader_present & regdump->shader_present)) {
+		gpu_props->shader_present &= force_shader_present;
+		dev_info(kbdev->dev, "Force shader_present from 0x%llX to 0x%llX",
+			regdump->shader_present,
+			gpu_props->shader_present);
+	}
 
 	gpu_props->shader_present = regdump->shader_present;
 	gpu_props->tiler_present = regdump->tiler_present;
