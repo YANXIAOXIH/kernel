@@ -25,6 +25,10 @@
 #include <linux/version.h>
 #if KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE
 #include <linux/sched/task.h>
+#endif
+
+#if KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE
+#include <linux/sched/signal.h>
 #else
 #include <linux/sched.h>
 #endif
