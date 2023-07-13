@@ -21,6 +21,10 @@ source "ubuntu/mtk-apusys-driver/Kconfig"
 ##
 ##
 ##
+source "ubuntu/mtk-mdp-driver/Kconfig"
+##
+##
+##
 if WLAN_VENDOR_MEDIATEK
 source "ubuntu/mtk-mt76/Kconfig"
 endif # WLAN_VENDOR_MEDIATEK
@@ -28,6 +32,10 @@ endif # WLAN_VENDOR_MEDIATEK
 ##
 ##
 source "ubuntu/mtk-vcodec-driver/Kconfig"
+##
+##
+##
+source "ubuntu/mtk-vcu-driver/Kconfig"
 ##
 ##
 ##
