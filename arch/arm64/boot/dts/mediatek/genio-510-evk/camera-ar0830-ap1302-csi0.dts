@@ -11,8 +11,8 @@
 /dts-v1/;
 /plugin/;
 
-#include <arm64/mediatek/mt8370/isp70.dtsi>
-#include <arm64/mediatek/mt8370/mtk-camera.dtsi>
+#include "isp71.dtsi"
+#include "mtk-camera.dtsi"
 
 / {
 	fragment@4 {
@@ -152,7 +152,7 @@
 
 			sensor0@3c {
 				compatible = "mediatek,imgsensor";
-				sensor-names = "ar0430ap1302_mipi_yuv";
+				sensor-names = "ar0830ap1302_mipi_yuv";
 				reg = <0x3c>;
 				status = "okay";
 

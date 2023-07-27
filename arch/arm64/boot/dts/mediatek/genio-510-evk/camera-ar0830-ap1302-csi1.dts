@@ -11,8 +11,8 @@
 /dts-v1/;
 /plugin/;
 
-#include <arm64/mediatek/mt8370/isp70.dtsi>
-#include <arm64/mediatek/mt8370/mtk-camera.dtsi>
+#include "isp71.dtsi"
+#include "mtk-camera.dtsi"
 
 / {
 	fragment@4 {
@@ -40,27 +40,27 @@
 	fragment@6 {
 		target = <&pio>;
 		__overlay__ {
-			camera_pins_cam0_rst_0: cam0@rst_0 {
+			camera_pins_cam1_rst_0: cam1@rst_0 {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO19__FUNC_B_GPIO19>;
+					pinmux = <PINMUX_GPIO21__FUNC_B_GPIO21>;
 					output-low;
 				};
 			};
-			camera_pins_cam0_rst_1: cam0@rst_1 {
+			camera_pins_cam1_rst_1: cam1@rst_1 {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO19__FUNC_B_GPIO19>;
+					pinmux = <PINMUX_GPIO21__FUNC_B_GPIO21>;
 					output-high;
 				};
 			};
-			camera_pins_cam0_pdn_0: cam0@pdn_0 {
+			camera_pins_cam1_pdn_0: cam1@pdn_0 {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO18__FUNC_B_GPIO18>;
+					pinmux = <PINMUX_GPIO20__FUNC_B_GPIO20>;
 					output-low;
 				};
 			};
-			camera_pins_cam0_pdn_1: cam0@pdn_1 {
+			camera_pins_cam1_pdn_1: cam1@pdn_1 {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO18__FUNC_B_GPIO18>;
+					pinmux = <PINMUX_GPIO20__FUNC_B_GPIO20>;
 					output-high;
 				};
 			};
@@ -112,33 +112,33 @@
 					output-high;
 				};
 			};
-			camera_pins_cam0_mclk_off: cam0@mclk_off {
+			camera_pins_cam1_mclk_off: cam1@mclk_off {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO22__FUNC_B_GPIO22>;
+					pinmux = <PINMUX_GPIO23__FUNC_B_GPIO23>;
 					drive-strength = <MTK_DRIVE_4mA>;
 				};
 			};
-			camera_pins_cam0_mclk_2ma: cam0@mclk_2ma {
+			camera_pins_cam1_mclk_2ma: cam1@mclk_2ma {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO22__FUNC_O_CMMCLK0>;
+					pinmux = <PINMUX_GPIO23__FUNC_O_CMMCLK1>;
 					drive-strength = <MTK_DRIVE_2mA>;
 				};
 			};
-			camera_pins_cam0_mclk_4ma: cam0@mclk_4ma {
+			camera_pins_cam1_mclk_4ma: cam1@mclk_4ma {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO22__FUNC_O_CMMCLK0>;
+					pinmux = <PINMUX_GPIO23__FUNC_O_CMMCLK1>;
 					drive-strength = <MTK_DRIVE_4mA>;
 				};
 			};
-			camera_pins_cam0_mclk_6ma: cam0@mclk_6ma {
+			camera_pins_cam1_mclk_6ma: cam1@mclk_6ma {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO22__FUNC_O_CMMCLK0>;
+					pinmux = <PINMUX_GPIO23__FUNC_O_CMMCLK1>;
 					drive-strength = <MTK_DRIVE_6mA>;
 				};
 			};
-			camera_pins_cam0_mclk_8ma: cam0@mclk_8ma {
+			camera_pins_cam1_mclk_8ma: cam1@mclk_8ma {
 				pins_cmd_dat {
-					pinmux = <PINMUX_GPIO22__FUNC_O_CMMCLK0>;
+					pinmux = <PINMUX_GPIO23__FUNC_O_CMMCLK1>;
 					drive-strength = <MTK_DRIVE_8mA>;
 				};
 			};
@@ -146,13 +146,13 @@
 	};
 
 	fragment@7 {
-		target = <&i2c5>;
+		target = <&i2c3>;
 		__overlay__ {
 			clock-frequency = <400000>;
 
 			sensor0@3c {
 				compatible = "mediatek,imgsensor";
-				sensor-names = "ar0430ap1302_mipi_yuv";
+				sensor-names = "ar0830ap1302_mipi_yuv";
 				reg = <0x3c>;
 				status = "okay";
 
@@ -173,11 +173,11 @@
 						"rst_high",
 						"pdn_low",
 						"pdn_high";
-				pinctrl-0 = <&camera_pins_cam0_mclk_off>;
-				pinctrl-1 = <&camera_pins_cam0_mclk_2ma>;
-				pinctrl-2 = <&camera_pins_cam0_mclk_4ma>;
-				pinctrl-3 = <&camera_pins_cam0_mclk_6ma>;
-				pinctrl-4 = <&camera_pins_cam0_mclk_8ma>;
+				pinctrl-0 = <&camera_pins_cam1_mclk_off>;
+				pinctrl-1 = <&camera_pins_cam1_mclk_2ma>;
+				pinctrl-2 = <&camera_pins_cam1_mclk_4ma>;
+				pinctrl-3 = <&camera_pins_cam1_mclk_6ma>;
+				pinctrl-4 = <&camera_pins_cam1_mclk_8ma>;
 				pinctrl-5 = <&camera_pins_cam0_vcamd_0>;
 				pinctrl-6 = <&camera_pins_cam0_vcamd_1>;
 				pinctrl-7 = <&camera_pins_cam0_vcama_0>;
@@ -186,10 +186,10 @@
 				pinctrl-10 = <&camera_pins_cam1_vcamd_1>;
 				pinctrl-11 = <&camera_pins_cam1_vcama_0>;
 				pinctrl-12 = <&camera_pins_cam1_vcama_1>;
-				pinctrl-13 = <&camera_pins_cam0_rst_0>;
-				pinctrl-14 = <&camera_pins_cam0_rst_1>;
-				pinctrl-15 = <&camera_pins_cam0_pdn_0>;
-				pinctrl-16 = <&camera_pins_cam0_pdn_1>;
+				pinctrl-13 = <&camera_pins_cam1_rst_0>;
+				pinctrl-14 = <&camera_pins_cam1_rst_1>;
+				pinctrl-15 = <&camera_pins_cam1_pdn_0>;
+				pinctrl-16 = <&camera_pins_cam1_pdn_1>;
 				dvdd-supply = <&cam_vcam_3v3_en>;
 
 				clocks = <&topckgen CLK_TOP_UNIVPLL_192M_D32>,
@@ -199,7 +199,7 @@
 					<&clk26m>,
 					<&topckgen CLK_TOP_UNIVPLL_192M_D4>,
 					<&topckgen CLK_TOP_UNIVPLL_D6_D8>,
-					<&topckgen CLK_TOP_CAMTG>;
+					<&topckgen CLK_TOP_CAMTG2>;
 				clock-names = "6", "12", "13", "24", "26", "48", "52", "mclk";
 
 				port {
@@ -218,7 +218,7 @@
 		__overlay__ {
 			seninf_csi_port_0: seninf_csi_port_0 {
 				compatible = "mediatek,seninf";
-				csi-port = "0";
+				csi-port = "1";
 				port {
 					seninf_csi_port_0_in: endpoint {
 						remote-endpoint = <&sensor0_out>;
