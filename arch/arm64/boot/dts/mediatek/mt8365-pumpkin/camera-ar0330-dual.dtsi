@@ -1,0 +1,174 @@
+// SPDX-License-Identifier: GPL-2.0
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/mt8365-clk.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/mt8365-pinfunc.h>
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	fragment@0 {
+		target = <&pio>;
+		__overlay__ {
+			cam0_pins_default: cam0_pins_default {
+				pins_clk {
+					pinmux = <MT8365_PIN_65_CMMCLK0__FUNC_CMMCLK0>;
+					drive-strength = <MTK_DRIVE_16mA>;
+				};
+				pins_rst {
+					pinmux = <MT8365_PIN_118_DMIC0_DAT0__FUNC_GPIO118>;
+					output-low; /* output-low drives pin low independently of active level */
+				};
+			};
+
+			cam1_pins_default: cam1_pins_default {
+				pins_clk {
+					pinmux = <MT8365_PIN_66_CMMCLK1__FUNC_CMMCLK1>;
+					drive-strength = <MTK_DRIVE_16mA>;
+				};
+				pins_rst {
+					pinmux = <MT8365_PIN_119_DMIC0_DAT1__FUNC_GPIO119>;
+					output-low; /* output-low drives pin low independently of active level */
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+                target = <&mt6357_pmic>;
+                __overlay__ {
+                        regulators {
+                                mt6357_vcama_reg: ldo-vcama {
+                                        regulator-min-microvolt = <2800000>;
+                                        regulator-max-microvolt = <2800000>;
+                                };
+
+
+                                mt6357_vcamio_reg: ldo-vcamio18 {
+                                        regulator-min-microvolt = <1800000>;
+                                        regulator-max-microvolt = <1800000>;
+                                };
+
+
+                                mt6357_vldo28_reg: ldo-vldo28 {
+                                        regulator-min-microvolt = <2800000>;
+                                        regulator-max-microvolt = <2800000>;
+                                };
+                        };
+                };
+	};
+
+	fragment@2 {
+		target = <&i2c2>;
+		__overlay__ {
+			sensor@10 {
+				compatible = "onnn,ar0330";
+				reg = <0x10>;
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&cam0_pins_default>;
+
+				clocks = <&topckgen CLK_TOP_CAMTG_SEL>;
+				assigned-clocks = <&topckgen CLK_TOP_CAMTG_SEL>;
+				assigned-clock-parents = <&topckgen CLK_TOP_USB20_192M_D8>;
+				clock-frequency = <24000000>;
+
+				reset-gpios = <&pio 118 GPIO_ACTIVE_LOW>;
+
+				vddpll-supply = <&mt6357_vldo28_reg>;
+				vaa-supply = <&mt6357_vcama_reg>;
+				vddio-supply = <&mt6357_vcamio_reg>;
+
+				orientation = <0>;
+				rotation = <0>;
+
+				port@0 {
+					ar0330_1_endpoint: endpoint {
+						remote-endpoint = <&mipi_ar0330_1>;
+						bus-type = <4>;
+						clock-lanes = <0>;
+						data-lanes = <1 2>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <&i2c3>;
+		__overlay__ {
+			sensor@10 {
+				compatible = "onnn,ar0330";
+				reg = <0x10>;
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&cam1_pins_default>;
+
+				clocks = <&topckgen CLK_TOP_CAMTG1_SEL>;
+				assigned-clocks = <&topckgen CLK_TOP_CAMTG1_SEL>;
+				assigned-clock-parents = <&topckgen CLK_TOP_USB20_192M_D8>;
+				clock-frequency = <24000000>;
+
+				reset-gpios = <&pio 119 GPIO_ACTIVE_LOW>;
+
+				vddpll-supply = <&mt6357_vldo28_reg>;
+				vaa-supply = <&mt6357_vcama_reg>;
+				vddio-supply = <&mt6357_vcamio_reg>;
+
+				orientation = <0>;
+				rotation = <0>;
+
+				port@0 {
+					ar0330_2_endpoint: endpoint {
+						remote-endpoint = <&mipi_ar0330_2>;
+						bus-type = <4>;
+						clock-lanes = <0>;
+						data-lanes = <1 2>;
+					};
+				};
+
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&seninf>;
+		__overlay__ {
+			status = "okay";
+
+			ports {
+				port@0 {
+					mipi_ar0330_1: endpoint {
+						clock-lanes = <1>;
+						data-lanes = <0 2>;
+						remote-endpoint = <&ar0330_1_endpoint>;
+					};
+				};
+
+				port@1 {
+					mipi_ar0330_2: endpoint {
+						clock-lanes = <2>;
+						data-lanes = <1 3>;
+						remote-endpoint = <&ar0330_2_endpoint>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@5 {
+		target = <&camsv1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@6 {
+		target = <&camsv2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};

@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-2.0
+
+#include "camera-ar0330-dual.dtsi"
+
+/ {
+	fragment@7 {
+		target = <&i2c2>;
+		__overlay__ {
+			sensor@10 {
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@8 {
+		target = <&camsv1>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+};
