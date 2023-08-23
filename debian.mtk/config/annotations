@@ -544,7 +544,7 @@ CONFIG_USB_OTG_FSM                              policy<{'arm64': 'n'}>
 CONFIG_USB_XHCI_MTK                             policy<{'arm64': 'y'}>
 CONFIG_USB_ZERO_HNPTEST                         policy<{'arm64': 'n'}>
 CONFIG_VIDEO_AP1302                             policy<{'arm64': 'm'}>
-CONFIG_VIDEO_AR0330                             policy<{'arm64': 'n'}>
+CONFIG_VIDEO_AR0330                             policy<{'arm64': 'm'}>
 CONFIG_VIDEO_MEDIATEK_JPEG                      policy<{'arm64': 'm'}>
 CONFIG_VIDEO_MEDIATEK_MDP                       policy<{'arm64': 'n'}>
 CONFIG_VIDEO_MEDIATEK_MDP3                      policy<{'arm64': 'm'}>
