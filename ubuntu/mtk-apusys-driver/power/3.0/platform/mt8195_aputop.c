@@ -25,7 +25,7 @@
 #include "mt8195_apupwr_prot.h"
 #include "mt8195_apu_devfreq_cooling.h"
 
-#define LOCAL_DBG	(1)
+#define LOCAL_DBG	(0)
 
 /* Below reg_name has to 1-1 mapping DTS's name */
 static const char *reg_name[APUPW_MAX_REGS] = {
@@ -35,7 +35,7 @@ static const char *reg_name[APUPW_MAX_REGS] = {
 };
 
 static struct apu_power apupw;
-int g_pwr_log_level_MT8195 = 7;
+int g_pwr_log_level_MT8195 = APUSYS_PWR_LOG_ERR;
 
 static void aputop_dump_pwr_res(void);
 
