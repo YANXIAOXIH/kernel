@@ -47,6 +47,8 @@ static int32_t mtk_mdp_map_color_format(int v4l2_format)
 		return DP_COLOR_ARGB8888;   /* v4l2_fourcc('B', 'A', '2', '4'), 32  ARGB-8-8-8-8  */
 	case V4L2_PIX_FMT_ABGR32:
 		return DP_COLOR_BGRA8888;   /* v4l2_fourcc('A', 'R', '2', '4'), 32  BGRA-8-8-8-8  */
+	case V4L2_PIX_FMT_RGBA32:
+		return DP_COLOR_RGBA8888;   /* v4l2_fourcc('A', 'B', '2', '4'), 32  RGBA-8-8-8-8  */
 	case V4L2_PIX_FMT_XRGB32:
 		return DP_COLOR_XRGB8888;   /* v4l2_fourcc('B', 'X', '2', '4'), 32  XRGB-8-8-8-8  */
 	case V4L2_PIX_FMT_XBGR32:
