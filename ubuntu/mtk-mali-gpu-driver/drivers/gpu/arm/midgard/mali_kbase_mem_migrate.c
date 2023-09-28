@@ -585,6 +585,9 @@ static const struct address_space_operations kbase_address_space_ops = {
 #if (KERNEL_VERSION(6, 0, 0) > LINUX_VERSION_CODE)
 void kbase_mem_migrate_set_address_space_ops(struct kbase_device *kbdev, struct file *const filp)
 {
+	if (!kbase_page_migration_enabled)
+		return;
+
 	mutex_lock(&kbdev->fw_load_lock);
 
 	if (filp) {
@@ -612,6 +615,9 @@ void kbase_mem_migrate_init(struct kbase_device *kbdev)
 	if (kbase_page_migration_enabled < 0)
 		kbase_page_migration_enabled = 0;
 
+	if (!kbase_page_migration_enabled)
+		return;
+
 	spin_lock_init(&mem_migrate->free_pages_lock);
 	INIT_LIST_HEAD(&mem_migrate->free_pages_list);
 
@@ -626,6 +632,9 @@ void kbase_mem_migrate_init(struct kbase_device *kbdev)
 void kbase_mem_migrate_term(struct kbase_device *kbdev)
 {
 	struct kbase_mem_migrate *mem_migrate = &kbdev->mem_migrate;
+
+	if (!kbase_page_migration_enabled)
+		return;
 
 	if (mem_migrate->free_pages_workq)
 		destroy_workqueue(mem_migrate->free_pages_workq);
