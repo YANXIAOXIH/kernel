@@ -2,6 +2,7 @@
 /plugin/;
 
 #include <dt-bindings/pinctrl/mt8195-pinfunc.h>
+#include <dt-bindings/pwm/pwm.h>
 
 / {
 	fragment@0 {
@@ -81,6 +82,7 @@
 		target = <&backlight_lcd1>;
 		__overlay__ {
 			default-on;
+			pwms = <&disp_pwm1 0 500000 PWM_POLARITY_INVERTED>;
 		};
 	};
 
@@ -90,6 +92,7 @@
 			status = "okay";
 			pinctrl-names = "default";
 			pinctrl-0 = <&disp_pwm1_pin_default>;
+			#pwm-cells = <3>;
 		};
 	};
 
