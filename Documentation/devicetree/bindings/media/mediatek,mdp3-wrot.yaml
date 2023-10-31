@@ -15,19 +15,13 @@ description: |
 
 properties:
   compatible:
-    items:
+    oneOf:
       - enum:
-        - mediatek,mt8183-mdp3-wrot
-
-  mediatek,mdp3-id:
-    $ref: /schemas/types.yaml#/definitions/uint32
-    maxItems: 1
-    description: |
-      There may be multiple blocks with the same function but
-      different addresses in MDP3.
-      In order to distinguish the connection with other blocks,
-      a unique ID is needed to dynamically use one or more identical
-      blocks to implement multiple pipelines.
+          - mediatek,mt8183-mdp3-wrot
+      - items:
+          - enum:
+              - mediatek,mt8195-mdp3-wrot
+          - const: mediatek,mt8183-mdp3-wrot
 
   reg:
     maxItems: 1
