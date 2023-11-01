@@ -42,6 +42,11 @@
 
 #define TEMP_UPDATE_TIME	(3000) /* update apu temperature time */
 
+/* Platform ID */
+#define EFUSE_PLAT_ID_8370A	(0x81)
+#define EFUSE_PLAT_ID_8390I	(0x88)
+#define EFUSE_PLAT_ID_8370I	(0x89)
+
 /* log lvl */
 enum {
 	APUSYS_PWR_LOG_ERR,

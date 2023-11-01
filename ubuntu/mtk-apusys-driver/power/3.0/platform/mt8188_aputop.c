@@ -9,6 +9,7 @@
 #include <linux/device.h>
 #include <linux/io.h>
 #include <linux/iopoll.h>
+#include <linux/nvmem-consumer.h>
 #include <linux/of.h>
 #include <linux/of_irq.h>
 #include <linux/of_address.h>
@@ -43,6 +44,8 @@ static const char *reg_name[APUPW_MAX_REGS] = {
 
 static struct apu_power apupw;
 static uint32_t g_opp_cfg_acx0;
+
+static int efuse_plat_id;
 
 static void aputop_dump_pwr_res(void);
 
@@ -206,6 +209,15 @@ static int init_opp_table(struct platform_device *pdev)
 					sizeof(struct tiny_dvfs_opp_entry));
 			}
 		}
+	}
+
+	/* raise voltage on vapu bin point for 8390I/8370A/8370I */
+	if (efuse_plat_id == EFUSE_PLAT_ID_8370A ||
+	    efuse_plat_id == EFUSE_PLAT_ID_8390I ||
+	    efuse_plat_id == EFUSE_PLAT_ID_8370I) {
+		opp_tbl->opp[0].vapu += 25000;
+		opp_tbl->opp[3].vapu += 25000;
+		opp_tbl->opp[5].vapu += 12500;
 	}
 
 	/* first line */
@@ -1292,8 +1304,7 @@ static int mt8188_apu_top_off(struct device *dev)
 	if (mt8188_read_pwr_flow_sync_reg() == 0) {
 		/* APU was loaded successfully, tell remote side I am ready to off */
 		mt8188_pwr_flow_remote_sync(1);
-	}
-	else {
+	} else {
 		/* APU was not loaded successfully, trigger power off from APMCU */
 		__apu_sleep_rpc_rcx(dev);
 	}
@@ -1450,6 +1461,32 @@ static int init_reg_base(struct platform_device *pdev)
 	return 0;
 }
 
+static int get_platform_id(struct platform_device *pdev)
+{
+	struct device *dev = &pdev->dev;
+	struct nvmem_cell *cell;
+	uint32_t *buf;
+
+	efuse_plat_id = 0;
+
+	cell = nvmem_cell_get(dev, "efuse_apu_segment");
+	if (IS_ERR(cell))
+		return dev_err_probe(dev, PTR_ERR(cell), "nvmem_cell_get failed\n");
+
+	buf = nvmem_cell_read(cell, NULL);
+	nvmem_cell_put(cell);
+	if (IS_ERR(buf)) {
+		dev_err(dev, "nvmem_cell_read failed\n");
+		return PTR_ERR(buf);
+	}
+
+	efuse_plat_id = *buf;
+	dev_info(dev, "efuse_plat_id = 0x%x\n", efuse_plat_id);
+
+	kfree(buf);
+	return 0;
+}
+
 static int mt8188_apu_top_pb(struct platform_device *pdev)
 {
 #if APU_POWER_INIT
@@ -1458,6 +1495,11 @@ static int mt8188_apu_top_pb(struct platform_device *pdev)
 	int ret = 0;
 
 	LOG_DBG("%s fpga_type : %d\n", __func__, fpga_type);
+
+	/* get platform id to identify 8188/8390I/8390A/8370I/8370A */
+	ret = get_platform_id(pdev);
+	if (IS_ERR_VALUE(ret))
+		return dev_err_probe(&pdev->dev, ret, "get_platform_id failed\n");
 
 	init_reg_base(pdev);
 	init_opp_table(pdev);
