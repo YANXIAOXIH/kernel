@@ -42,7 +42,7 @@
 				clock-names = "bclk";
 				#iommu-cells = <1>;
 			};
-			
+
 			apusys_rv: apusys_rv@19001000 {
 				compatible = "mediatek,mt8188-apusys_rv";
 				memory-region = <&apu_reserve_memory>;
@@ -209,6 +209,9 @@
 							  <&opp_table_apu_rv>,
 							  <&opp_table_vpu>,
 							  <&opp_table_dla>;
+
+				nvmem-cells = <&efuse_apu_segment>;
+				nvmem-cell-names = "efuse_apu_segment";
 			};
 
 			vpu_core0: vpu_core0@19120000 {
