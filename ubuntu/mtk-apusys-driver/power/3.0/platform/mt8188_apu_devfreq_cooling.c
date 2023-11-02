@@ -50,7 +50,7 @@ static int _plat_opp_table_add(struct device *dev,
 	int i, ret = 0;
 	int pll_idx = PLL_VPU;
 
-	if (dvfs_dev_id >= DVFS_DEV_MAX)
+	if (dvfs_dev_id >= DVFS_DEV_MAX || opp_tbl == NULL)
 		return -1;
 
 	pll_idx = dvfs_dev_id_to_pll_idx[dvfs_dev_id];
