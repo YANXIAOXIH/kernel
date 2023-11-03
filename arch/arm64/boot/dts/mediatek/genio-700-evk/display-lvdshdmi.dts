@@ -11,7 +11,7 @@
 			touchscreen@5d {
 				status = "disabled";
 			};
-			
+
 			it6122: it6122@6c {
 				compatible = "ite,it6122";
 				reg = <0x6c>;
@@ -19,25 +19,40 @@
 				pinctrl-0 = <&it6122_pins_default>;
 				vio33tp1-gpio = <&pio 119 GPIO_ACTIVE_HIGH>;
 				ite,reset-gpio = <&pio 5 GPIO_ACTIVE_HIGH>;
+				pwr-supply = <&lvds_pwr>;
 			};
 		};
 	};
-	
+
 	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			lvds_pwr: lvds-pwr {
+				compatible = "regulator-fixed";
+				regulator-name = "lcm1_en";
+				enable-active-high;
+				gpio = <&pio 111 GPIO_ACTIVE_HIGH>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&lvds_pwr_pins_default>;
+			};
+		};
+	};
+
+	fragment@2 {
 		target = <&dsi0>;
 		__overlay__ {
 			panel@0 {
 				status = "disabled";
 			};
-			
+
 			panel@1 {
 				compatible = "koe,tx18d204vm0baa";
 				status = "okay";
 				reg = <0>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&panel_pins_default>;
+				pinctrl-0 = <&lvds_panel_pins_default>;
 				bl-gpios = <&pio 45 GPIO_ACTIVE_HIGH>;
-				pwr-gpios = <&pio 111 GPIO_ACTIVE_HIGH>;
+				pwr-supply = <&lvds_pwr>;
 				mediatek,it6122-attached;
 				port {
 					panel0_in: endpoint {
@@ -48,21 +63,35 @@
 		};
 	};
 
-	fragment@2 {
+	fragment@3 {
 		target = <&lcm1_tp_avdd>;
 		__overlay__ {
 			status = "disabled";
 		};
 	};
-	
-	fragment@3 {
+
+	fragment@4 {
 		target = <&pio>;
 		__overlay__ {
-			it6122_pins_default: it6122_pins_default {
+			it6122_pins_default: it6122-pins-default {
 				pins-cmd-dat {
 					pinmux = <PINMUX_GPIO119__FUNC_B_GPIO119>,
 					<PINMUX_GPIO5__FUNC_B_GPIO5>;
 					output-high;
+				};
+			};
+
+			lvds_pwr_pins_default: lvds-pwr-pins-default {
+				lvds-pwr {
+					pinmux = <PINMUX_GPIO111__FUNC_B_GPIO111>;
+					output-low;
+				};
+			};
+
+			lvds_panel_pins_default: lvds-panel-pins-default {
+				panel-dcdc {
+					pinmux = <PINMUX_GPIO45__FUNC_B_GPIO45>;
+					output-low;
 				};
 			};
 		};
