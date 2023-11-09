@@ -16,6 +16,12 @@ config UBUNTU_ODM_DRIVERS
 ##
 ##
 ##
+if WLAN_VENDOR_MEDIATEK
+source "ubuntu/mtk-mt76/Kconfig"
+endif # WLAN_VENDOR_MEDIATEK
+##
+##
+##
 source "ubuntu/ubuntu-host/Kconfig"
 ##
 ##

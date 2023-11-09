@@ -15,6 +15,10 @@
 ##
 ##
 ##
+obj-y += mtk-mt76/
+##
+##
+##
 obj-$(CONFIG_UBUNTU_HOST)      += ubuntu-host/
 ##
 ##
