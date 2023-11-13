@@ -685,6 +685,9 @@ static ssize_t vpu_debug_read(struct file *file, char __user *user_buf,
 	} else {
 		len = snprintf(buf, sizeof(buf), "VPU not running\n");
 	}
+	if (len > 0) {
+		pr_info("[VCU] error len[%d]", len);
+	}
 
 	return simple_read_from_buffer(user_buf, count, ppos, buf, len);
 }
