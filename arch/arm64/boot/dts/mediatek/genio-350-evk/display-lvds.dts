@@ -1,0 +1,148 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/mt8365-clk.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/mt8365-pinfunc.h>
+
+/ {
+	fragment@0 {
+		target = <&dpi0>;
+		__overlay__ {
+			mediatek,output-to-lvds;
+			clocks = <&mmsys CLK_MM_DPI0_DPI0>,
+				 <&mmsys CLK_MM_MM_DPI0>,
+				 <&apmixedsys CLK_APMIXED_LVDSPLL>,
+				 <&topckgen CLK_TOP_DPI0_SEL>,
+				 <&topckgen CLK_TOP_LVDSPLL_D2>,
+				 <&topckgen CLK_TOP_LVDSPLL_D4>,
+				 <&topckgen CLK_TOP_LVDSPLL_D8>,
+				 <&topckgen CLK_TOP_LVDSPLL_D16>;
+			clock-names = "dpi_sel", "engine", "pll", "pixel",
+						  "TVDPLL_D2",
+						  "TVDPLL_D4",
+						  "TVDPLL_D8",
+						  "TVDPLL_D16";
+			pinctrl-names = "";
+			port {
+				dpi_out: endpoint {
+					remote-endpoint = <&lvds_in>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&dpi_pin_func>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@2 {
+		target = <&dpi_pin_gpio>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@3 {
+		target-path = "/";
+		__overlay__ {
+			panel@0 {
+				compatible = "auo,g156xtn010_lvds";
+				reg = <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&lvds_panel_pins_default>;
+				pwr-gpios = <&pio 129 GPIO_ACTIVE_HIGH>;
+				bl-gpios = <&pio 67 GPIO_ACTIVE_HIGH>;
+				status = "okay";
+
+				port {
+					lvds_panel_in: endpoint {
+						remote-endpoint = <&lvds_out>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&pio>;
+		__overlay__ {
+			lvds_panel_pins_default: lvds-panel-pins-default {
+				panel-dcdc {
+					pinmux = <MT8365_PIN_129_TDM_TX_BCK__FUNC_GPIO129>;
+					output-low;
+				};
+
+				panel-rst {
+					pinmux = <MT8365_PIN_67_CMPCLK__FUNC_GPIO67>;
+					output-low;
+				};
+			};
+		};
+	};
+
+	fragment@5 {
+		target = <&lvds_tx>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@6 {
+		target = <&lvds>;
+		__overlay__ {
+			status = "okay";
+			ports {
+				port@0 {
+					reg = <0>;
+					lvds_in: endpoint {
+						remote-endpoint = <&dpi_out>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					lvds_out: endpoint {
+						remote-endpoint = <&lvds_panel_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@7 {
+		target = <&dsi0>;
+		__overlay__ {
+			panel@0 {
+				status = "disabled";
+			};
+			ports {
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@8 {
+		target = <&i2c1>;
+		__overlay__ {
+			it66121hdmitx {
+				status = "disabled";
+			};
+
+			touch {
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@9 {
+		target = <&sound>;
+		__overlay__ {
+			dai-link-hdmi {
+				status = "disabled";
+			};
+		};
+	};
+};
