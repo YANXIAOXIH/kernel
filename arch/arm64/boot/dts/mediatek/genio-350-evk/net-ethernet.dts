@@ -3,16 +3,30 @@
 
 / {
 	fragment@0 {
+		target = <&ethernet>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@1 {
 		target = <&dpi0>;
+		__overlay__ {
+			pinctrl-names = "";
+		};
+	};
+
+	fragment@2 {
+		target = <&dpi_pin_func>;
 		__overlay__ {
 			status = "disabled";
 		};
 	};
 
-	fragment@1 {
-		target = <&ethernet>;
+	fragment@3 {
+		target = <&dpi_pin_gpio>;
 		__overlay__ {
-			status = "okay";
+			status = "disabled";
 		};
 	};
 };
