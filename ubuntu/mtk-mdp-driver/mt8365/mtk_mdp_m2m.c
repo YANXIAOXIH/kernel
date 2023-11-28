@@ -1465,7 +1465,7 @@ static const struct v4l2_m2m_ops mtk_mdp_m2m_ops = {
 int mtk_mdp_register_m2m_device(struct mtk_mdp_dev *mdp)
 {
 	struct device *dev = &mdp->pdev->dev;
-	int ret;
+	int ret, len;
 
 	mdp->variant = &mtk_mdp_default_variant;
 	mdp->vdev = video_device_alloc();
@@ -1481,8 +1481,11 @@ int mtk_mdp_register_m2m_device(struct mtk_mdp_dev *mdp)
 	mdp->vdev->lock = &mdp->lock;
 	mdp->vdev->vfl_dir = VFL_DIR_M2M;
 	mdp->vdev->v4l2_dev = &mdp->v4l2_dev;
-	snprintf(mdp->vdev->name, sizeof(mdp->vdev->name), "%s:m2m",
+	len = snprintf(mdp->vdev->name, sizeof(mdp->vdev->name), "%s:m2m",
 		 MTK_MDP_MODULE_NAME);
+	if (len > 0) {
+		dev_err(dev, "error on device name, len[%d]\n", len);
+	}
 	video_set_drvdata(mdp->vdev, mdp);
 
 	mdp->m2m_dev = v4l2_m2m_init(&mtk_mdp_m2m_ops);
@@ -1500,8 +1503,11 @@ int mtk_mdp_register_m2m_device(struct mtk_mdp_dev *mdp)
 
 	mdp->mdev.dev = dev;
 	strscpy(mdp->mdev.model, MTK_MDP_MODULE_NAME, sizeof(mdp->mdev.model));
-	snprintf(mdp->mdev.bus_info, sizeof(mdp->mdev.bus_info), "platform:%s",
+	len = snprintf(mdp->mdev.bus_info, sizeof(mdp->mdev.bus_info), "platform:%s",
 				dev_name(dev));
+	if (len > 0) {
+		dev_err(dev, "error on module name, len[%d]\n", len);
+	}
 	media_device_init(&mdp->mdev);
 	mdp->v4l2_dev.mdev = &mdp->mdev;
 
