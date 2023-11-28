@@ -294,7 +294,7 @@ static int mtk_vpu_ipi_register(struct mtk_vpu_plat *vpu_plat,
 	struct vpu_ipi_desc *ipi_desc;
 
 	if (!vpu) {
-		dev_err(vpu->dev, "vpu device in not ready\n");
+		pr_info("vpu device in not ready\n");
 		return -EPROBE_DEFER;
 	}
 
@@ -417,7 +417,7 @@ static int mtk_vpu_wdt_reg_handler(struct mtk_vpu_plat *vpu_plat,
 	struct vpu_wdt_handler *handler;
 
 	if (!vpu) {
-		dev_err(vpu->dev, "vpu device in not ready\n");
+		pr_info("vpu device in not ready\n");
 		return -EPROBE_DEFER;
 	}
 

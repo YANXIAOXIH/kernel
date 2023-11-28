@@ -508,7 +508,7 @@ int vcu_ipi_register(struct mtk_vpu_plat *vpu,
 	enum ipi_id id = ipi_vpu_id_fixup(vpu_id);
 
 	if (vcu == NULL) {
-		dev_err(vcu->dev, "vcu device in not ready\n");
+		pr_info("vcu device in not ready\n");
 		return -EPROBE_DEFER;
 	}
 
@@ -793,10 +793,13 @@ static int mtk_vcu_open(struct inode *inode, struct file *file)
 	vcu_mtkdev[vcuid]->vcuid = vcuid;
 
 	vcu_queue = mtk_vcu_dec_init(vcu_mtkdev[vcuid]->dev);
-	vcu_queue->vcu = vcu_mtkdev[vcuid];
-	file->private_data = vcu_queue;
-
-	return 0;
+	if (vcu_queue) {
+		vcu_queue->vcu = vcu_mtkdev[vcuid];
+		file->private_data = vcu_queue;
+		return 0;
+	} else {
+		return -ENOMEM;
+	}
 }
 
 static int mtk_vcu_release(struct inode *inode, struct file *file)
