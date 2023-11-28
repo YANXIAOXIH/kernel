@@ -124,6 +124,10 @@ static int vdec_init(struct mtk_vcodec_ctx *ctx, unsigned long *h_vdec)
 	}
 
 	inst->vcu.dev = vpu_get_plat_device(ctx->dev->plat_dev);
+	if (inst->vcu.dev == NULL) {
+		err = -ENODEV;
+		goto error_free_inst;
+	}
 	inst->vcu.ctx = ctx;
 	inst->vcu.handler = vcu_dec_ipi_handler;
 

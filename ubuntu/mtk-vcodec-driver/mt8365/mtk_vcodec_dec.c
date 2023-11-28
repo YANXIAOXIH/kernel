@@ -867,6 +867,10 @@ static int vidioc_try_fmt_vid_cap_mplane(struct file *file, void *priv,
 	if (!fmt) {
 		f->fmt.pix.pixelformat = mtk_video_formats[CAP_FMT_IDX].fourcc;
 		fmt = mtk_vdec_find_format(f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 
 	return vidioc_try_fmt(f, fmt);
@@ -882,6 +886,10 @@ static int vidioc_try_fmt_vid_out_mplane(struct file *file, void *priv,
 	if (!fmt) {
 		f->fmt.pix.pixelformat = mtk_video_formats[OUT_FMT_IDX].fourcc;
 		fmt = mtk_vdec_find_format(f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 
 	if (pix_fmt_mp->plane_fmt[0].sizeimage == 0) {
@@ -1010,6 +1018,10 @@ static int vidioc_vdec_s_fmt_out(struct file *file, void *priv,
 		f->fmt.pix.pixelformat =
 			mtk_video_formats[OUT_FMT_IDX].fourcc;
 		fmt = mtk_vdec_find_format(f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 
 	q_data->fmt = fmt;
@@ -1086,6 +1098,10 @@ static int vidioc_vdec_s_fmt_cap(struct file *file, void *priv,
 		f->fmt.pix.pixelformat =
 			mtk_video_formats[CAP_FMT_IDX].fourcc;
 		fmt = mtk_vdec_find_format(f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 
 	/* use OUTPUT's dimensions */

@@ -580,6 +580,10 @@ static int vidioc_venc_s_fmt_cap(struct file *file, void *priv,
 	if (!fmt) {
 		f->fmt.pix.pixelformat = ctx->cap_fmt_default->fourcc;
 		fmt = mtk_venc_find_format(ctx, f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 	mtk_v4l2_debug(2,"vidioc_venc_s_fmt_cap fmt->num_planes is %d \n",fmt->num_planes);
 	mtk_v4l2_debug(2,"vidioc_venc_s_fmt_cap fmt->fourcc is %c%c%c%c\n",
@@ -645,6 +649,10 @@ static int vidioc_venc_s_fmt_out(struct file *file, void *priv,
 	if (!fmt) {
 		f->fmt.pix.pixelformat = ctx->out_fmt_default->fourcc;
 		fmt = mtk_venc_find_format(ctx, f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 	mtk_v4l2_debug(2,"vidioc_venc_s_fmt_out fmt->num_planes is %d \n",fmt->num_planes);
 	mtk_v4l2_debug(2,"vidioc_venc_s_fmt_out fmt->fourcc is %d\n",fmt->fourcc);
@@ -726,6 +734,10 @@ static int vidioc_try_fmt_vid_cap_mplane(struct file *file, void *priv,
 	if (!fmt) {
 		f->fmt.pix.pixelformat = ctx->cap_fmt_default->fourcc;
 		fmt = mtk_venc_find_format(ctx, f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 	f->fmt.pix_mp.colorspace = ctx->colorspace;
 	f->fmt.pix_mp.ycbcr_enc = ctx->ycbcr_enc;
@@ -745,6 +757,10 @@ static int vidioc_try_fmt_vid_out_mplane(struct file *file, void *priv,
 	if (!fmt) {
 		f->fmt.pix.pixelformat = ctx->out_fmt_default->fourcc;
 		fmt = mtk_venc_find_format(ctx, f);
+		if (!fmt) {
+			mtk_v4l2_err("fail to find format");
+			return -EINVAL;
+		}
 	}
 	if (!f->fmt.pix_mp.colorspace) {
 		f->fmt.pix_mp.colorspace = V4L2_COLORSPACE_REC709;
