@@ -342,8 +342,12 @@ static const struct v4l2_dv_timings_cap it6510_timings_cap = {
 
 
 
-#define dprx_msg(...) dev_err(&it6510->dp_i2c->dev, ## __VA_ARGS__)
-#define mipi_msg(...) dev_err(&it6510->mipi_i2c->dev, ## __VA_ARGS__)
+#define dprx_msg_err(...) dev_err(&it6510->dp_i2c->dev, ## __VA_ARGS__)
+#define mipi_msg_err(...) dev_err(&it6510->mipi_i2c->dev, ## __VA_ARGS__)
+#define dprx_msg_info(...) dev_info(&it6510->dp_i2c->dev, ## __VA_ARGS__)
+#define mipi_msg_info(...) dev_info(&it6510->mipi_i2c->dev, ## __VA_ARGS__)
+#define dprx_msg_dbg(...) dev_dbg(&it6510->dp_i2c->dev, ## __VA_ARGS__)
+#define mipi_msg_dbg(...) dev_dbg(&it6510->mipi_i2c->dev, ## __VA_ARGS__)
 
 static void dprx_link_status_change(struct it6510 *it6510, u8 status);
 static void dprx_config_color_transfer(struct it6510 *it6510, struct color_format* video_in);
@@ -621,13 +625,13 @@ static void mipi_csi_initial(struct it6510 *it6510)
 	//mipiset(mipi, 0xa9, 0xFF, 0x70);
 
 
-	mipi_msg("%s\n", __func__);
-	mipi_msg("csi lan_num %d\n", it6510->csi.lane_cnt);
-	mipi_msg("csi swap_pn %d\n", csi_para->swap_pn);
-	mipi_msg("csi swap_lan  %d\n", csi_para->swap_lan);
-	mipi_msg("csi pclk_inv %d\n", csi_para->pclk_inv);
-	mipi_msg("csi mclk_inv %d\n", csi_para->mclk_inv);
-	mipi_msg("csi lpx_num %d\n", csi_para->lpx_num);
+	mipi_msg_info("%s\n", __func__);
+	mipi_msg_dbg("csi lan_num %d\n", it6510->csi.lane_cnt);
+	mipi_msg_dbg("csi swap_pn %d\n", csi_para->swap_pn);
+	mipi_msg_dbg("csi swap_lan  %d\n", csi_para->swap_lan);
+	mipi_msg_dbg("csi pclk_inv %d\n", csi_para->pclk_inv);
+	mipi_msg_dbg("csi mclk_inv %d\n", csi_para->mclk_inv);
+	mipi_msg_dbg("csi lpx_num %d\n", csi_para->lpx_num);
 
 }
 
@@ -641,12 +645,12 @@ static int csi_get_bus_para(struct it6510 *it6510)
 			it6510_csi_bus_cfg[i].type == csi->data_type){
 			
 			csi->bus.cfg = it6510_csi_bus_cfg[i];
-			mipi_msg("csi_get_bus_para = %d \n", i);
+			mipi_msg_dbg("csi_get_bus_para = %d \n", i);
 			return 0;
 		}
 	}
 	
-	mipi_msg("csi_get_bus_para() err \n");
+	mipi_msg_err("csi_get_bus_para() err \n");
 	return -1;
 }
 
@@ -702,20 +706,20 @@ __maybe_unused static void mipitx_setup_patternGen(struct it6510 *it6510)
 
 	dprxchgbank(dp, 0);
 
-	mipi_msg("mipitx_setup_patternGen()!\n");
-	mipi_msg("htotal = %d\n", htotal);
-	mipi_msg("hdew = %d\n", hdew);
-	mipi_msg("hdes = %d\n", hdes);
-	mipi_msg("hfph = %d\n", hfph);
-	mipi_msg("hsyncw = %d\n", hsyncw);
-	mipi_msg("hsyncpol = %d\n",hsyncpol);
-	mipi_msg("vtotal = %d\n", vtotal);
-	mipi_msg("vdes = %d\n", vdes);
-	mipi_msg("vdew = %d\n", vdew);
-	mipi_msg("vfph = %d\n", vfph);
-	mipi_msg("vsyncw = %d\n", vsyncw);
-	mipi_msg("vsyncpol = %d\n", vsyncpol);
-	mipi_msg("interlaced mode = %d\n", interlace);
+	mipi_msg_info("mipitx_setup_patternGen()!\n");
+	mipi_msg_dbg("htotal = %d\n", htotal);
+	mipi_msg_dbg("hdew = %d\n", hdew);
+	mipi_msg_dbg("hdes = %d\n", hdes);
+	mipi_msg_dbg("hfph = %d\n", hfph);
+	mipi_msg_dbg("hsyncw = %d\n", hsyncw);
+	mipi_msg_dbg("hsyncpol = %d\n",hsyncpol);
+	mipi_msg_dbg("vtotal = %d\n", vtotal);
+	mipi_msg_dbg("vdes = %d\n", vdes);
+	mipi_msg_dbg("vdew = %d\n", vdew);
+	mipi_msg_dbg("vfph = %d\n", vfph);
+	mipi_msg_dbg("vsyncw = %d\n", vsyncw);
+	mipi_msg_dbg("vsyncpol = %d\n", vsyncpol);
+	mipi_msg_dbg("interlaced mode = %d\n", interlace);
 
     mipiset(mipi,0x90, 0x02, hsyncpol<<1);//hpol
     mipiset(mipi,0x90, 0x04, vsyncpol<<2);//vpol
@@ -804,7 +808,7 @@ static void mipitx_setup_csi(struct it6510 *it6510)
 	
 	pixelclock_mhz = dprx_get_pclk(it6510);
 
-	mipi_msg("pixelclock_mhz = %u\n", pixelclock_mhz);
+	mipi_msg_dbg("pixelclock_mhz = %u\n", pixelclock_mhz);
 	
 	if (pixelclock_mhz <= 0)
 		return;
@@ -812,8 +816,8 @@ static void mipitx_setup_csi(struct it6510 *it6510)
 	if (csi_get_bus_para(it6510) != 0)
 		return;
 
-	mipi_msg("it6510_csi_update_bus_para\n");
-	mipi_msg("{%X, %X, %X, %X, %X, %X ,%X}\n",
+	mipi_msg_info("it6510_csi_update_bus_para\n");
+	mipi_msg_dbg("{%X, %X, %X, %X, %X, %X ,%X}\n",
 		csi_cfg->lane,
 		csi_cfg->type,
 		csi_cfg->reg23_p2m,
@@ -822,7 +826,7 @@ static void mipitx_setup_csi(struct it6510 *it6510)
 		csi_cfg->regb0_div[1],
 		csi_cfg->regb0_div[2]);
 
-	//mipi_msg("pixelclock_mhz = %u\n", pixelclock_mhz);
+	//mipi_msg_dbg("pixelclock_mhz = %u\n", pixelclock_mhz);
 
 
 	if (pixelclock_mhz > 200)
@@ -845,14 +849,14 @@ static void mipitx_setup_csi(struct it6510 *it6510)
 	//mpre_div = over_write_mpredivider();
 	//mpll_div = over_write_mdivider();
 
-	mipi_msg("mpdiv_sel %d, mpre_div %d mpll_div %d\n",
+	mipi_msg_dbg("mpdiv_sel %d, mpre_div %d mpll_div %d\n",
 			mpdiv_sel, mpre_div, mpll_div);
 
 	if (pixelclock_mhz < 10 * mpre_div ||
 		pixelclock_mhz > 100 * mpre_div) {
 
-		mipi_msg("MPTX PHY setting wrong !!!\n");
-		mipi_msg("Need to reset parameter for TXPHY !!!\n");
+		mipi_msg_err("MPTX PHY setting wrong !!!\n");
+		mipi_msg_err("Need to reset parameter for TXPHY !!!\n");
 	}
 
 
@@ -889,7 +893,7 @@ static void mipitx_setup_csi(struct it6510 *it6510)
 	
 	#endif
 		
-	mipi_msg("mipiclock_ns %d, mipi_ui %d, mipiclock_mhz %d pixelclock_mhz %d\n",
+	mipi_msg_dbg("mipiclock_ns %d, mipi_ui %d, mipiclock_mhz %d pixelclock_mhz %d\n",
 			mipiclock_ns, mipi_ui, mipiclock_mhz, pixelclock_mhz);
 
 	#if 0
@@ -910,13 +914,13 @@ static void mipitx_setup_csi(struct it6510 *it6510)
 	
 	regb0 = ((mpre_div - 1) << 5) | ((mpll_div - 1) & 0x1F);
 	
-	mipi_msg("en_fsfrnum = %d !!!\n", en_fsfrnum);
-	mipi_msg("reg_hs_prepare_zero %X(%d)\n", reg_hs_prepare_zero, reg_hs_prepare_zero);
-	mipi_msg("reg_hs_trail %X(%d)\n", reg_hs_trail, reg_hs_trail);
+	mipi_msg_dbg("en_fsfrnum = %d !!!\n", en_fsfrnum);
+	mipi_msg_dbg("reg_hs_prepare_zero %X(%d)\n", reg_hs_prepare_zero, reg_hs_prepare_zero);
+	mipi_msg_dbg("reg_hs_trail %X(%d)\n", reg_hs_trail, reg_hs_trail);
 	
-	mipi_msg("reg23 = %X !!!\n", csi_cfg->reg23_p2m);
-	mipi_msg("reg25 = %X !!!\n", csi_cfg->reg25_p2mdly);
-	mipi_msg("regb0 = %X !!!\n", regb0);
+	mipi_msg_dbg("reg23 = %X !!!\n", csi_cfg->reg23_p2m);
+	mipi_msg_dbg("reg25 = %X !!!\n", csi_cfg->reg25_p2mdly);
+	mipi_msg_dbg("regb0 = %X !!!\n", regb0);
 	
 	mipi_write(mipi, 0x1F, reg_hs_trail);
 	mipi_write(mipi, 0x20, csi_cfg->type);
@@ -952,24 +956,24 @@ static void mipitx_irq(struct it6510 *it6510)
 	reg0ah = mipi_read(mipi, 0x0A);
 	reg0bh = mipi_read(mipi, 0x0B);
 
-	// mipi_msg("reg09h = %x\n", reg09h);
-	// mipi_msg("reg0ah = %x\n", reg0ah);
-	// mipi_msg("reg0bh = %x\n", reg0bh);
+	// mipi_msg_dbg("reg09h = %x\n", reg09h);
+	// mipi_msg_dbg("reg0ah = %x\n", reg0ah);
+	// mipi_msg_dbg("reg0bh = %x\n", reg0bh);
 
 	if(reg0bh & 0x10) {
-		mipi_msg("mipi tx VidStb Change ...\n");
-		mipi_msg("mipi video status = %d", reg09h & 0x40 );
+		mipi_msg_dbg("mipi tx VidStb Change ...\n");
+		mipi_msg_dbg("mipi video status = %d", reg09h & 0x40 );
 		mipi_write(mipi, 0x0B, 0x10);
 	}
 
 	if (reg0ah & 0x70) {
 
 		if(reg0ah & 0x20)
-			mipi_msg("Mipi Byte mismatch Err!!! \n");
+			mipi_msg_err("Mipi Byte mismatch Err!!! \n");
 
 
 		if(reg0ah & 0x40)
-			mipi_msg("mipi P2M FIFO Err!!! \n");
+			mipi_msg_err("mipi P2M FIFO Err!!! \n");
 
 		mipi_write(mipi, 0x0A, reg0ah & 0x70);
 	}
@@ -1025,7 +1029,7 @@ static int it6510_read_ids(struct it6510 *it6510)
 		return ret;
 	}
 
-	dev_err(dev, "dp:%02X%02X%02X%02X%02X\n",
+	dev_info(dev, "dp:%02X%02X%02X%02X%02X\n",
 			dp_id[0],dp_id[1],dp_id[2],dp_id[3],dp_id[4]);
 
 	return 0;
@@ -1084,28 +1088,28 @@ static void it6510_debug_caof(struct it6510 *it6510)
 	l3_caof_d = ((reg73f & 0x7c) >> 2);
 
 	//DPRX_DEBUG_CAOF(("CAOF FLAG   = %02X \n", reg11));
-	dprx_msg("CAOF STATUS = %02X   %X\n", reg771, reg770);
-	dprx_msg("\n");
-	dprx_msg("ENCAOF/ENSOF =%02X \n", reg717);
-	dprx_msg("ENCAOF/ENSOF =%02X \n", reg717);
-	dprx_msg("ENCAOF/ENSOF =%02X \n", reg717);
-	dprx_msg("\n");
-	dprx_msg("L0_CAOF_A   = %02X\n", l0_caof_a);
-	dprx_msg("L0_CAOF_B   = %02X\n", l0_caof_b);
-	dprx_msg("L0_CAOF_C   = %02X\n", l0_caof_c);
-	dprx_msg("L0_CAOF_D   = %02X\n", l0_caof_d);
-	dprx_msg("L1_CAOF_A   = %02X\n", l1_caof_a);
-	dprx_msg("L1_CAOF_B   = %02X\n", l1_caof_b);
-	dprx_msg("L1_CAOF_C   = %02X\n", l1_caof_c);
-	dprx_msg("L1_CAOF_D   = %02X\n", l1_caof_d);
-	dprx_msg("L2_CAOF_A   = %02X\n", l2_caof_a);
-	dprx_msg("L2_CAOF_B   = %02X\n", l2_caof_b);
-	dprx_msg("L2_CAOF_C   = %02X\n", l2_caof_c);
-	dprx_msg("L2_CAOF_D   = %02X\n", l2_caof_d);
-	dprx_msg("L3_CAOF_A   = %02X\n", l3_caof_a);
-	dprx_msg("L3_CAOF_B   = %02X\n", l3_caof_b);
-	dprx_msg("L3_CAOF_C   = %02X\n", l3_caof_c);
-	dprx_msg("L3_CAOF_D   = %02X\n", l3_caof_d);
+	dprx_msg_dbg("CAOF STATUS = %02X   %X\n", reg771, reg770);
+	dprx_msg_dbg("\n");
+	dprx_msg_dbg("ENCAOF/ENSOF =%02X \n", reg717);
+	dprx_msg_dbg("ENCAOF/ENSOF =%02X \n", reg717);
+	dprx_msg_dbg("ENCAOF/ENSOF =%02X \n", reg717);
+	dprx_msg_dbg("\n");
+	dprx_msg_dbg("L0_CAOF_A   = %02X\n", l0_caof_a);
+	dprx_msg_dbg("L0_CAOF_B   = %02X\n", l0_caof_b);
+	dprx_msg_dbg("L0_CAOF_C   = %02X\n", l0_caof_c);
+	dprx_msg_dbg("L0_CAOF_D   = %02X\n", l0_caof_d);
+	dprx_msg_dbg("L1_CAOF_A   = %02X\n", l1_caof_a);
+	dprx_msg_dbg("L1_CAOF_B   = %02X\n", l1_caof_b);
+	dprx_msg_dbg("L1_CAOF_C   = %02X\n", l1_caof_c);
+	dprx_msg_dbg("L1_CAOF_D   = %02X\n", l1_caof_d);
+	dprx_msg_dbg("L2_CAOF_A   = %02X\n", l2_caof_a);
+	dprx_msg_dbg("L2_CAOF_B   = %02X\n", l2_caof_b);
+	dprx_msg_dbg("L2_CAOF_C   = %02X\n", l2_caof_c);
+	dprx_msg_dbg("L2_CAOF_D   = %02X\n", l2_caof_d);
+	dprx_msg_dbg("L3_CAOF_A   = %02X\n", l3_caof_a);
+	dprx_msg_dbg("L3_CAOF_B   = %02X\n", l3_caof_b);
+	dprx_msg_dbg("L3_CAOF_C   = %02X\n", l3_caof_c);
+	dprx_msg_dbg("L3_CAOF_D   = %02X\n", l3_caof_d);
 
 }
 
@@ -1132,7 +1136,7 @@ static int dprx_caof(struct it6510 *it6510)
 	dprxset(dp, 0x11, 0xc0, 0xc0);
 	reg11 = dprx_read(dp, 0x11);
 	
-	dprx_msg("CAOF FLAG INIT  = %02X\n", reg11);
+	dprx_msg_info("CAOF FLAG INIT  = %02X\n", reg11);
 
 	dprxchgbank(dp, 7);
 
@@ -1144,7 +1148,7 @@ static int dprx_caof(struct it6510 *it6510)
 	reg770 = dprx_read(dp, 0x70);
 	reg771 = dprx_read(dp, 0x71);
 
-	dprx_msg("CAOF STATUS = %02X %02X\n", reg771, reg770);
+	dprx_msg_dbg("CAOF STATUS = %02X %02X\n", reg771, reg770);
 
 	delay1ms(1);
 	dprxset(dp, 0x31, 0x08, 0x08);
@@ -1153,15 +1157,15 @@ static int dprx_caof(struct it6510 *it6510)
 	dprxchgbank(dp, 0);
 	reg11 = (dprx_read(dp, 0x11)&0x40);
 
-	dprx_msg("reg11 = %x \n", reg11);
+	dprx_msg_dbg("reg11 = %x \n", reg11);
 
 	wait_cnt = 0;
 	retry_cnt = 0;
 	caof_done = false;
 
 	do {
-		dprx_msg("Wait for CAOF done\n");
-		dprx_msg("wait_cnt=%d, retry_cnt=%d \n",
+		dprx_msg_info("Wait for CAOF done\n");
+		dprx_msg_dbg("wait_cnt=%d, retry_cnt=%d \n",
 				wait_cnt, retry_cnt);
 
 		delay1ms(1);
@@ -1183,7 +1187,7 @@ static int dprx_caof(struct it6510 *it6510)
 
 		if (reg11 == 0x40){
 			caof_done = true;
-			dprx_msg("CAOF Finish !! \n");
+			dprx_msg_info("CAOF Finish !! \n");
 		}
 
 	}while ((reg11 != 0x40) && (retry_cnt <= 3));
@@ -1193,7 +1197,7 @@ static int dprx_caof(struct it6510 *it6510)
 	dprxchgbank(dp, 7);
 
 	if (caof_done == false) {
-		dprx_msg("CAOF FAIL !!\n");
+		dprx_msg_err("CAOF FAIL !!\n");
 		dprxset(dp, 0x31, 0x28, 0x00);
 		dprxset(dp, 0x31, 0x28, 0x20);
 		delay1ms(1);
@@ -1491,7 +1495,7 @@ static  void dprx_config_hdcp(struct it6510 *it6510)
 
 	u8 hdcp_rx_cap[3] = {0x00,0x00,0x00};
 
-	dprx_msg("dprx_config_hdcp(%X,%X)\n",dprx->support_hdcp,dprx->support_hdcp2);
+	dprx_msg_info("dprx_config_hdcp(%X,%X)\n",dprx->support_hdcp,dprx->support_hdcp2);
 	
 	dprxchgbank(dp,5);
 
@@ -1514,7 +1518,7 @@ static  void dprx_config_hdcp(struct it6510 *it6510)
 
 		dprxset(dp, 0x10, 0x08, 0x08);
 
-		dprx_msg("FWRxCap=%X%X%X\n",hdcp_rx_cap[0],hdcp_rx_cap[1],hdcp_rx_cap[2]);
+		dprx_msg_dbg("FWRxCap=%X%X%X\n",hdcp_rx_cap[0],hdcp_rx_cap[1],hdcp_rx_cap[2]);
 
 		dprx_write(dp, 0x57, 0x04);
 		dprx_write(dp, 0x58, hdcp_rx_cap[0]);
@@ -1571,7 +1575,7 @@ static int dprx_get_hdcp_status(struct it6510 *it6510)
 	hdcp2_status = (dprx_read(dp, 0x67) & 0x0B) == 0x0B ? true : false;
 	dprxchgbank(dp, 0);
 		
-	dprx_msg("dprx_get_hdcp_status %X, %X\n", hdpc_status, hdcp2_status);
+	dprx_msg_dbg("dprx_get_hdcp_status %X, %X\n", hdpc_status, hdcp2_status);
 	
 	if (hdcp2_status == true)
 		hdcp_detect = 2;
@@ -1701,8 +1705,8 @@ static unsigned char dprx_is_audio_fs_error(struct it6510 *it6510)
 
 		dprxchgbank(dp, 6);
 
-		//dprx_msg("audio M=%X%X%X,  \n", dprx_read(dp,0x59), dprx_read(dp,0x58), dprx_read(dp,0x57) );
-		//dprx_msg("audio N=%X%X%X,  \n", dprx_read(dp,0x5C), dprx_read(dp,0x5B), dprx_read(dp,0x5A) );
+		//dprx_msg_dbg("audio M=%X%X%X,  \n", dprx_read(dp,0x59), dprx_read(dp,0x58), dprx_read(dp,0x57) );
+		//dprx_msg_dbg("audio N=%X%X%X,  \n", dprx_read(dp,0x5C), dprx_read(dp,0x5B), dprx_read(dp,0x5A) );
 
 		M_aud = (unsigned long) dprx_read(dp, 0x59);
 		M_aud <<= 8;
@@ -1720,7 +1724,7 @@ static unsigned char dprx_is_audio_fs_error(struct it6510 *it6510)
 
 		dprxchgbank(dp, 0);
 
-		dprx_msg("audio M=%lu, N=%lu, fs=%X \n", M_aud,  N_aud, fs);
+		dprx_msg_dbg("audio M=%lu, N=%lu, fs=%X \n", M_aud,  N_aud, fs);
 
 		LS_rck *= M_aud;
 		LS_rck /= N_aud;
@@ -1728,8 +1732,8 @@ static unsigned char dprx_is_audio_fs_error(struct it6510 *it6510)
 		dprx->guess_fs = dprx_guess_fs((unsigned int)LS_rck);
 
 		if (dprx->guess_fs != uc) {
-			dprx_msg("audio M=%lu, N=%lu, LS_rck=%lu \n", M_aud,  N_aud, LS_rck);
-			dprx_msg("fs guess = %X (%X) \n",dprx->guess_fs, fs);
+			dprx_msg_dbg("audio M=%lu, N=%lu, LS_rck=%lu \n", M_aud,  N_aud, LS_rck);
+			dprx_msg_dbg("fs guess = %X (%X) \n",dprx->guess_fs, fs);
 			return true;
 		}
 	}
@@ -1745,7 +1749,7 @@ static void dprx_audio_force_fs(struct it6510 *it6510, unsigned char ena)
 
     dprxchgbank(dp, 6);
 
-    //dprx_msg("dprx_audio_force_fs(%X,%X)\n", ena, dprx->guess_fs);
+    //dprx_msg_info("dprx_audio_force_fs(%X,%X)\n", ena, dprx->guess_fs);
 
 	dprxset(dp, 0x35, 0x3F, dprx->guess_fs);
 
@@ -1771,7 +1775,7 @@ static bool dprx_check_hbr_audio(struct it6510 *it6510)
 	coding_type = dprx_read(dp, 0x71) >> 3;
 	dprxchgbank(dp, 0);
 
-	dprx_msg("Audio codinfg type %x\n", coding_type);
+	dprx_msg_info("Audio codinfg type %x\n", coding_type);
 	return coding_type == AUD_HBR ? true : false;
 
 }
@@ -1812,7 +1816,7 @@ static void dprx_audio_check(struct it6510 *it6510)
 
 	audstable = dprx_read(dp, 0x22) & 0x02 ? true : false;
 
-	dprx_msg("LSAudioMute=%X, audstable=%X,\n",
+	dprx_msg_dbg("LSAudioMute=%X, audstable=%X,\n",
 			ls_audio_mute, audstable);
 	
 	if (ls_audio_mute == true || audstable == false) {
@@ -1844,7 +1848,7 @@ static void dprx_delayed_audio_work(struct work_struct *work)
 		
     mutex_lock(&it6510->lock);
     it6510->audio_wait = false;
-    dprx_msg("dprx_delayed_audio_work...\n");
+    dprx_msg_info("dprx_delayed_audio_work...\n");
     dprx_audio_check(it6510);
     mutex_unlock(&it6510->lock);
 }
@@ -1858,7 +1862,7 @@ static void dprx_irq_audio_change(struct it6510 *it6510)
 	//u8 ls_audio_mute = true;
 
     if (it6510->audio_wait == true) {
-	dprx_msg("it6510->audio_wait=%X...\n", it6510->audio_wait);
+	dprx_msg_dbg("it6510->audio_wait=%X...\n", it6510->audio_wait);
 	return;
     }
 
@@ -1880,7 +1884,7 @@ static void dprx_enable_audio(struct it6510 *it6510, u8 enable)
 	struct regmap *dp = it6510->dp_regmap;
 	//struct dprx_data *dprx = &it6510->dprx;
 	
-	dprx_msg("dprx_enable_audio(%X)\n", enable);
+	dprx_msg_dbg("dprx_enable_audio(%X)\n", enable);
 
 	if (enable == true) {
 		dprx_write(dp, 0x07, 0x6C);
@@ -2048,7 +2052,7 @@ static void dprx_reset_video(struct it6510 *it6510)
 	//struct regmap *dp = it6510->dp_regmap;
 	struct dprx_data *dprx = &it6510->dprx;
 	
-	dprx_msg("DPRX Video Reset !!\n");
+	dprx_msg_dbg("DPRX Video Reset !!\n");
 
 	dprx_vid_fiforst(it6510);
 
@@ -2076,7 +2080,7 @@ static void dprx_video_check(struct it6510 *it6510)
 
 	vidstable = dprx_read(dp, 0x22) & 0x01 ? true : false;
 
-	dprx_msg("LSNoVidstream = %X, vidstable = %X\n",
+	dprx_msg_dbg("LSNoVidstream = %X, vidstable = %X\n",
 				ls_no_vidstream, vidstable);
 
 	if (vidstable != true) {
@@ -2102,7 +2106,7 @@ static void dprx_enable_video(struct it6510 *it6510, u8 enable)
 	struct regmap *dp = it6510->dp_regmap;
 	//struct dprx_data *dprx = &it6510->dprx;
 
-	dprx_msg("dprx_enable_video(%X)\n", enable);
+	dprx_msg_dbg("dprx_enable_video(%X)\n", enable);
 	
 	if (enable == true) {
 		dprx_write(dp, 0x07, 0x13);
@@ -2264,13 +2268,13 @@ static void dprx_config_color_transfer(struct it6510 *it6510,
 	
 
 	//if (debug == 3) {
-		dprx_msg("%s\n",  __func__);
-		dprx_msg(" in color mode = %X\n", video_in->color_mode);
-		dprx_msg("out color mode = %X\n", video_out->color_mode);
-		dprx_msg("reg_310 = %X\n", dprx_read(dp, 0x10));
-		dprx_msg("reg_311 = %X\n", dprx_read(dp, 0x11));
-		dprx_msg("reg_327 = %X\n", dprx_read(dp, 0x27));
-		dprx_msg("reg_328 = %X\n", dprx_read(dp, 0x28));
+		dprx_msg_dbg("%s\n",  __func__);
+		dprx_msg_dbg(" in color mode = %X\n", video_in->color_mode);
+		dprx_msg_dbg("out color mode = %X\n", video_out->color_mode);
+		dprx_msg_dbg("reg_310 = %X\n", dprx_read(dp, 0x10));
+		dprx_msg_dbg("reg_311 = %X\n", dprx_read(dp, 0x11));
+		dprx_msg_dbg("reg_327 = %X\n", dprx_read(dp, 0x27));
+		dprx_msg_dbg("reg_328 = %X\n", dprx_read(dp, 0x28));
 	//}
 
 
@@ -2325,7 +2329,7 @@ static void dprx_irq_data_status_change(struct it6510 *it6510)
 	//}
 	
 	if (reg08 & 0x07) {
-		dprx_msg("AUX Receive Error Interrupt(%X) ...\n",
+		dprx_msg_err("AUX Receive Error Interrupt(%X) ...\n",
 							reg08 & 0x07);
 	}
 
@@ -2336,18 +2340,18 @@ static void dprx_irq_data_status_change(struct it6510 *it6510)
 
 
 		if (reg07 & 0x0C) {
-			dprx_msg("Audio FIFO Error Interrupt (%X)...\n",
+			dprx_msg_err("Audio FIFO Error Interrupt (%X)...\n",
 							reg07 & 0x0C);
 		}
 
 		//DPRX_DEBUG_AUDIO(("DPRX Audio Irq:\n"));
 		if (reg2c & 0xBC) {
-			dprx_msg("Audio status change Interrupt(%X) ...\n",
+			dprx_msg_dbg("Audio status change Interrupt(%X) ...\n",
 								reg2c & 0xBC);
 
 		}
 		if (reg08 & 0xC0) {
-			dprx_msg("Audio Mute Start/end (%X/%X)\n",
+			dprx_msg_dbg("Audio Mute Start/end (%X/%X)\n",
 					(reg08 & 0x40) >> 6, reg08 & 0x80 >> 7);
 		}
 
@@ -2355,7 +2359,7 @@ static void dprx_irq_data_status_change(struct it6510 *it6510)
         dprx_irq_audio_change(it6510);
 
 		if (reg08 & 0x08) {
-			dprx_msg("Auto Audio Mute\n");
+			dprx_msg_dbg("Auto Audio Mute\n");
 			if(dprx->audio_stable == true)
 				dprx_aud_mute_clr(it6510, true);
 		}
@@ -2376,24 +2380,24 @@ static void dprx_irq_data_status_change(struct it6510 *it6510)
 	if (reg2c & 0x40 || reg08 & 0x30 || reg0c & 0x20 || reg07 & 0x03) {
 
 	if (reg07 & 0x03) {
-		dprx_msg("video FIFO Error Interrupt (%X)...\n",
+		dprx_msg_err("video FIFO Error Interrupt (%X)...\n",
 						reg07 & 0x03);
 	}	
 
 		if (reg2c & 0x40) {
-			dprx_msg("video status change Interrupt ...\n");
+			dprx_msg_dbg("video status change Interrupt ...\n");
 		}
 
 		if (reg08 & 0x10) {
-			dprx_msg("Video Mute Start Interrupt ...\n");
+			dprx_msg_dbg("Video Mute Start Interrupt ...\n");
 		}        
 	
 		if (reg08 & 0x20) {
-			dprx_msg("Video Mute End Interrupt ...\n");
+			dprx_msg_dbg("Video Mute End Interrupt ...\n");
 		}
 
 		if (reg0c & 0x20) {
-			dprx_msg("New Video Format Interrupt ...\n");
+			dprx_msg_dbg("New Video Format Interrupt ...\n");
 
 		}
 
@@ -2408,26 +2412,26 @@ static void dprx_irq_data_status_change(struct it6510 *it6510)
 
 
 	if (reg0c & 0x40) {
-		dprx_msg("New VSC Interrupt ...\n");
+		dprx_msg_dbg("New VSC Interrupt ...\n");
 		//dprx_vsc_pkt_update();
 
 	}
 
 	if (reg0c & 0x80) {
-		dprx_msg("Gen2Pkt Interrupt ...\n");
+		dprx_msg_dbg("Gen2Pkt Interrupt ...\n");
 		//dprx_gen2record_pkt_update(true);
 		//dprx_hdr_pkt_update(true);
 	}
 
 
 	if (reg2d & 0x20) {
-		dprx_msg("NO GEN record !\n");
+		dprx_msg_dbg("NO GEN record !\n");
 		//dprx_irq_no_genpkt_record();
 
 	}
 
 	if (reg2d & 0x40) {
-		dprx_msg("NO GEN2 record !\n");
+		dprx_msg_dbg("NO GEN2 record !\n");
 		//dprx_irq_no_gen2pkt_record();
 	}
 }
@@ -2443,12 +2447,12 @@ static u8 dprx_link_symbole_lock_status(struct it6510 *it6510)
 	link_status = dprx_read(dp, 0x90);
 	dprxchgbank(dp, 1);
 	dpcd101 = dprx_read(dp, 0x11);
-	dprx_msg("dprx_link_symbole_lock_status.\n");
-	dprx_msg("link_status=%X\n", link_status);
-	dprx_msg("dpcd101=%x\n",dpcd101);
-	dprx_msg("dpcd202=%x\n",dprx_read(dp, 0x1A));
-	dprx_msg("dpcd203=%x\n",dprx_read(dp, 0x1B));
-	dprx_msg("dpcd204=%x\n",dprx_read(dp, 0x1C));
+	dprx_msg_info("dprx_link_symbole_lock_status.\n");
+	dprx_msg_dbg("link_status=%X\n", link_status);
+	dprx_msg_dbg("dpcd101=%x\n",dpcd101);
+	dprx_msg_dbg("dpcd202=%x\n",dprx_read(dp, 0x1A));
+	dprx_msg_dbg("dpcd203=%x\n",dprx_read(dp, 0x1B));
+	dprx_msg_dbg("dpcd204=%x\n",dprx_read(dp, 0x1C));
 	dprxchgbank(dp, 0);
 	
 	if ((link_status & 0x84) == 0x04) {
@@ -2486,7 +2490,7 @@ static void dprx_trigger_sareq(struct it6510 *it6510)
 	struct regmap *dp = it6510->dp_regmap;
 	u8 dpcd100, dpcd101;
 	
-	dprx_msg("dprx_trigger_sareq...\n");
+	dprx_msg_info("dprx_trigger_sareq...\n");
 	
 	dprxchgbank(dp, 1);
 	dpcd100 = dprx_read(dp, 0x10);
@@ -2590,7 +2594,7 @@ static u8 dprx_link_eq_process(struct it6510 *it6510)
 			
 		}
 		
-		dprx_msg("L[%X ]link_error_status = %x link_error_count= %x\n",
+		dprx_msg_dbg("L[%X ]link_error_status = %x link_error_count= %x\n",
 					i,link_error_status[i], link_error_count[i]);
 	}
 	
@@ -2622,7 +2626,7 @@ static void dprx_delayed_link_work(struct work_struct *work)
 		return;
 		
     mutex_lock(&it6510->lock);
-    dprx_msg("dprx_delayed_link_work...\n");
+    dprx_msg_info("dprx_delayed_link_work...\n");
  
 start_link_error_check:
     if (dprx->link_train_done == true) {
@@ -2644,7 +2648,7 @@ start_link_error_check:
 			ret = dprx_link_eq_process(it6510);
 			
 			if (ret == false) {
-				dprx_msg("check link again\n");
+				dprx_msg_err("check link again\n");
 				goto start_link_error_check;
 			}
 		}
@@ -2663,7 +2667,7 @@ static void dprx_issue_hpd_irq(struct it6510 *it6510)
 	dprx->issue_hpd_irq = false;
 
 	dprx_write(dp, 0x1F, 0x40);
-	dprx_msg("DPRX issue HPD_IRQ!\n");
+	dprx_msg_dbg("DPRX issue HPD_IRQ!\n");
 
 }
 static void dprx_irq_check_symble_unlcok(struct it6510 *it6510)
@@ -2697,7 +2701,7 @@ static void dprx_irq_check_symble_unlcok(struct it6510 *it6510)
 		unalign = false;
 	
 		if ((reg0a & 0x04) && link_sts) {
-			dprx_msg("Symbol UnAlign !!\n");
+			dprx_msg_dbg("Symbol UnAlign !!\n");
 			unalign = true;
 		}
 
@@ -2706,8 +2710,8 @@ static void dprx_irq_check_symble_unlcok(struct it6510 *it6510)
 			dprx->issue_hpd_irq = true;
 			dprx_link_status_change(it6510, false);
 			
-			dprx_msg("Symbol Unlock status : ");
-			dprx_msg("[%c][%c][%c][%c]\n", 
+			dprx_msg_dbg("Symbol Unlock status : ");
+			dprx_msg_dbg("[%c][%c][%c][%c]\n",
 				(symunlkno&0x01)?'1':'0',
 				(symunlkno&0x02)?'1':'0',
 				(symunlkno&0x04)?'1':'0',
@@ -2739,30 +2743,30 @@ static void dprx_irq_training_status_change(struct it6510 *it6510)
 	if (reg0a & 0x0B) {
 			
 		reg90 = dprx_read(dp, 0x90);
-		dprx_msg("reg0A = %X, reg90 = %X\n",reg0a ,reg90);
+		dprx_msg_dbg("reg0A = %X, reg90 = %X\n",reg0a ,reg90);
 
 		dprx->link_train_done = reg90 & 0x04 ? true : false;
 
 		dprx_link_status_change(it6510,
 				dprx->link_train_done);
 	
-		dprx_msg("dprx->link_train_done = %X\n",
+		dprx_msg_dbg("dprx->link_train_done = %X\n",
 					dprx->link_train_done);
 	}
 
 	if (reg0a & 0x01) {
-		dprx_msg("Link Training Start Interrupt!!\n");
+		dprx_msg_dbg("Link Training Start Interrupt!!\n");
 	}
 
 	if (reg0a & 0x02) {
-		dprx_msg("Link Training Done Interrupt\n");
+		dprx_msg_dbg("Link Training Done Interrupt\n");
 	}
 
 	if (reg2c & 0x01) {
-		dprx_msg("HBR2 Training Fail Interrupt !\n");
+		dprx_msg_err("HBR2 Training Fail Interrupt !\n");
 	}
 	if (reg0a & 0x08) {
-		dprx_msg("Link Training Fail Interrupt\n");
+		dprx_msg_err("Link Training Fail Interrupt\n");
 	}
 
 	dprx_irq_check_symble_unlcok(it6510);
@@ -2787,13 +2791,13 @@ static void dprx_irq(struct it6510 *it6510)
 	if ((reg2e == 0x00) && (reg2f == 0x00))
 		return;
 
-	dprx_msg("Reg2E=%X, Reg2F=%X\n", reg2e, reg2f);
+	dprx_msg_dbg("Reg2E=%X, Reg2F=%X\n", reg2e, reg2f);
 
 	if (reg2e&0x10) {
 
 		reg0b = dprx_read(dp, 0x0B);
 
-		dprx_msg("Reg0B=%X\n", reg0b);
+		dprx_msg_dbg("Reg0B=%X\n", reg0b);
 
 		dprx_write(dp, 0x0B, reg0b & 0xFC);
 
@@ -2802,10 +2806,10 @@ static void dprx_irq(struct it6510 *it6510)
 		}
 
 		if (reg0b & 0xF1) {
-			dprx_msg("dprx hdcp1.4 status irq = %x \n", reg0b&0xF1);
+			dprx_msg_dbg("dprx hdcp1.4 status irq = %x \n", reg0b&0xF1);
 			dprx_write(dp, 0x0B, reg0b&0xF1);
 			if (reg0b & 0x80) {
-				dprx_msg("HDCP 1.4 Authentication Done Interrupt ...\n");
+				dprx_msg_dbg("HDCP 1.4 Authentication Done Interrupt ...\n");
 				dprx_get_hdcp_status(it6510);
 			}
 		}
@@ -2834,11 +2838,11 @@ static void dprx_irq(struct it6510 *it6510)
 		}
 	
 		if (reg0f & 0xC0) {
-			dprx_msg("dprx hdcp2.3 status irq = %x \n", reg0f&0xC0);
+			dprx_msg_dbg("dprx hdcp2.3 status irq = %x \n", reg0f&0xC0);
 			if (reg0f & 0x80) {
-				dprx_msg("HDCP 2.3 Authentication Done Interrupt\n");
+				dprx_msg_dbg("HDCP 2.3 Authentication Done Interrupt\n");
 				dprx_get_hdcp_status(it6510);
-				dprx_msg("HDCP2 stream Type = %X\n",
+				dprx_msg_dbg("HDCP2 stream Type = %X\n",
 						dprx_get_hdcp2_stream_type(it6510));
 			}
 		}
@@ -2861,10 +2865,10 @@ static void dprx_irq(struct it6510 *it6510)
 		dprx_write(dp, 0x10,reg_tmp);
 
 		if (reg_tmp & 0x01)	
-			dprx_msg("HDCP 2.3 encription status chage\n");
+			dprx_msg_dbg("HDCP 2.3 encription status chage\n");
 
 		if (reg_tmp & 0x02)	
-			dprx_msg("HDCP 2.3 update status irq\n");
+			dprx_msg_dbg("HDCP 2.3 update status irq\n");
 			
 	}
 
@@ -2968,61 +2972,61 @@ static void dprx_show_link_info(struct it6510 *it6510)
 	dpcd206 = dprx_read(dp, 0x1E);
 	dpcd207 = dprx_read(dp, 0x1F);
 	dprxchgbank(dp, 0);
-	dprx_msg("Link Configuration: \n");
-	dprx_msg("LINK_BW_SET: %u.%u Gbps\n",(((u16)(dpcd100)*27)/100),
+	dprx_msg_dbg("Link Configuration: \n");
+	dprx_msg_dbg("LINK_BW_SET: %u.%u Gbps\n",(((u16)(dpcd100)*27)/100),
 						((((u16)(dpcd100)*27)%100)/10));
-	dprx_msg("LANE_COUNT_SET: %d Lanes\n",dpcd101&0x1F);
-	dprx_msg("Enhanced Framing Mode = %X\n", ((dpcd101&0x80)>>7));
-	dprx_msg("Scrambling = %X\n", ((dpcd102&0x20)>>5) );
-	dprx_msg("DPCD status\n");
-	dprx_msg("Lan:        [3][2][1][0]");
-	dprx_msg("Voltage Swing\n");
-	dprx_msg("Req:        [%X][%X][%X][%X]\n", (dpcd207&0x30)>>4,
+	dprx_msg_dbg("LANE_COUNT_SET: %d Lanes\n",dpcd101&0x1F);
+	dprx_msg_dbg("Enhanced Framing Mode = %X\n", ((dpcd101&0x80)>>7));
+	dprx_msg_dbg("Scrambling = %X\n", ((dpcd102&0x20)>>5) );
+	dprx_msg_dbg("DPCD status\n");
+	dprx_msg_dbg("Lan:        [3][2][1][0]");
+	dprx_msg_dbg("Voltage Swing\n");
+	dprx_msg_dbg("Req:        [%X][%X][%X][%X]\n", (dpcd207&0x30)>>4,
 						(dpcd207&0x03),
 						(dpcd206&0x30)>>4,
 						(dpcd206&0x03));
-	dprx_msg("Set:        [%X][%X][%X][%X]\n", (dpcd106&0x03),
+	dprx_msg_dbg("Set:        [%X][%X][%X][%X]\n", (dpcd106&0x03),
 						(dpcd105&0x03),
 						(dpcd104&0x03),
 						(dpcd103&0x03));
-	dprx_msg("MaxReached: [%X][%X][%X][%X]\n", (dpcd106&0x04)>>2,
+	dprx_msg_dbg("MaxReached: [%X][%X][%X][%X]\n", (dpcd106&0x04)>>2,
 						(dpcd105&0x04)>>2,
 						(dpcd104&0x04)>>2,
 						(dpcd103&0x04)>>2);
-	dprx_msg("CR Done:    [%X][%X][%X][%X]\n", (dpcd203&0x10)>>4,
+	dprx_msg_dbg("CR Done:    [%X][%X][%X][%X]\n", (dpcd203&0x10)>>4,
 						(dpcd203&0x01),
 						(dpcd202&0x10)>>4,
 						(dpcd202&0x01));
-	dprx_msg("==\n");
-	dprx_msg("Pre-Emphasis");
-	dprx_msg("Req:        [%X][%X][%X][%X]\n", (dpcd207&0xC0)>>6,
+	dprx_msg_dbg("==\n");
+	dprx_msg_dbg("Pre-Emphasis");
+	dprx_msg_dbg("Req:        [%X][%X][%X][%X]\n", (dpcd207&0xC0)>>6,
 						(dpcd207&0x0C)>>2,
 						(dpcd206&0xC0)>>6,
 						(dpcd206&0x0C)>>2);
-	dprx_msg("Set:        [%X][%X][%X][%X]\n", (dpcd106&0x18)>>3,
+	dprx_msg_dbg("Set:        [%X][%X][%X][%X]\n", (dpcd106&0x18)>>3,
 						(dpcd105&0x18)>>3,
 						(dpcd104&0x18)>>3,
 						(dpcd103&0x18)>>3);
-	dprx_msg("MaxReached: [%X][%X][%X][%X]\n", (dpcd106&0x20)>>5,
+	dprx_msg_dbg("MaxReached: [%X][%X][%X][%X]\n", (dpcd106&0x20)>>5,
 						(dpcd105&0x20)>>5,
 						(dpcd104&0x20)>>5,
 						(dpcd103&0x20)>>5);
-	dprx_msg("EQ Done:    [%X][%X][%X][%X]\n", (dpcd203&0x20)>>5,
+	dprx_msg_dbg("EQ Done:    [%X][%X][%X][%X]\n", (dpcd203&0x20)>>5,
 						(dpcd203&0x02)>>1,
 						(dpcd202&0x20)>>5,
 						(dpcd202&0x02)>>1);
-	dprx_msg("==\n");
-	dprx_msg("Symbol Lock [%X][%X][%X][%X]\n", (dpcd203&0x40)>>6,
+	dprx_msg_dbg("==\n");
+	dprx_msg_dbg("Symbol Lock [%X][%X][%X][%X]\n", (dpcd203&0x40)>>6,
 						(dpcd203&0x04)>>2,
 						(dpcd202&0x40)>>6,
 						(dpcd202&0x04)>>2);
-	dprx_msg("Inter-Lane Align = %X\n",dpcd204&0x01);
-	dprx_msg("Spread spectrum modulation freq = %X\n",dpcd107&0x01);
-	dprx_msg("Spreding amplitude = %X\n",(dpcd107&0x10)>>4 );
-	dprx_msg("ANSI 8B10B: %X\n", dpcd108&0x01);
-	dprx_msg("CP_READY %X\n",(dpcd200&0x40)>>6);
-	dprx_msg("Link Status Update = %X\n", (dpcd204&0x80)>>7);
-	dprx_msg("\n");
+	dprx_msg_dbg("Inter-Lane Align = %X\n",dpcd204&0x01);
+	dprx_msg_dbg("Spread spectrum modulation freq = %X\n",dpcd107&0x01);
+	dprx_msg_dbg("Spreding amplitude = %X\n",(dpcd107&0x10)>>4 );
+	dprx_msg_dbg("ANSI 8B10B: %X\n", dpcd108&0x01);
+	dprx_msg_dbg("CP_READY %X\n",(dpcd200&0x40)>>6);
+	dprx_msg_dbg("Link Status Update = %X\n", (dpcd204&0x80)>>7);
+	dprx_msg_dbg("\n");
 }
 
 
@@ -3057,7 +3061,7 @@ static void dprx_set_hpd(struct it6510 *it6510, u8 hpd)
 	struct regmap *dp = it6510->dp_regmap;
 	//struct dprx_data *dprx = &it6510->dprx;
 
-	dprx_msg("dprx_set_hpd(%X)...\n",hpd);
+	dprx_msg_info("dprx_set_hpd(%X)...\n",hpd);
 
 	//reset to default RS
 	dprx_update_rs(it6510, DEFAULT_RS_LEVEL); 
@@ -3074,7 +3078,7 @@ static void dprx_set_hpd(struct it6510 *it6510, u8 hpd)
 
 static void dprx_trun_on_hpd(struct it6510 *it6510)
 {
-	dprx_msg("%s\n",  __func__);
+	dprx_msg_info("%s\n",  __func__);
 
 	dprx_irq_clear_all(it6510);
 	dprx_enable_link_irq(it6510);
@@ -3088,7 +3092,7 @@ static void dprx_trun_on_hpd(struct it6510 *it6510)
 
 static void dprx_trun_off_hpd(struct it6510 *it6510)
 {
-	dprx_msg("%s\n",  __func__);
+	dprx_msg_info("%s\n",  __func__);
 	
 	dprx_set_hpd(it6510, false);
 
@@ -3103,7 +3107,7 @@ static u16 dprx_get_input_status(struct it6510 *it6510)
 {
 	struct dprx_data *dprx = &it6510->dprx;
 
-	dprx_msg("%s\n",  __func__);
+	dprx_msg_info("%s\n",  __func__);
 	return dprx->video_stable;
 
 }
@@ -3115,7 +3119,7 @@ static u16 dprx_get_pclk(struct it6510 *it6510)
 	u16 tmp;
 	u16 pclk;
 
-	//dprx_msg("%s\n",  __func__);
+	//dprx_msg_info("%s\n",  __func__);
 	dprxchgbank(dp, 0);
 
 	dprxset(dp, 0x24, 0x08, 0x00);
@@ -3129,7 +3133,7 @@ static u16 dprx_get_pclk(struct it6510 *it6510)
 
 	dprxset(dp, 0x24, 0x08, 0x08);
 
-	dprx_msg("%s %d to  %d\n", __func__, tmp, pclk);
+	dprx_msg_dbg("%s %d to  %d\n", __func__, tmp, pclk);
 
 	return pclk;
 }
@@ -3195,10 +3199,10 @@ static irqreturn_t it6510_intp_threaded_handler(int unused, void *data)
 	
 	mutex_lock(&it6510->lock);
 
-	//dprx_msg("%s  00\n",  __func__);
+	//dprx_msg_info("%s  00\n",  __func__);
 	dprx_irq(it6510);
 	mipitx_irq(it6510);
-	//dprx_msg("%s  11\n",  __func__);
+	//dprx_msg_info("%s  11\n",  __func__);
 
 	mutex_unlock(&it6510->lock);
 
@@ -3220,7 +3224,7 @@ static void it6510_enable_stream(struct v4l2_subdev *sd, bool enable)
 {	
 	struct it6510 *it6510 = sd_to_it6510(sd);
 
-	dprx_msg("%s(%d)\n",  __func__, enable);
+	dprx_msg_info("%s(%d)\n",  __func__, enable);
 	mutex_lock(&it6510->lock);
 
 	it6510_enable_csi(it6510, enable);
@@ -3280,19 +3284,19 @@ static void dprx_get_bt_timing(struct it6510 *it6510)
 	dprxchgbank(dp, 0);
 
 
-	dprx_msg("htotal = %d\n", htotal);
-	dprx_msg("hdew = %d\n", hdew);
-	dprx_msg("hdes = %d\n", hdes);
-	dprx_msg("hfph = %d\n", hfph);
-	dprx_msg("hsyncw = %d\n", hsyncw);
-	dprx_msg("hsyncpol = %d\n",hsyncpol);
-	dprx_msg("vtotal = %d\n", vtotal);
-	dprx_msg("vdes = %d\n", vdes);
-	dprx_msg("vdew = %d\n", vdew);
-	dprx_msg("vfph = %d\n", vfph);
-	dprx_msg("vsyncw = %d\n", vsyncw);
-	dprx_msg("vsyncpol = %d\n", vsyncpol);
-	dprx_msg("interlaced mode = %d\n", interlace);
+	dprx_msg_dbg("htotal = %d\n", htotal);
+	dprx_msg_dbg("hdew = %d\n", hdew);
+	dprx_msg_dbg("hdes = %d\n", hdes);
+	dprx_msg_dbg("hfph = %d\n", hfph);
+	dprx_msg_dbg("hsyncw = %d\n", hsyncw);
+	dprx_msg_dbg("hsyncpol = %d\n",hsyncpol);
+	dprx_msg_dbg("vtotal = %d\n", vtotal);
+	dprx_msg_dbg("vdes = %d\n", vdes);
+	dprx_msg_dbg("vdew = %d\n", vdew);
+	dprx_msg_dbg("vfph = %d\n", vfph);
+	dprx_msg_dbg("vsyncw = %d\n", vsyncw);
+	dprx_msg_dbg("vsyncpol = %d\n", vsyncpol);
+	dprx_msg_dbg("interlaced mode = %d\n", interlace);
 
 
 	it6510->timings.type = V4L2_DV_BT_656_1120;
@@ -3378,7 +3382,7 @@ static int it6510_dp_get_dv_timings(struct v4l2_subdev *sd,
 
 	it6510_get_bt_timing(it6510, timings);
 
-	dprx_msg("pixelclock = %lld \n", timings->bt.pixelclock);
+	dprx_msg_dbg("pixelclock = %lld \n", timings->bt.pixelclock);
 
 	if (timings->bt.pixelclock < 0){
 		return -ENODATA;
@@ -3416,7 +3420,7 @@ static void it6510_update_colorspace(struct it6510 *it6510)
 	//struct mipi_bus *csi = &it6510->csi;
 	struct color_format video_in;
 
-	dprx_msg("%s\n",  __func__);
+	dprx_msg_info("%s\n",  __func__);
 
 	if (!dprx_get_input_status(it6510))
 		return ;
@@ -3436,7 +3440,7 @@ static void it6510_set_power(struct it6510 *it6510, int power_up)
 {
 	mutex_lock(&it6510->lock);
 	
-	dprx_msg("%s %d\n",  __func__, power_up);
+	dprx_msg_info("%s %d\n",  __func__, power_up);
 	
 	if (power_up == true) {
 		it6510_initial(it6510);
@@ -3475,7 +3479,7 @@ static int it6510_g_input_status(struct v4l2_subdev *sd, u32 *status)
 {
 	struct it6510 *it6510 = sd_to_it6510(sd);
 	*status = dprx_get_input_status(it6510) == true ? 0 : V4L2_IN_ST_NO_SIGNAL;
-	dprx_msg("%s\n",  __func__);
+	dprx_msg_info("%s\n",  __func__);
 	v4l2_dbg(1, debug, sd, "%s: status = 0x%x\n", __func__, *status);
 
 	return 0;
@@ -3875,7 +3879,7 @@ static ssize_t edid_ram_show(struct device *dev,
 
 	u8 reg_buf[256];
 
-	dev_err(dev, "%s(%x)\n", __func__, it6510->attr_dp_reg_bank);
+	dev_info(dev, "%s(%x)\n", __func__, it6510->attr_dp_reg_bank);
 
 	mutex_lock(&it6510->lock);
 	dprx_get_edid_ram(it6510, reg_buf);
@@ -3899,7 +3903,7 @@ static ssize_t dp_reg_store(struct device *dev,
 
 	it6510->attr_dp_reg_bank = (u8) reg_bank;
 
-	dev_err(dev, "dp_reg_store() %d, %x\n",
+	dev_info(dev, "dp_reg_store() %d, %x\n",
 			reg_bank, it6510->attr_dp_reg_bank);
 
 	return count;
@@ -3915,7 +3919,7 @@ static ssize_t dp_reg_show(struct device *dev,
 	int i;
 	u8 reg_buf[256];
 
-	dev_err(dev, "%s(%x)\n", __func__, it6510->attr_dp_reg_bank);
+	dev_info(dev, "%s(%x)\n", __func__, it6510->attr_dp_reg_bank);
 
 	mutex_lock(&it6510->lock);
 	dprxchgbank(dp, it6510->attr_dp_reg_bank);
@@ -3961,8 +3965,8 @@ static ssize_t mipi_reg_store(struct device *dev,
 
     if( sscanf(buf,"%X %X ", &addr, &val) ){
     
-        dev_err(dev, "addr= %2.2X \n", addr);
-        dev_err(dev, "val = %2.2X \n", val);
+        dev_info(dev, "addr= %2.2X \n", addr);
+        dev_info(dev, "val = %2.2X \n", val);
 
         if((( addr<=0xFF)&&(0x00<=addr))&&(( val<=0xFF)&&(0x00<=val))){
             regmap_write(mipi, addr, val);   
@@ -3995,7 +3999,7 @@ static ssize_t enable_stream_store(struct device *dev,
 
 	if (kstrtoint(buf, 10, &en_stream) < 0)
 		return -EINVAL;
-	dev_err(dev, "enable_stream_store() %d\n", en_stream);
+	dev_info(dev, "enable_stream_store() %d\n", en_stream);
 
 	it6510->attr_enable_stream = en_stream;
 
@@ -4027,7 +4031,7 @@ static ssize_t mipi_link_store(struct device *dev,
 
 	if (kstrtoint(buf, 10, &en_link) < 0)
 		return -EINVAL;
-	dev_err(dev, "mipi_link_store() %d\n", en_link);
+	dev_info(dev, "mipi_link_store() %d\n", en_link);
 	
 	if ((en_link == 1) || (en_link == 2) || (en_link == 4)) {
 		it6510->csi.lane_cnt = en_link;
@@ -4060,7 +4064,7 @@ static ssize_t power_up_store(struct device *dev,
 	if (kstrtoint(buf, 10, &power_up) < 0)
 		return -EINVAL;
 		
-	dev_err(dev, "power_up_store() %d\n", power_up);
+	dev_info(dev, "power_up_store() %d\n", power_up);
 	
 	if (power_up == 0)
 		power_up = false;
@@ -4140,11 +4144,11 @@ static int it6510_parst_dt(struct it6510 *it6510)
 
 	it6510->csi.lane_cnt = endpoint.bus.mipi_csi2.num_data_lanes;
 
-	dev_err(dev, "Display Port lanes = %d\n", it6510->dpcd.lane);
-	dev_err(dev, "Display Port bitRate = %d.%dG\n",
+	dev_dbg(dev, "Display Port lanes = %d\n", it6510->dpcd.lane);
+	dev_dbg(dev, "Display Port bitRate = %d.%dG\n",
 							(it6510->dpcd.bitrate*27)/100,
 							(it6510->dpcd.bitrate*27)%100);
-	dev_err(dev, "csi lanes = %d\n", it6510->csi.lane_cnt);
+	dev_dbg(dev, "csi lanes = %d\n", it6510->csi.lane_cnt);
 
 	ret = 0;
 
@@ -4224,7 +4228,7 @@ static int it6510_probe(struct i2c_client *client,
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 
-	dev_err(dev, "it6510_probe()\n");
+	dev_info(dev, "it6510_probe()\n");
 
 	it6510 = devm_kzalloc(dev, sizeof(*it6510), GFP_KERNEL);
 	if (!it6510)
@@ -4296,13 +4300,13 @@ static int it6510_probe(struct i2c_client *client,
 	it6510->pad.flags = MEDIA_PAD_FL_SOURCE;
 	sd->entity.function = MEDIA_ENT_F_VID_IF_BRIDGE;
 	err = media_entity_pads_init(&sd->entity, 1, &it6510->pad);
-	dev_err(dev, "media_entity_pads_init() %d\n",err);
+	dev_info(dev, "media_entity_pads_init() %d\n",err);
 	if (err < 0)
 		goto err_hdl;
 
 	sd->dev = &client->dev;
 	err = v4l2_async_register_subdev(sd);
-	dev_err(dev, "v4l2_async_register_subdev() %d\n",err);
+	dev_info(dev, "v4l2_async_register_subdev() %d\n",err);
 	if (err < 0)
 		goto err_hdl;
 
