@@ -6,6 +6,7 @@
 #include <linux/device.h>
 #include <linux/idr.h>
 #include <linux/mm.h>
+#include <linux/module.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/tee_drv.h>
