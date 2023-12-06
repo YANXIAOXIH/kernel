@@ -7,7 +7,6 @@
 8021q
 8139cp
 8139too
-8250_aspeed_vuart
 8250_bcm7271
 8250_exar
 8250_men_mcb
@@ -607,7 +606,6 @@ bh1780
 binder_linux
 binfmt_misc
 blake2b_generic
-blake2s_generic
 block2mtd
 blocklayoutdriver
 blowfish_common
@@ -874,9 +872,6 @@ cls_flower
 cls_fw
 cls_matchall
 cls_route
-cls_rsvp
-cls_rsvp6
-cls_tcindex
 cls_u32
 cm109
 cm32181
@@ -1091,7 +1086,6 @@ dccp_ipv6
 ddbridge
 ddbridge-dummy-fe
 de2104x
-decnet
 defxx
 denali
 denali_dt
@@ -1178,7 +1172,6 @@ dmfe
 dmi-sysfs
 dmm32at
 dmx3191d
-dn_rtmsg
 dnet
 dp83640
 dp83822
@@ -2763,7 +2756,6 @@ lib80211_crypt_tkip
 lib80211_crypt_wep
 libarc4
 libblake2s
-libblake2s-generic
 libceph
 libchacha
 libchacha20poly1305
@@ -3669,7 +3661,6 @@ nouveau
 nozomi
 npcm750-pwm-fan
 nps_enet
-ns
 ns-thermal
 ns558
 ns83820
@@ -5944,7 +5935,6 @@ surface_platform_profile
 svc-i3c-master
 svgalib
 switchtec
-sx8
 sx8654
 sx9310
 sx9500
