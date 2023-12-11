@@ -1483,8 +1483,8 @@ int mtk_mdp_register_m2m_device(struct mtk_mdp_dev *mdp)
 	mdp->vdev->v4l2_dev = &mdp->v4l2_dev;
 	len = snprintf(mdp->vdev->name, sizeof(mdp->vdev->name), "%s:m2m",
 		 MTK_MDP_MODULE_NAME);
-	if (len > 0) {
-		dev_err(dev, "error on device name, len[%d]\n", len);
+	if (len >= sizeof(mdp->vdev->name)) {
+		dev_warn(dev, "warning on device name, len[%d]\n", len);
 	}
 	video_set_drvdata(mdp->vdev, mdp);
 
@@ -1505,8 +1505,8 @@ int mtk_mdp_register_m2m_device(struct mtk_mdp_dev *mdp)
 	strscpy(mdp->mdev.model, MTK_MDP_MODULE_NAME, sizeof(mdp->mdev.model));
 	len = snprintf(mdp->mdev.bus_info, sizeof(mdp->mdev.bus_info), "platform:%s",
 				dev_name(dev));
-	if (len > 0) {
-		dev_err(dev, "error on module name, len[%d]\n", len);
+	if (len >= sizeof(mdp->mdev.bus_info)) {
+		dev_warn(dev, "warning on bus info, len[%d]\n", len);
 	}
 	media_device_init(&mdp->mdev);
 	mdp->v4l2_dev.mdev = &mdp->mdev;
