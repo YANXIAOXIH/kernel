@@ -1128,6 +1128,98 @@ static int vidioc_try_fmt(struct v4l2_format *f, struct mtk_video_fmt *fmt,
 	return 0;
 }
 
+static unsigned int mapRangeFromV4L2(enum v4l2_quantization value) {
+	unsigned int range = 0;
+
+	switch(value) {
+		case V4L2_QUANTIZATION_DEFAULT:
+		case V4L2_QUANTIZATION_LIM_RANGE:
+			range = 0;
+			break;
+		case V4L2_QUANTIZATION_FULL_RANGE:
+			range = 1;
+			break;
+		default:
+			mtk_v4l2_err("Unsupport v4l2_quantization value =%d",
+				value);
+			range = 0;
+	}
+
+	return range;
+}
+
+static unsigned int mapColorPrimariesFromV4L2(enum v4l2_colorspace value) {
+	unsigned int colorPrimaries = 0;
+
+	switch(value) {
+		case V4L2_COLORSPACE_REC709:
+		case V4L2_COLORSPACE_SRGB:
+		case V4L2_COLORSPACE_OPRGB:
+			colorPrimaries = 1;
+			break;
+		case V4L2_COLORSPACE_SMPTE170M:
+		case V4L2_COLORSPACE_470_SYSTEM_M:
+		case V4L2_COLORSPACE_470_SYSTEM_BG:
+			colorPrimaries = 5;
+			break;
+		case V4L2_COLORSPACE_BT2020:
+			colorPrimaries = 9;
+			break;
+		default:
+			mtk_v4l2_err("Unsupport v4l2_colorspace value =%d",
+				value);
+			colorPrimaries = 0;
+	}
+
+	return colorPrimaries;
+}
+
+static unsigned int mapTransformCharacterFromV4L2(enum v4l2_xfer_func value) {
+	unsigned int transformCharacter = 0;
+
+	switch(value) {
+		case V4L2_XFER_FUNC_709:
+		case V4L2_XFER_FUNC_SRGB:
+		case V4L2_XFER_FUNC_OPRGB:
+			transformCharacter = 1;
+			break;
+		case V4L2_XFER_FUNC_DCI_P3:
+			transformCharacter = 11;
+			break;
+		case V4L2_XFER_FUNC_SMPTE2084:
+			transformCharacter = 16;
+			break;
+		default:
+			mtk_v4l2_err("Unsupport v4l2_xfer_func value =%d",
+				value);
+			transformCharacter = 0;
+	}
+
+	return transformCharacter;
+}
+
+static unsigned int mapMatrixCoeffsFromV4L2(enum v4l2_ycbcr_encoding value) {
+	unsigned int matrixCoeffs = 0;
+
+	switch(value) {
+		case V4L2_YCBCR_ENC_601:
+			matrixCoeffs = 6;
+			break;
+		case V4L2_YCBCR_ENC_709:
+			matrixCoeffs = 1;
+			break;
+		case V4L2_YCBCR_ENC_BT2020:
+			matrixCoeffs = 9;
+			break;
+		default:
+			mtk_v4l2_err("Unsupport v4l2_ycbcr_encoding value =%d",
+				value);
+			matrixCoeffs = 0;
+	}
+
+	return matrixCoeffs;
+}
+
 static void mtk_venc_set_param(struct mtk_vcodec_ctx *ctx,
 			       struct venc_enc_param *param)
 {
@@ -1270,6 +1362,11 @@ static void mtk_venc_set_param(struct mtk_vcodec_ctx *ctx,
 	param->temporal_layer_pcount = enc_params->temporal_layer_pcount;
 	param->temporal_layer_bcount = enc_params->temporal_layer_bcount;
 	param->max_ltr_num = enc_params->max_ltr_num;
+	//set color apsect to driver from v4l2
+	param->color_primaries = mapColorPrimariesFromV4L2(ctx->colorspace);
+	param->transform_character = mapTransformCharacterFromV4L2(ctx->xfer_func);
+	param->matrix_coeffs = mapMatrixCoeffsFromV4L2(ctx->ycbcr_enc);
+	param->fullrange = mapRangeFromV4L2(ctx->quantization);
 }
 
 static int vidioc_venc_subscribe_evt(struct v4l2_fh *fh,
@@ -1496,6 +1593,11 @@ static int vidioc_try_fmt_vid_cap_mplane(struct file *file, void *priv,
 	f->fmt.pix_mp.ycbcr_enc = ctx->ycbcr_enc;
 	f->fmt.pix_mp.quantization = ctx->quantization;
 	f->fmt.pix_mp.xfer_func = ctx->xfer_func;
+	mtk_v4l2_debug(1, "colorspace:%d ycbcr_enc:%d quantization:%d xfer_func:%d",
+		f->fmt.pix_mp.colorspace,
+		f->fmt.pix_mp.ycbcr_enc,
+		f->fmt.pix_mp.quantization,
+		f->fmt.pix_mp.xfer_func);
 
 	return vidioc_try_fmt(f, fmt, ctx);
 }

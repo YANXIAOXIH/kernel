@@ -512,6 +512,15 @@ static int venc_set_param(unsigned long handle,
 		inst->vsi->config.temporal_layer_pcount = enc_prm->temporal_layer_pcount;
 		inst->vsi->config.temporal_layer_bcount = enc_prm->temporal_layer_bcount;
 		inst->vsi->config.max_ltr_num = enc_prm->max_ltr_num;
+		inst->vsi->config.color_primaries = enc_prm->color_primaries;
+		inst->vsi->config.transform_character = enc_prm->transform_character;
+		inst->vsi->config.matrix_coeffs = enc_prm->matrix_coeffs;
+		inst->vsi->config.fullrange = enc_prm->fullrange;
+		mtk_vcodec_debug(inst, "color_primaries:%d transform_character:%d matrix_coeffs:%d fullrange:%d",
+			enc_prm->color_primaries,
+			enc_prm->transform_character,
+			enc_prm->matrix_coeffs,
+			enc_prm->fullrange);
 
 		if (enc_prm->color_desc) {
 			memcpy(&inst->vsi->config.color_desc,

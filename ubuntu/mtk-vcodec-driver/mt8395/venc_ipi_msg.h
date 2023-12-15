@@ -471,6 +471,10 @@ struct venc_vcu_config {
 	__u32 highquality;
 	__u32 dummynal;
 	__u32 slbc_addr;
+	__u32 color_primaries;
+	__u32 transform_character;
+	__u32 matrix_coeffs;
+	__u32 fullrange;
 	__u32 reserved;
 	struct mtk_color_desc color_desc;
 	struct mtk_venc_multi_ref multi_ref;

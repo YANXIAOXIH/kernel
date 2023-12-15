@@ -406,6 +406,10 @@ struct venc_enc_param {
 	unsigned int temporal_layer_pcount;
 	unsigned int temporal_layer_bcount;
 	unsigned int max_ltr_num;
+	unsigned int color_primaries;
+	unsigned int transform_character;
+	unsigned int matrix_coeffs;
+	unsigned int fullrange;
 };
 
 /*
