@@ -42,6 +42,8 @@
 #define MTK_DEFAULT_FRAMERATE_NUM 1001
 #define MTK_DEFAULT_FRAMERATE_DENOM 30000
 
+#define MTK_DEFAULT_GOP_SIZE 30
+
 #define MTK_VENC_CAPABILITY_NOT_AVAILABLE 0xFFFFFFFF
 
 static void mtk_venc_worker(struct work_struct *work);
@@ -1726,6 +1728,8 @@ void mtk_vcodec_enc_set_default_params(struct mtk_vcodec_ctx *ctx)
 	ctx->enc_params.profile = V4L2_MPEG_VIDEO_H264_PROFILE_HIGH;
 	ctx->enc_params.level = V4L2_MPEG_VIDEO_H264_LEVEL_4_0;
 	ctx->enc_params.tier = V4L2_MPEG_VIDEO_HEVC_TIER_MAIN;
+
+	ctx->enc_params.gop_size = MTK_DEFAULT_GOP_SIZE;
 }
 
 int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
@@ -1742,7 +1746,7 @@ int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_H264_I_PERIOD,
 			0, 65535, 1, 0);
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_GOP_SIZE,
-			0, 65535, 1, 0);
+			0, 65535, 1, MTK_DEFAULT_GOP_SIZE);
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME,
 			0, 0, 0, 0);
 	v4l2_ctrl_new_std_menu(handler, ops,
