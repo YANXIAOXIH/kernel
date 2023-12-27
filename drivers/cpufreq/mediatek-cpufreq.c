@@ -352,11 +352,6 @@ static int mtk_cpu_dvfs_info_init(struct mtk_cpu_dvfs_info *info, int cpu)
 		ret = PTR_ERR(proc_reg);
 		goto out_free_resources;
 	}
-	ret = regulator_enable(proc_reg);
-	if (ret) {
-		pr_warn("enable vproc for cpu%d fail\n", cpu);
-		goto out_free_resources;
-	}
 
 	/* Both presence and absence of sram regulator are valid cases. */
 	sram_reg = regulator_get_exclusive(cpu_dev, "sram");
@@ -375,21 +370,13 @@ static int mtk_cpu_dvfs_info_init(struct mtk_cpu_dvfs_info *info, int cpu)
 		goto out_free_resources;
 	}
 
-	ret = clk_prepare_enable(cpu_clk);
-	if (ret)
-		goto out_free_opp_table;
-
-	ret = clk_prepare_enable(inter_clk);
-	if (ret)
-		goto out_disable_mux_clock;
-
 	/* Search a safe voltage for intermediate frequency. */
 	rate = clk_get_rate(inter_clk);
 	opp = dev_pm_opp_find_freq_ceil(cpu_dev, &rate);
 	if (IS_ERR(opp)) {
 		pr_err("failed to get intermediate opp for cpu%d\n", cpu);
 		ret = PTR_ERR(opp);
-		goto out_disable_inter_clock;
+		goto out_free_opp_table;
 	}
 	info->intermediate_voltage = dev_pm_opp_get_voltage(opp);
 	dev_pm_opp_put(opp);
@@ -407,12 +394,6 @@ static int mtk_cpu_dvfs_info_init(struct mtk_cpu_dvfs_info *info, int cpu)
 	info->need_voltage_tracking = !IS_ERR(sram_reg);
 
 	return 0;
-
-out_disable_inter_clock:
-	clk_disable_unprepare(inter_clk);
-
-out_disable_mux_clock:
-	clk_disable_unprepare(cpu_clk);
 
 out_free_opp_table:
 	dev_pm_opp_of_cpumask_remove_table(&info->cpus);
@@ -432,20 +413,14 @@ out_free_resources:
 
 static void mtk_cpu_dvfs_info_release(struct mtk_cpu_dvfs_info *info)
 {
-	if (!IS_ERR(info->proc_reg)) {
-		regulator_disable(info->proc_reg);
+	if (!IS_ERR(info->proc_reg))
 		regulator_put(info->proc_reg);
-	}
 	if (!IS_ERR(info->sram_reg))
 		regulator_put(info->sram_reg);
-	if (!IS_ERR(info->cpu_clk)) {
-		clk_disable_unprepare(info->cpu_clk);
+	if (!IS_ERR(info->cpu_clk))
 		clk_put(info->cpu_clk);
-	}
-	if (!IS_ERR(info->inter_clk)) {
-		clk_disable_unprepare(info->inter_clk);
+	if (!IS_ERR(info->inter_clk))
 		clk_put(info->inter_clk);
-	}
 
 	dev_pm_opp_of_cpumask_remove_table(&info->cpus);
 }
