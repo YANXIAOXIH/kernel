@@ -199,6 +199,7 @@ CONFIG_DRM_KMS_HELPER                           policy<{'arm64': 'y'}>
 CONFIG_DRM_MEDIATEK                             policy<{'arm64': 'y'}>
 CONFIG_DRM_MGA                                  policy<{'arm64': 'n'}>
 CONFIG_DRM_NOMODESET                            policy<{'arm64': 'y'}>
+CONFIG_DRM_PANEL_AUO_G156XTN010_LVDS            policy<{'arm64': 'y'}>
 CONFIG_DRM_PANEL_AVD_TT70WS_CN_134_A            policy<{'arm64': 'n'}>
 CONFIG_DRM_PANEL_EDP                            policy<{'arm64': 'm'}>
 CONFIG_DRM_PANEL_KOE_TX18D204VM0BAA             policy<{'arm64': 'y'}>
@@ -358,6 +359,7 @@ CONFIG_MTK_DPTX_SUPPORT                         policy<{'arm64': 'y'}>
 CONFIG_MTK_EFUSE                                policy<{'arm64': 'y'}>
 CONFIG_MTK_HDMI_RX                              policy<{'arm64': 'm'}>
 CONFIG_MTK_IOMMU                                policy<{'arm64': 'y'}>
+CONFIG_MTK_LVDS_SUPPORT                         policy<{'arm64': 'y'}>
 CONFIG_MTK_PMIC_WRAP                            policy<{'arm64': 'y'}>
 CONFIG_MTK_SENINF                               policy<{'arm64': 'm'}>
 CONFIG_MTK_SMI                                  policy<{'arm64': 'y'}>
@@ -393,6 +395,7 @@ CONFIG_PHY_EXYNOS_PCIE                          policy<{'arm64': 'n'}>
 CONFIG_PHY_MTK_CDPHY                            policy<{'arm64': 'm'}>
 CONFIG_PHY_MTK_DP                               policy<{'arm64': 'y'}>
 CONFIG_PHY_MTK_DPHY                             policy<{'arm64': 'n'}>
+CONFIG_PHY_MTK_LVDS                             policy<{'arm64': 'y'}>
 CONFIG_PHY_MTK_MIPI_DSI                         policy<{'arm64': 'y'}>
 CONFIG_PHY_MTK_PCIE                             policy<{'arm64': 'y'}>
 CONFIG_PHY_MTK_TPHY                             policy<{'arm64': 'y'}>
