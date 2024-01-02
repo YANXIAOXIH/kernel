@@ -17,6 +17,11 @@ config UBUNTU_ODM_DRIVERS
 ##
 ##
 ##
+source "ubuntu/media-i2c-it6510/Kconfig"
+##
+##
+##
+##
 source "ubuntu/mtk-apusys-driver/Kconfig"
 ##
 ##

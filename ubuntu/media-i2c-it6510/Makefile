@@ -15,41 +15,7 @@
 ##
 ##
 ##
-obj-y += media-i2c-it6510/
-##
-##
-##
-obj-y += mtk-apusys-driver/
-##
-##
-##
-obj-y += mtk-mdp-driver/
-##
-##
-##
-obj-y += mtk-mt76/
-##
-##
-##
-obj-y += mtk-vcodec-driver/
-##
-##
-##
-obj-y += mtk-mali-gpu-driver/
-##
-##
-##
-obj-y += mtk-vcu-driver/
-##
-##
-##
-obj-$(CONFIG_UBUNTU_HOST)      += ubuntu-host/
-##
-##
-##
-##
-##
-##
+obj-$(CONFIG_VIDEO_IT6510)	+= it6510.o
 
 # This is a stupid trick to get kbuild to create ubuntu/built-in.o
 obj- += foo.o

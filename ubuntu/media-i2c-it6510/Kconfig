@@ -1,0 +1,10 @@
+config VIDEO_IT6510
+	tristate "IT6510 bridge ic sample driver"
+	help
+	  This driver is base on IT6510 sample driver from ITE. It is
+	  forward porting from kernel 5.10 to kernel 5.15.
+
+	  Enable IT6510 demo kit receive DP signal and divide into video
+	  and audio. This driver supports audio signal output as i2s format
+	  from IT6510 SoC and connect to mt8395, output the sound from jack.
+
