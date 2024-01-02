@@ -518,6 +518,8 @@ CONFIG_SQUASHFS_FILE_CACHE                      policy<{'arm64': 'y'}>
 CONFIG_SQUASHFS_FILE_DIRECT                     policy<{'arm64': 'n'}>
 CONFIG_TASKS_RCU                                policy<{'arm64': 'y'}>
 CONFIG_TEGRA_SOCTHERM                           policy<{'arm64': 'm'}>
+CONFIG_THERMAL_DEFAULT_GOV_POWER_ALLOCATOR      policy<{'arm64': 'y'}>
+CONFIG_THERMAL_DEFAULT_GOV_STEP_WISE            policy<{'arm64': 'n'}>
 CONFIG_TINYDRM_ILI9163                          policy<{'arm64': 'n'}>
 CONFIG_TOUCHSCREEN_GOODIX                       policy<{'arm64': 'y'}>
 CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS              policy<{'arm64': 'y'}>
