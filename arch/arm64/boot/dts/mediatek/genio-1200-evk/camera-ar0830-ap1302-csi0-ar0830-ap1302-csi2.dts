@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (c) 2023 MediaTek Inc.
+ * Copyright (c) 2024 MediaTek Inc.
  *
  */
 
@@ -18,7 +18,6 @@
 				reg = <0x3c>;
 				status = "okay";
 			};
-
 			sensor1 {
 				status = "disabled";
 			};
@@ -29,8 +28,26 @@
 		target = <&i2c1>;
 		__overlay__ {
 			sensor2 {
-				status = "disabled";
+				sensor-names = "ar0830ap1302_mipi_yuv";
+				reg = <0x3c>;
+				status = "okay";
 			};
+		};
+	};
+
+	fragment@12 {
+		target = <&mtkcam0>;
+		__overlay__ {
+			status = "okay";
+			mediatek,stream-enable = <MTK_CAMERA_PREVIEW>;
+		};
+	};
+
+	fragment@13 {
+		target = <&mtkcam1>;
+		__overlay__ {
+			status = "okay";
+			mediatek,stream-enable = <MTK_CAMERA_PREVIEW>;
 		};
 	};
 };
