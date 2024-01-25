@@ -74,6 +74,7 @@ struct mtk_dpi {
 	struct reset_control *reset_ctl;
 	struct device *dev;
 	struct clk *engine_clk;
+	struct clk *dpi_ck_cg;
 	struct clk *pixel_clk;
 	struct clk *dpi_sel_clk;
 	struct clk *tvd_clk;
@@ -463,7 +464,9 @@ static void mtk_dpi_power_off(struct mtk_dpi *dpi)
 	clk_disable_unprepare(dpi->pixel_clk);
 	clk_disable_unprepare(dpi->engine_clk);
 	clk_disable_unprepare(dpi->dpi_sel_clk);
+	clk_disable_unprepare(dpi->dpi_ck_cg);
 	clk_disable_unprepare(dpi->hdmi_cg);
+	clk_disable_unprepare(dpi->tvd_clk);
 }
 
 static int mtk_dpi_power_on(struct mtk_dpi *dpi)
@@ -479,6 +482,12 @@ static int mtk_dpi_power_on(struct mtk_dpi *dpi)
 		goto err_refcount;
 	}
 
+	ret = clk_prepare_enable(dpi->tvd_clk);
+	if (ret) {
+		dev_err(dpi->dev, "Failed to enable tvd pll: %d\n", ret);
+		goto err_tvd;
+	}
+
 	ret = clk_prepare_enable(dpi->engine_clk);
 	if (ret) {
 		dev_err(dpi->dev, "Failed to enable engine clock: %d\n", ret);
@@ -489,6 +498,12 @@ static int mtk_dpi_power_on(struct mtk_dpi *dpi)
 	if (ret) {
 		dev_err(dpi->dev, "Failed to enable hdmi_cg clock: %d\n", ret);
 		goto err_hdmi_cg;
+	}
+
+	ret = clk_prepare_enable(dpi->dpi_ck_cg);
+	if (ret) {
+		dev_err(dpi->dev, "Failed to enable dpi_ck_cg clock: %d\n", ret);
+		goto err_ck_cg;
 	}
 
 	ret = clk_prepare_enable(dpi->pixel_clk);
@@ -502,10 +517,14 @@ static int mtk_dpi_power_on(struct mtk_dpi *dpi)
 	return 0;
 
 err_pixel:
+	clk_disable_unprepare(dpi->dpi_ck_cg);
+err_ck_cg:
 	clk_disable_unprepare(dpi->hdmi_cg);
 err_hdmi_cg:
 	clk_disable_unprepare(dpi->engine_clk);
 err_engine:
+	clk_disable_unprepare(dpi->tvd_clk);
+err_tvd:
 	clk_disable_unprepare(dpi->dpi_sel_clk);
 err_refcount:
 	dpi->refcount--;
@@ -549,7 +568,6 @@ static int mtk_dpi_set_display_mode(struct mtk_dpi *dpi,
 		clk_set_rate(dpi->pixel_clk, vm.pixelclock * 2);
 	else
 		clk_set_rate(dpi->pixel_clk, vm.pixelclock);
-
 
 	vm.pixelclock = clk_get_rate(dpi->pixel_clk);
 
@@ -620,8 +638,8 @@ static int mtk_dpi_set_display_mode(struct mtk_dpi *dpi,
 		// DPI could be connecting to external bridge
 		// or internal HDMI encoder.
 		if (dpi->conf->is_internal_hdmi) {
-			mtk_dpi_mask(dpi, DPI_CON, DPI_OUTPUT_1T1P_EN,
-					DPI_OUTPUT_1T1P_EN);
+			mtk_dpi_mask(dpi, DPI_CON, DPINTF_YUV422_EN,
+					DPINTF_YUV422_EN);
 			mtk_dpi_mask(dpi, DPI_CON, dpi->is_2p_input ? DPI_INPUT_2P_EN : 0,
 					DPI_INPUT_2P_EN);
 		} else {
@@ -966,6 +984,13 @@ static const struct mtk_dpi_yc_limit mtk_dpi_limit = {
 	.y_top = 0x0FE0,
 };
 
+static const struct mtk_dpi_yc_limit mtk_dpintf_limit = {
+	.c_bottom = 0x0000,
+	.c_top = 0xFFF,
+	.y_bottom = 0x0000,
+	.y_top = 0xFFF,
+};
+
 static const u32 mt8195_output_fmts[] = {
 	MEDIA_BUS_FMT_RGB888_1X24,
 	MEDIA_BUS_FMT_YUYV8_1X16,
@@ -1090,6 +1115,7 @@ static const struct mtk_dpi_conf mt8195_dpintf_conf = {
 	.channel_swap_shift = DPINTF_CH_SWAP,
 	.yuv422_en_bit = DPINTF_YUV422_EN,
 	.csc_enable_bit = DPINTF_CSC_ENABLE,
+	.limit = &mtk_dpintf_limit,
 };
 
 static int mtk_dpi_probe(struct platform_device *pdev)
@@ -1156,6 +1182,16 @@ static int mtk_dpi_probe(struct platform_device *pdev)
 		if (ret != -EPROBE_DEFER)
 			dev_err(dev, "Failed to get hdmi_cg clock: %d\n",
 					ret);
+
+		return ret;
+	}
+
+	dpi->dpi_ck_cg = devm_clk_get_optional(dev, "ck_cg");
+	if (IS_ERR(dpi->dpi_ck_cg)) {
+		ret = PTR_ERR(dpi->dpi_ck_cg);
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "Failed to get dpi ck cg clock: %d\n",
+				ret);
 
 		return ret;
 	}
