@@ -2786,7 +2786,7 @@
 
 		dp_intf0: dp-intf@1c015000 {
 			status = "disabled";
-			compatible = "mediatek,mt8195-dpintf";
+			compatible = "mediatek,mt8195-dp-intf";
 			reg = <0 0x1c015000 0 0x1000>;
 			interrupts = <GIC_SPI 657 IRQ_TYPE_LEVEL_HIGH 0>;
 			power-domains = <&spm MT8188_POWER_DOMAIN_VDOSYS0>;
@@ -2810,7 +2810,7 @@
 
 		dp_intf1: dp-intf@1c113000 {
 			status = "disabled";
-			compatible = "mediatek,mt8195-dpintf";
+			compatible = "mediatek,mt8195-dp-intf";
 			reg = <0 0x1c113000 0 0x1000>;
 			interrupts = <GIC_SPI 525 IRQ_TYPE_LEVEL_HIGH 0>;
 			power-domains = <&spm MT8188_POWER_DOMAIN_VDOSYS1>;
