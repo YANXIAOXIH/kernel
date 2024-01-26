@@ -11,7 +11,7 @@
 /dts-v1/;
 /plugin/;
 
-#include <arm64/mediatek/mt8370/isp70.dtsi>
+#include <arm64/mediatek/mt8370/isp71.dtsi>
 #include <arm64/mediatek/mt8370/mtk-camera.dtsi>
 
 / {
