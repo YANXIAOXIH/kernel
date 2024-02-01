@@ -19,3 +19,6 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += display-headless.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += display-lvdsdp.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += display-lvdsedp.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += display-lvdshdmi.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi0.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi1.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-2lanes-csi0.dtbo
