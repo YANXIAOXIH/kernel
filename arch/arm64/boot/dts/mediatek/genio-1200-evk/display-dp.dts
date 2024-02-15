@@ -39,34 +39,41 @@
 	};
 
 	fragment@5 {
-		target = <&dsi0>;
+		target = <&cec>;
 		__overlay__ {
 			status = "disabled";
 		};
 	};
 
 	fragment@6 {
-		target = <&mipi_tx0>;
+		target = <&dsi0>;
 		__overlay__ {
 			status = "disabled";
 		};
 	};
 
 	fragment@7 {
-		target = <&backlight_lcd0>;
+		target = <&mipi_tx0>;
 		__overlay__ {
 			status = "disabled";
 		};
 	};
 
 	fragment@8 {
-		target = <&disp_pwm0>;
+		target = <&backlight_lcd0>;
 		__overlay__ {
 			status = "disabled";
 		};
 	};
 
 	fragment@9 {
+		target = <&disp_pwm0>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@10 {
 		target = <&sound>;
 		__overlay__ {
 			dai-link-3 { /* HDMI */

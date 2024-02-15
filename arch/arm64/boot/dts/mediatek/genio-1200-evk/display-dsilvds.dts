@@ -135,6 +135,13 @@
 	};
 
 	fragment@10 {
+		target = <&cec>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@11 {
 		target = <&sound>;
 		__overlay__ {
 			dai-link-3 { /* HDMI */
@@ -147,7 +154,7 @@
 		};
 	};
 
-	fragment@11 {
+	fragment@12 {
 		target = <&mt6359_vcn33_2_bt_ldo_reg>;
 		__overlay__ {
 			regulator-always-on;
