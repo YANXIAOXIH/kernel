@@ -52,6 +52,13 @@
 	};
 
 	fragment@7 {
+		target = <&cec>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@8 {
 		target = <&sound>;
 		__overlay__ {
 			dai-link-1 { /* HDMI */
