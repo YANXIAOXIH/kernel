@@ -1250,16 +1250,12 @@ static void mtk_venc_set_param(struct mtk_vcodec_ctx *ctx,
 		param->input_yuv_fmt = VENC_YUV_FORMAT_24bitBGR888;
 		break;
 	case V4L2_PIX_FMT_ARGB32:
+	case V4L2_PIX_FMT_RGB32:
 		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitARGB8888;
 		break;
 	case V4L2_PIX_FMT_ABGR32:
-		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitBGRA8888;
-		break;
 	case V4L2_PIX_FMT_BGR32:
-		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitABGR8888;
-		break;
-	case V4L2_PIX_FMT_RGB32:
-		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitRGBA8888;
+		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitBGRA8888;
 		break;
 	case V4L2_PIX_FMT_ARGB1010102:
 		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitARGB1010102;
