@@ -242,6 +242,7 @@ CONFIG_FB_SYS_FILLRECT                          policy<{'arm64': 'y'}>
 CONFIG_FB_SYS_FOPS                              policy<{'arm64': 'y'}>
 CONFIG_FB_SYS_IMAGEBLIT                         policy<{'arm64': 'y'}>
 CONFIG_FORCE_MAX_ZONEORDER                      policy<{'arm64': '11'}>
+CONFIG_GPIO_M058SSAN                            policy<{'arm64': 'n'}>
 CONFIG_GPIO_THUNDERX                            policy<{'arm64': '-'}>
 CONFIG_GPIO_UNIPHIER                            policy<{'arm64': 'y'}>
 CONFIG_HAVE_S3C_RTC                             policy<{'arm64': 'y'}>
@@ -448,6 +449,7 @@ CONFIG_RPMSG_VIRTIO                             policy<{'arm64': 'y'}>
 CONFIG_RTC_DRV_MT2712                           policy<{'arm64': 'n'}>
 CONFIG_RTC_DRV_MT6397                           policy<{'arm64': 'y'}>
 CONFIG_RTC_DRV_MT7622                           policy<{'arm64': 'n'}>
+CONFIG_RTC_DRV_PCF85263                         policy<{'arm64': 'n'}>
 CONFIG_RTC_DRV_S3C                              policy<{'arm64': 'y'}>
 CONFIG_S3C2410_WATCHDOG                         policy<{'arm64': 'y'}>
 CONFIG_SATA_MOBILE_LPM_POLICY                   policy<{'arm64': '0'}>
