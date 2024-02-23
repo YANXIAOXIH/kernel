@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (c) 2023 MediaTek Inc.
+ * Copyright (c) 2024 MediaTek Inc.
  *
  */
 
@@ -26,6 +26,20 @@
 				reg = <0x1a>;
 				status = "okay";
 			};
+		};
+	};
+
+	fragment@13 {
+		target = <&mtkcam0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@14 {
+		target = <&mtkcam1>;
+		__overlay__ {
+			status = "okay";
 		};
 	};
 };

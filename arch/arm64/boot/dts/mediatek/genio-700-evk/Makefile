@@ -22,3 +22,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += display-headless.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi0.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi1.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-2lanes-csi0.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi0-imx214-csi1.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi0-ar0830-ap1302-csi1.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-csi0-imx214-csi1.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-csi0-ar0830-ap1302-csi1.dtbo
