@@ -288,4 +288,45 @@
 		};
 	};
 
+	fragment@10 {
+		target = <&hcp>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@11 {
+		target-path = "/soc";
+		__overlay__ {
+			hcp_l1 {
+				status = "disabled";
+			};
+
+			imgsys_l10 {
+				status = "disabled";
+			};
+
+			imgsys_l11A {
+				status = "disabled";
+			};
+
+			imgsys_l11C {
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@12 {
+		target = <&imgsys_fw>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@13 {
+		target = <&ipesys_me>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
 };
