@@ -1,0 +1,5 @@
+linux (6.6.0-1.0) v101; urgency=medium
+
+  * initial packaging
+
+ -- Jiajia Liu <liujiajia@kylinos.cn>  Tue, 27 Feb 2024 14:53:54 +0800
