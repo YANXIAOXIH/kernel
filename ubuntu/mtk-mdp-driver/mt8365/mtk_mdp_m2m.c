@@ -697,9 +697,13 @@ static void mtk_mdp_m2m_get_bufs(struct mtk_mdp_ctx *ctx)
 	d_frame = &ctx->d_frame;
 
 	src_vbuf = v4l2_m2m_next_src_buf(ctx->m2m_ctx);
-	mtk_mdp_prepare_addr(ctx, &src_vbuf->vb2_buf, s_frame, &s_frame->addr);
-
 	dst_vbuf = v4l2_m2m_next_dst_buf(ctx->m2m_ctx);
+	if ((src_vbuf == NULL) || (dst_vbuf == NULL)) {
+		dev_err(&ctx->mdp_dev->pdev->dev, "Error on getting src_vbuf and dst_vbuf!\n");
+		return;
+	}
+
+	mtk_mdp_prepare_addr(ctx, &src_vbuf->vb2_buf, s_frame, &s_frame->addr);
 	mtk_mdp_prepare_addr(ctx, &dst_vbuf->vb2_buf, d_frame, &d_frame->addr);
 
 	dst_vbuf->vb2_buf.timestamp = src_vbuf->vb2_buf.timestamp;
@@ -717,6 +721,10 @@ static void mtk_mdp_process_done(void *priv, int vb_state)
 
 	src_vbuf = v4l2_m2m_src_buf_remove(ctx->m2m_ctx);
 	dst_vbuf = v4l2_m2m_dst_buf_remove(ctx->m2m_ctx);
+	if ((src_vbuf == NULL) || (dst_vbuf == NULL)) {
+		dev_err(&ctx->mdp_dev->pdev->dev, "Error on removing src_vbuf and dst_vbuf!\n");
+		return;
+	}
 
 	dst_vbuf->vb2_buf.timestamp = src_vbuf->vb2_buf.timestamp;
 	dst_vbuf->timecode = src_vbuf->timecode;
