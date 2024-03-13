@@ -1470,8 +1470,11 @@ static int get_platform_id(struct platform_device *pdev)
 	efuse_plat_id = 0;
 
 	cell = nvmem_cell_get(dev, "efuse_apu_segment");
-	if (IS_ERR(cell))
-		return dev_err_probe(dev, PTR_ERR(cell), "nvmem_cell_get failed\n");
+	if (IS_ERR(cell)) {
+		/* Older chips have no efuse_apu_segment. Leave efuse_plat_id as 0.*/
+		dev_info(dev, "no efuse_apu_segment, assume efuse_plat_id = 0x%x\n", efuse_plat_id);
+		goto out;
+	}
 
 	buf = nvmem_cell_read(cell, NULL);
 	nvmem_cell_put(cell);
@@ -1484,6 +1487,7 @@ static int get_platform_id(struct platform_device *pdev)
 	dev_info(dev, "efuse_plat_id = 0x%x\n", efuse_plat_id);
 
 	kfree(buf);
+out:
 	return 0;
 }
 
