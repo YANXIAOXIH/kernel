@@ -629,6 +629,7 @@ static void mtk_vcodec_build_log_string(struct mtk_vcodec_dev *dev,
 	char *venc_temp_str;
 	char temp_str[LOG_PARAM_INFO_SIZE * 2 + 1] = {0};
 	int temp_num = LOG_PARAM_INFO_SIZE * 2 + 1;
+	int ret = 0;
 
 	if (log_index == MTK_VCODEC_LOG_INDEX_LOG) {
 		plist = &dev->log_param_list;
@@ -653,8 +654,13 @@ static void mtk_vcodec_build_log_string(struct mtk_vcodec_dev *dev,
 			mtk_v4l2_debug(8, "existed log param %s: %s\n",
 					pram->param_key, pram->param_val);
 
-			snprintf(temp_str, temp_num, "%s %s",
+			ret = snprintf(temp_str, temp_num, "%s %s",
 				pram->param_key, pram->param_val);
+			if (ret < 0) {
+				mtk_v4l2_err("invalid snprintf");
+				return;
+			}
+
 			strncat(vdec_temp_str, temp_str, temp_num);
 		}
 		if (log_index == MTK_VCODEC_LOG_INDEX_LOG) {
@@ -670,8 +676,12 @@ static void mtk_vcodec_build_log_string(struct mtk_vcodec_dev *dev,
 			mtk_v4l2_debug(8, "existed log param %s: %s\n",
 					pram->param_key, pram->param_val);
 
-			snprintf(temp_str, temp_num, "%s %s",
+			ret = snprintf(temp_str, temp_num, "%s %s",
 				pram->param_key, pram->param_val);
+			if (ret < 0) {
+				mtk_v4l2_err("invalid snprintf");
+				return;
+			}
 			strncat(venc_temp_str, temp_str, temp_num);
 		}
 		if (log_index == MTK_VCODEC_LOG_INDEX_LOG) {
