@@ -220,10 +220,11 @@ struct vdec_fb *mtk_vcodec_get_fb(struct mtk_vcodec_ctx *ctx)
 				ctx->id, num_rdy_bufs);
 			if (num_rdy_bufs > 1) {
 				dst_vb2_v4l2 = v4l2_m2m_dst_buf_remove(ctx->m2m_ctx);
-				v4l2_m2m_buf_queue_check(
-					ctx->m2m_ctx, dst_vb2_v4l2);
+				if (dst_vb2_v4l2 != NULL)
+					v4l2_m2m_buf_queue_check(ctx->m2m_ctx, dst_vb2_v4l2);
 				dst_vb2_v4l2 = v4l2_m2m_next_dst_buf(ctx->m2m_ctx);
-				dst_buf = &dst_vb2_v4l2->vb2_buf;
+				if (dst_vb2_v4l2 != NULL)
+					dst_buf = &dst_vb2_v4l2->vb2_buf;
 			} else
 				dst_buf = NULL;
 		}
@@ -265,9 +266,9 @@ struct vdec_fb *mtk_vcodec_get_fb(struct mtk_vcodec_ctx *ctx)
 		dst_vb2_v4l2 = v4l2_m2m_dst_buf_remove(ctx->m2m_ctx);
 		if (dst_vb2_v4l2 != NULL)
 			dst_buf = &dst_vb2_v4l2->vb2_buf;
-			mtk_v4l2_debug(8, "[%d] index=%d, num_rdy_bufs=%d\n",
-				ctx->id, dst_buf->index,
-				v4l2_m2m_num_dst_bufs_ready(ctx->m2m_ctx));
+		mtk_v4l2_debug(8, "[%d] index=%d, num_rdy_bufs=%d\n",
+			ctx->id, dst_buf->index,
+			v4l2_m2m_num_dst_bufs_ready(ctx->m2m_ctx));
 
 		mutex_unlock(&ctx->buf_lock);
 	} else {
@@ -310,7 +311,8 @@ struct mtk_vcodec_mem *mtk_vcodec_get_bs(struct mtk_vcodec_ctx *ctx)
 		pbs_buf->dmabuf = dst_buf->planes[0].dbuf;
 
 		dst_vb2_v4l2 = v4l2_m2m_dst_buf_remove(ctx->m2m_ctx);
-		dst_buf = &dst_vb2_v4l2->vb2_buf;
+		if (dst_vb2_v4l2 != NULL)
+			dst_buf = &dst_vb2_v4l2->vb2_buf;
 		if (dst_buf != NULL) {
 			mtk_v4l2_debug(8, "[%d] index=%d, num_rdy_bufs=%d\n", ctx->id,
 				dst_buf->index,
