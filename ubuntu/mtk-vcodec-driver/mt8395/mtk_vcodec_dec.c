@@ -61,7 +61,8 @@ static void set_vdec_vcp_data(struct mtk_vcodec_ctx *ctx, enum vcp_reserve_mem_i
 
 	if (id == VDEC_SET_PROP_MEM_ID) {
 
-		sprintf(tmp_buf, "%s", mtk_vdec_property);
+		if (sprintf(tmp_buf, "%s", mtk_vdec_property) < 0)
+			mtk_v4l2_err("mtk_vdec_property error");
 
 		mtk_v4l2_debug(3, "[%d] mtk_vdec_property %s", ctx->id, tmp_buf);
 		mtk_v4l2_debug(3, "[%d] mtk_vdec_property_prev %s",
@@ -80,7 +81,8 @@ static void set_vdec_vcp_data(struct mtk_vcodec_ctx *ctx, enum vcp_reserve_mem_i
 		}
 	} else if (id == VDEC_VCP_LOG_INFO_ID) {
 
-		sprintf(tmp_buf, "%s", mtk_vdec_vcp_log);
+		if (sprintf(tmp_buf, "%s", mtk_vdec_vcp_log) < 0)
+			mtk_v4l2_err("mtk_vdec_vcp_log error");
 
 		mtk_v4l2_debug(3, "[%d] mtk_vdec_vcp_log %s", ctx->id, tmp_buf);
 		mtk_v4l2_debug(3, "[%d] mtk_vdec_vcp_log_prev %s", ctx->id, mtk_vdec_vcp_log_prev);
@@ -2016,8 +2018,8 @@ static int vidioc_vdec_dqbuf(struct file *file, void *priv,
 			}
 
 			f_data.value = ctx->fence_idx;
-			sprintf(f_data.name, "vdec_fence%d",
-				f_data.value);
+			if (sprintf(f_data.name, "vdec_fence%d", f_data.value) < 0)
+				mtk_v4l2_err("f_data.name error");
 			ret = fence_create(ctx->p_timeline_obj,
 				&f_data);
 			mtk_v4l2_debug(2, "fence_create id %d ret %d",
@@ -2891,10 +2893,12 @@ static void vb2ops_vdec_buf_queue(struct vb2_buffer *vb)
 		src_mem->dmabuf);
 
 	if (src_mem->va != NULL) {
-		sprintf(debug_bs, "%02x %02x %02x %02x %02x %02x %02x %02x %02x",
+		ret = sprintf(debug_bs, "%02x %02x %02x %02x %02x %02x %02x %02x %02x",
 		  ((char *)src_mem->va)[0], ((char *)src_mem->va)[1], ((char *)src_mem->va)[2],
 		  ((char *)src_mem->va)[3], ((char *)src_mem->va)[4], ((char *)src_mem->va)[5],
 		  ((char *)src_mem->va)[6], ((char *)src_mem->va)[7], ((char *)src_mem->va)[8]);
+		if (ret < 0)
+			mtk_v4l2_err("debug_bs error");
 	}
 
 	frame_size[0] = ctx->dec_params.frame_size_width;
