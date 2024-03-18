@@ -2857,12 +2857,12 @@ static int mtk_vcu_probe(struct platform_device *pdev)
 #if ENABLE_GCE
 	ret = of_property_read_u32(dev->of_node, "mediatek,dec_gce_th_num",
 				      &vcu->gce_th_num[VCU_VDEC]);
-	if (ret != 0 || vcu->gce_th_num[VCU_VDEC] > GCE_THNUM_MAX)
+	if (!ret && vcu->gce_th_num[VCU_VDEC] > GCE_THNUM_MAX)
 		vcu->gce_th_num[VCU_VDEC] = 1;
 
 	ret = of_property_read_u32(dev->of_node, "mediatek,enc_gce_th_num",
 				      &vcu->gce_th_num[VCU_VENC]);
-	if (ret != 0 || vcu->gce_th_num[VCU_VENC] > GCE_THNUM_MAX)
+	if (!ret && vcu->gce_th_num[VCU_VENC] > GCE_THNUM_MAX)
 		vcu->gce_th_num[VCU_VENC] = 1;
 
 	for (i = 0; i < ARRAY_SIZE(vcu->gce_gpr); i++) {
