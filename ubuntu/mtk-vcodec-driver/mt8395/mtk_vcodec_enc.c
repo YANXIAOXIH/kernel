@@ -342,7 +342,7 @@ static int vidioc_venc_s_ctrl(struct v4l2_ctrl *ctrl)
 		if (!vidioc_venc_check_supported_profile_level(
 				V4L2_PIX_FMT_H264, ctrl->val, 1))
 			return -EINVAL;
-		p->profile = ctrl->val;
+		p->h264_profile = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_HEVC_PROFILE:
 		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_HEVC_PROFILE val = %d",
@@ -350,15 +350,7 @@ static int vidioc_venc_s_ctrl(struct v4l2_ctrl *ctrl)
 		if (!vidioc_venc_check_supported_profile_level(
 				V4L2_PIX_FMT_HEVC, ctrl->val, 1))
 			return -EINVAL;
-		p->profile = ctrl->val;
-		break;
-	case V4L2_CID_MPEG_VIDEO_MPEG4_PROFILE:
-		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_MPEG4_PROFILE val = %d",
-			       ctrl->val);
-		if (!vidioc_venc_check_supported_profile_level(
-			    V4L2_PIX_FMT_MPEG4, ctrl->val, 1))
-			return -EINVAL;
-		p->profile = ctrl->val;
+		p->hevc_profile = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_H264_LEVEL:
 		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_H264_LEVEL val = %d",
@@ -366,7 +358,8 @@ static int vidioc_venc_s_ctrl(struct v4l2_ctrl *ctrl)
 		if (!vidioc_venc_check_supported_profile_level(
 				V4L2_PIX_FMT_H264, ctrl->val, 0))
 			return -EINVAL;
-		p->level = ctrl->val;
+
+		p->h264_level = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_HEVC_LEVEL:
 		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_HEVC_LEVEL val = %d",
@@ -374,20 +367,13 @@ static int vidioc_venc_s_ctrl(struct v4l2_ctrl *ctrl)
 		if (!vidioc_venc_check_supported_profile_level(
 				V4L2_PIX_FMT_HEVC, ctrl->val, 0))
 			return -EINVAL;
-		p->level = ctrl->val;
+
+		p->hevc_level = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_HEVC_TIER:
 		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_HEVC_TIER val = %d",
 			ctrl->val);
 		p->tier = ctrl->val;
-		break;
-	case V4L2_CID_MPEG_VIDEO_MPEG4_LEVEL:
-		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_MPEG4_LEVEL val = %d",
-			       ctrl->val);
-		if (!vidioc_venc_check_supported_profile_level(
-			    V4L2_PIX_FMT_MPEG4, ctrl->val, 0))
-			return -EINVAL;
-		p->level = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_H264_I_PERIOD:
 		mtk_v4l2_debug(2, "V4L2_CID_MPEG_VIDEO_H264_I_PERIOD val = %d",
@@ -1305,9 +1291,15 @@ static void mtk_venc_set_param(struct mtk_vcodec_ctx *ctx,
 		param->input_yuv_fmt = VENC_YUV_FORMAT_I420;
 		break;
 	}
-	param->profile = enc_params->profile;
-	param->level = enc_params->level;
-	param->tier = enc_params->tier;
+
+	if (ctx->q_data[MTK_Q_DATA_DST].fmt->fourcc == V4L2_PIX_FMT_H264) {
+		param->profile = enc_params->h264_profile;
+		param->level = enc_params->h264_level;
+	} else {
+		param->profile = enc_params->hevc_profile;
+		param->level = enc_params->hevc_level;
+		param->tier = enc_params->tier;
+	}
 
 	/* Config visible resolution */
 	param->width = q_data_src->visible_width;

@@ -291,8 +291,10 @@ struct mtk_enc_params {
 	unsigned int    framerate_num;
 	unsigned int    framerate_denom;
 	unsigned int    h264_max_qp;
-	unsigned int    profile;
-	unsigned int    level;
+	unsigned int    h264_profile;
+	unsigned int    h264_level;
+	unsigned int    hevc_profile;
+	unsigned int    hevc_level;
 	unsigned int    tier;
 	unsigned int    force_intra;
 	unsigned int    scenario;
