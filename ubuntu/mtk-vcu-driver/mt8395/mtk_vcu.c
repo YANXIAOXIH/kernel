@@ -1028,6 +1028,7 @@ int vcu_cmdq_pkt_write(struct cmdq_pkt *pkt, dma_addr_t addr, u32 value, u32 mas
 	if (!pkt) {
 		pr_info("%s Error: pkt is NULL !", __func__);
 		ret = -EINVAL;
+		return ret;
 	}
 
 	if(mask != 0xFFFFFFFF)
