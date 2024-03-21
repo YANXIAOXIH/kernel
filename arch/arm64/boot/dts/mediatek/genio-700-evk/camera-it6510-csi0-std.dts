@@ -132,34 +132,41 @@
 	};
 
 	fragment@10 {
-		target-path = "/soc";
+		target-path = "/soc/hcp_l15";
 		__overlay__ {
-			hcp_l1 {
-				status = "disabled";
-			};
-
-			imgsys_l10 {
-				status = "disabled";
-			};
-
-			imgsys_l11A {
-				status = "disabled";
-			};
-
-			imgsys_l11C {
-				status = "disabled";
-			};
+			status = "disabled";
 		};
 	};
 
 	fragment@11 {
-		target = <&imgsys_fw>;
+		target-path = "/soc/imgsys_l10";
 		__overlay__ {
 			status = "disabled";
 		};
 	};
 
 	fragment@12 {
+		target-path = "/soc/imgsys_l11A";
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@13 {
+		target-path = "/soc/imgsys_l11C";
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@14 {
+		target = <&imgsys_fw>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@15 {
 		target = <&ipesys_me>;
 		__overlay__ {
 			status = "disabled";
