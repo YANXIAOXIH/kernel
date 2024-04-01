@@ -648,7 +648,7 @@ static int mtk_dpi_set_display_mode(struct mtk_dpi *dpi,
 		mtk_dpi_config_disable_edge(dpi);
 	}
 	if (dpi->conf->input_2pixel) {
-		mtk_dpi_mask(dpi, DPI_CON, DPINTF_INPUT_2P_EN,
+		mtk_dpi_mask(dpi, DPI_CON, dpi->is_2p_input ? DPINTF_INPUT_2P_EN: 0,
 			     DPINTF_INPUT_2P_EN);
 	}
 	mtk_dpi_sw_reset(dpi, false);
