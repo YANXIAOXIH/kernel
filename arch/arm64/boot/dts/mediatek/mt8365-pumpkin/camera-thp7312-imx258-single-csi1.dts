@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-2.0
+
+#include "camera-thp7312-imx258-dual.dtsi"
+
+/ {
+	fragment@6 {
+		target = <&i2c3>;
+		__overlay__ {
+			camera@61 {
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@7 {
+		target = <&camsv1>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+};
