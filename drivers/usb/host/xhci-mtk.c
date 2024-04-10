@@ -75,7 +75,7 @@
 
 #define HSCH_CFG1		0x960
 #define SCH3_RXFIFO_DEPTH_MASK	GENMASK(21, 20)
-
+#define SCH3_RXFIFO_DEPTH_BACK_COMP	0xc00
 #define SS_GEN2_EOF_CFG		0x990
 #define SSG2EOF_OFFSET		0x3c
 
@@ -588,6 +588,12 @@ static int xhci_mtk_probe(struct platform_device *pdev)
 			     &mtk->u3p_dis_msk);
 	of_property_read_u32(node, "mediatek,u2p-dis-msk",
 			     &mtk->u2p_dis_msk);
+
+	/* handle downstream dt property for backwards compatibility */
+	if (of_property_read_bool(node, "mediatek,u3-rx-fifo-depth")) {
+		mtk->rxfifo_depth = SCH3_RXFIFO_DEPTH_BACK_COMP;
+		dev_info(dev, "backwards compatible for rxfifo_depth, might be overwritten\n");
+	}
 
 	of_property_read_u32(node, "rx-fifo-depth", &mtk->rxfifo_depth);
 
