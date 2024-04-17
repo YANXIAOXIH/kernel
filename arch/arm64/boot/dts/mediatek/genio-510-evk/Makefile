@@ -1,4 +1,5 @@
 DTC_FLAGS += -@
+dtb-$(CONFIG_ARCH_MEDIATEK) += audio-sof.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-dual-std.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-2lanes-csi0.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0430-ap1302-csi1.dtbo
