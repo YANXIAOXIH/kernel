@@ -4758,8 +4758,9 @@ int power_control_init(struct kbase_device *kbdev)
 	struct platform_device *pdev;
 	int err = 0;
 	unsigned int i;
+	int num_supply;
 #if defined(CONFIG_REGULATOR)
-	static const char *const regulator_names[] = { "mali", "shadercores" };
+	static const char *regulator_names[] = { "mali", "shadercores" };
 	BUILD_BUG_ON(ARRAY_SIZE(regulator_names) < BASE_MAX_NR_CLOCKS_REGULATORS);
 #endif /* CONFIG_REGULATOR */
 
@@ -4769,6 +4770,23 @@ int power_control_init(struct kbase_device *kbdev)
 	pdev = to_platform_device(kbdev->dev);
 
 #if defined(CONFIG_REGULATOR)
+	num_supply = of_property_count_strings(kbdev->dev->of_node, "supply-names");
+	if (num_supply > BASE_MAX_NR_CLOCKS_REGULATORS) {
+		dev_err(&pdev->dev, "Too many supply-names: %d > %d\n",
+			num_supply, BASE_MAX_NR_CLOCKS_REGULATORS);
+		return -EINVAL;
+	}
+
+	if (num_supply < 0) {
+		dev_info(&pdev->dev, "No regulators in gpu node\n");
+	} else {
+		/* parse regulator names(.*-supply$) from gpu dts "supply-names" node */
+		err = of_property_read_string_array(kbdev->dev->of_node,
+			"supply-names",
+			regulator_names,
+			num_supply);
+	}
+
 	/* Since the error code EPROBE_DEFER causes the entire probing
 	 * procedure to be restarted from scratch at a later time,
 	 * all regulators will be released before returning.
