@@ -4,6 +4,9 @@
  *
  */
 
+/dts-v1/;
+/plugin/;
+
 #include "camera-common.dtsi"
 
 / {
