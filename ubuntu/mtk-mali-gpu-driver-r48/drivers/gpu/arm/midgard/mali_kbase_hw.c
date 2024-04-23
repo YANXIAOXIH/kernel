@@ -341,6 +341,8 @@ static const enum base_hw_issue *kbase_hw_get_issues_for_new_id(struct kbase_dev
 			gpu_id->version_status = fallback_version_status;
 			gpu_id->version_id = fallback_version;
 		}
+	} else {
+		dev_warn(kbdev->dev, "fail to search GPU_ID_PRODUCT in kbase_hw_get_issues_for_new_id\n");
 	}
 
 

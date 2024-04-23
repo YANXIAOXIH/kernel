@@ -159,6 +159,22 @@ void kbase_gpuprops_update_composite_ids(struct kbase_gpu_id_props *props)
 
 void kbase_gpuprops_parse_gpu_id(struct kbase_gpu_id_props *props, u64 gpu_id)
 {
+	u64 orig_gpu_id = gpu_id;
+
+	/* 
+	 * Mali-G57 on MT8192 has a different GPU ID 0x90930000.
+	 * Mali-G57 on MT8195 has a different GPU ID 0x90930010.
+	 * Pretending it's a normal G57 to minimize the impact.
+	 */
+	orig_gpu_id = gpu_id;
+	if (GPU_ID2_PRODUCT_TNAX_MT819X == (GPU_ID2_PRODUCT_MODEL & gpu_id)) {
+		gpu_id = (GPU_ID2_PRODUCT_TNAX & GPU_ID2_PRODUCT_MODEL) | (orig_gpu_id & ~GPU_ID2_PRODUCT_MODEL);
+		printk(KERN_INFO "mali: [kbase_gpuprops_parse_gpu_id] Detected G-57 variant with GPU ID 0x%llx. "
+			"Changing the ID to 0x%llx.",
+			orig_gpu_id, 
+			gpu_id);
+	}
+
 	props->arch_major = GPU_ID2_ARCH_MAJOR_GET(gpu_id);
 	props->version_status = gpu_id & GPU_ID2_VERSION_STATUS;
 	props->version_minor = GPU_ID2_VERSION_MINOR_GET(gpu_id);

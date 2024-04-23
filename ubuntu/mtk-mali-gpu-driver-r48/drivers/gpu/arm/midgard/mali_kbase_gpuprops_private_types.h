@@ -70,6 +70,7 @@ struct kbasep_gpuprops_regdump {
 	u32 js_features[GPU_MAX_JOB_SLOTS];
 	u32 texture_features[BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS];
 	u64 gpu_id;
+	u64 orig_gpu_id;	/* For GPU ID 9.3 */
 	u32 thread_max_threads;
 	u32 thread_max_workgroup_size;
 	u32 thread_max_barrier_size;

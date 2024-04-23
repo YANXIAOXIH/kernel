@@ -250,6 +250,7 @@ struct kbase_gpu_props {
 	struct kbase_js_features_props js_features[GPU_MAX_JOB_SLOTS];
 
 	struct kbase_gpu_id_props gpu_id;
+	struct kbase_gpu_id_props orig_gpu_id;
 
 	struct kbase_gpu_features_props gpu_features;
 
