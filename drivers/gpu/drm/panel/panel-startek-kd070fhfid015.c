@@ -210,10 +210,10 @@ static int stk_panel_prepare(struct drm_panel *panel)
 	ret = regulator_enable(stk->pp3300_supply);
 	if (ret < 0)
 		return ret;
+	mdelay(8);
 	ret = regulator_enable(stk->iovcc_supply);
 	if (ret < 0)
 		return ret;
-	mdelay(8);
 	mdelay(20);
 	gpiod_set_value(stk->enable_gpio, 1);
 	mdelay(20);
