@@ -3282,7 +3282,7 @@ int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
 #endif
 	v4l2_ctrl_new_std_menu(handler, ops, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
 		V4L2_MPEG_VIDEO_BITRATE_MODE_CQ,
-		0, V4L2_MPEG_VIDEO_BITRATE_MODE_VBR);
+		0, V4L2_MPEG_VIDEO_BITRATE_MODE_CBR);
 	if (handler->error)
 		mtk_v4l2_debug(0, "Adding control failed V4L2_CID_MPEG_VIDEO_BITRATE_MODE %x %d",
 			 V4L2_CID_MPEG_VIDEO_BITRATE_MODE, handler->error);
