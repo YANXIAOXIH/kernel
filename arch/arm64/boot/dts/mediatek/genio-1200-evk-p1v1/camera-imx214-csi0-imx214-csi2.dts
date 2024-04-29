@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (c) 2022 MediaTek Inc.
+ * Copyright (c) 2024 MediaTek Inc.
  *
  */
 
@@ -28,8 +28,24 @@
 		target = <&i2c1>;
 		__overlay__ {
 			sensor2 {
-				status = "disabled";
+				sensor-names = "imx214_mipi_raw";
+				reg = <0x1a>;
+				status = "okay";
 			};
+		};
+	};
+
+	fragment@12 {
+		target = <&mtkcam0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@13 {
+		target = <&mtkcam1>;
+		__overlay__ {
+			status = "okay";
 		};
 	};
 };
