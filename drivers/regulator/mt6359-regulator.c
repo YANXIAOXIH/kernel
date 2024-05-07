@@ -277,6 +277,9 @@ static unsigned int mt6359_regulator_get_mode(struct regulator_dev *rdev)
 		return ret;
 	}
 
+	if (info->modeset_mask == 0)
+		return REGULATOR_MODE_INVALID;
+
 	regval &= info->modeset_mask;
 	regval >>= ffs(info->modeset_mask) - 1;
 
