@@ -63,6 +63,9 @@ int aps_ipi_recv(int type_0, u64 *val)
 {
 	struct aps_ipi_data ipi_cmd_send;
 
+	if (!aps_tx_rpm_dev.ept)
+		return 0;
+
 	ipi_cmd_send.type0  = type_0;
 	ipi_cmd_send.dir    = APS_IPI_READ;
 	ipi_cmd_send.data   = 0;
