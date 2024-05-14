@@ -425,11 +425,4 @@
 			};
 		};
 	};
-
-	fragment@9 {
-		target = <&mtkcam0>;
-		__overlay__ {
-			status = "okay";
-		};
-	};
 };
