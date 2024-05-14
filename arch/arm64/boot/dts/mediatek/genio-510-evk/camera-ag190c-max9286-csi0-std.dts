@@ -203,30 +203,30 @@
 	fragment@8 {
 		target-path = "/soc/hcp_l15";
 		__overlay__ {
-				status = "disabled";
-			};
+			status = "disabled";
+		};
 	};
 
 	fragment@9 {
 		target-path = "/soc/imgsys_l10";
 		__overlay__ {
-				status = "disabled";
-			};
+			status = "disabled";
+		};
 	};
 
 	fragment@10 {
 		target-path = "/soc/imgsys_l11A";
 		__overlay__ {
-				status = "disabled";
-			};
+			status = "disabled";
+		};
 	};
 
 	fragment@11 {
 		target-path = "/soc/imgsys_l11C";
 		__overlay__ {
-				status = "disabled";
-			};
+			status = "disabled";
 		};
+	};
 
 	fragment@12 {
 		target = <&imgsys_fw>;
