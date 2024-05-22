@@ -868,6 +868,7 @@ static int vidioc_try_fmt(struct v4l2_format *f, struct mtk_video_fmt *fmt,
 		} else if (pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ABGR32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ARGB32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_RGB32 ||
+			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_RGBA32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_BGR32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ARGB1010102 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ABGR1010102 ||
@@ -997,6 +998,7 @@ static int vidioc_try_fmt(struct v4l2_format *f, struct mtk_video_fmt *fmt,
 		if (pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ABGR32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ARGB32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_RGB32 ||
+			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_RGBA32 ||
 			pix_fmt_mp->pixelformat == V4L2_PIX_FMT_BGR32 ||
 		pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ARGB1010102 ||
 		pix_fmt_mp->pixelformat == V4L2_PIX_FMT_ABGR1010102 ||
@@ -1238,6 +1240,9 @@ static void mtk_venc_set_param(struct mtk_vcodec_ctx *ctx,
 	case V4L2_PIX_FMT_ARGB32:
 	case V4L2_PIX_FMT_RGB32:
 		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitARGB8888;
+		break;
+	case V4L2_PIX_FMT_RGBA32:
+		param->input_yuv_fmt = VENC_YUV_FORMAT_32bitRGBA8888;
 		break;
 	case V4L2_PIX_FMT_ABGR32:
 	case V4L2_PIX_FMT_BGR32:
