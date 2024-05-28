@@ -18,7 +18,7 @@
 #if IS_ENABLED(CONFIG_MTK_AEE_FEATURE)
 #include <mt-plat/aee.h>
 #endif
-#include "apu_top_entry.h"
+#include "../../apu_top_entry.h"
 
 extern const struct apupwr_plat_data *pwr_data;
 

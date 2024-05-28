@@ -17,7 +17,7 @@
 
 #include "apu_top.h"
 #include "aputop_rpmsg.h"
-#include <apu_top_entry.h>
+#include "../../apu_top_entry.h"
 
 #if IS_ENABLED(CONFIG_DEVFREQ_THERMAL)
 static int apu_devfreq_probe(struct platform_device *pdev)

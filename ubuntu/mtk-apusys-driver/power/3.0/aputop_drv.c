@@ -19,7 +19,7 @@
 #include "apu_devfreq_cooling.h"
 #include "aputop_log.h"
 #include "aputop_rpmsg.h"
-#include <apu_top_entry.h>
+#include "../../apu_top_entry.h"
 
 const struct apupwr_plat_data *pwr_data;
 
