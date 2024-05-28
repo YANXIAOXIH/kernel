@@ -15,10 +15,14 @@
 #undef TRACE_PUT
 #endif
 
+#if IS_ENABLED(CONFIG_UBUNTU_HOST)
+#define TRACE_PUTS(p)
+#else
 #define TRACE_PUTS(p) \
 	do { \
 		trace_puts(p);; \
 	} while (0)
+#endif
 
 void trace_tag_begin(const char *format, ...);
 void trace_tag_end(void);
