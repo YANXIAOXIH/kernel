@@ -16,7 +16,7 @@
 #define vpu_trace_dump(fmt, args...) \
 { \
 	if (vpu_drv->met & VPU_MET_LEGACY) \
-		trace_printk("MET_DUMP|" fmt "\n", ##args); \
+		vpu_met_debug("MET_DUMP|" fmt "\n", ##args); \
 }
 
 /* log format */
