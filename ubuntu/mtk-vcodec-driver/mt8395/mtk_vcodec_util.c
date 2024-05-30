@@ -229,7 +229,7 @@ struct vdec_fb *mtk_vcodec_get_fb(struct mtk_vcodec_ctx *ctx)
 				dst_buf = NULL;
 		}
 	}
-	if (dst_buf != NULL) {
+	if ((dst_buf != NULL) && (dst_vb2_v4l2 != NULL)) {
 		dst_buf_info = container_of(
 			dst_vb2_v4l2, struct mtk_video_dec_buf, vb);
 		pfb = &dst_buf_info->frame_buffer;
