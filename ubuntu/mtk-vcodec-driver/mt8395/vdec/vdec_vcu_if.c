@@ -609,10 +609,23 @@ int vcu_dec_query_cap(struct vdec_vcu_inst *vcu, unsigned int id, void *out)
 	int err = 0;
 
 	mtk_vcodec_debug(vcu, "+ id=%X", AP_IPIMSG_DEC_QUERY_CAP);
+
+	if (vcu->ctx == NULL)
+	{
+		mtk_vcodec_err(vcu, "vcu ctx is NULL");
+		return -EINVAL;
+	}
+
+	if (vcu->ctx->dev == NULL)
+	{
+		mtk_vcodec_err(vcu, "vcu->ctx->dev is NULL");
+		return -EINVAL;
+	}
+
 	vcu->dev = VCU_FPTR(vcu_get_plat_device)(vcu->ctx->dev->plat_dev);
 	if (vcu->dev  == NULL) {
 		mtk_vcodec_err(vcu, "vcu device in not ready");
-		return -EPROBE_DEFER;
+		return -EINVAL;
 	}
 
 	vcu->id = (vcu->id == IPI_VCU_INIT) ? IPI_VDEC_COMMON : vcu->id;

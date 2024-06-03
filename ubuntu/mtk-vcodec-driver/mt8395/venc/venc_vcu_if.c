@@ -447,10 +447,23 @@ int vcu_enc_query_cap(struct venc_vcu_inst *vcu, unsigned int id, void *out)
 	}
 
 	mtk_vcodec_debug(vcu, "+ id=%X", vcu->id);
+
+	if (vcu->ctx == NULL)
+	{
+		mtk_vcodec_err(vcu, "vcu ctx is NULL");
+		return -EINVAL;
+	}
+
+	if (vcu->ctx->dev == NULL)
+	{
+		mtk_vcodec_err(vcu, "vcu->ctx->dev is NULL");
+		return -EINVAL;
+	}
+
 	vcu->dev = VCU_FPTR(vcu_get_plat_device)(vcu->ctx->dev->plat_dev);
 	if (vcu->dev  == NULL) {
 		mtk_vcodec_err(vcu, "vcu device in not ready");
-		return -EPROBE_DEFER;
+		return -EINVAL;
 	}
 
 	vcu->id = (vcu->id == IPI_VCU_INIT) ? IPI_VENC_COMMON : vcu->id;
@@ -472,6 +485,8 @@ int vcu_enc_query_cap(struct venc_vcu_inst *vcu, unsigned int id, void *out)
 	vcu_enc_set_pid(vcu);
 	err = vcu_enc_send_msg(vcu, &msg, sizeof(msg));
 	mtk_vcodec_debug(vcu, "- id=%X ret=%d", msg.msg_id, err);
+
+	mtk_vcodec_err(vcu, "- id=%X ret=%d", msg.msg_id, err);
 
 	return err;
 }
