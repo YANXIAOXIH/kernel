@@ -905,6 +905,7 @@ static int vpu_probe(struct platform_device *pdev)
 		} else {
 			// do not probe coreX if core0 did not success to probe
 			pr_info("%s: not probe vpu core %d due to core0 was not probe\n", __func__, vd->id);
+			ret = -ENODEV;
 			goto out;
 		}
 	}
