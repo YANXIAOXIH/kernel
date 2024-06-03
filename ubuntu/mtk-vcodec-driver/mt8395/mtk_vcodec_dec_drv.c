@@ -412,6 +412,7 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 	int i = 0, reg_index = 0, ret = 0;
 	const char *name = NULL;
 	u32 port_id;
+	struct device_link *link;
 
 	if (!pdev)
 		return -ENODEV;
@@ -427,9 +428,12 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 	if (VCU_FPTR(vcu_get_plat_device)) {
 		dev->vcu_plat_dev = VCU_FPTR(vcu_get_plat_device)(dev->plat_dev);
 		if (dev->vcu_plat_dev == NULL) {
-			mtk_v4l2_err("[VCU] vcu device in not ready");
+			mtk_v4l2_err("[VCU] vcu device in not ready: dev->vcu_plat_dev == NULL");
 			return -EPROBE_DEFER;
 		}
+	} else {
+		mtk_v4l2_err("[VCU] vcu device in not ready");
+		return -EPROBE_DEFER;
 	}
 #endif
 
@@ -533,17 +537,11 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 	snprintf(dev->v4l2_dev.name, sizeof(dev->v4l2_dev.name), "%s",
 			 "[/MTK_V4L2_VDEC]");
 
-	ret = v4l2_device_register(&pdev->dev, &dev->v4l2_dev);
-	if (ret) {
-		mtk_v4l2_err("v4l2_device_register err=%d", ret);
-		goto err_res;
-	}
-
 	vfd_dec = video_device_alloc();
 	if (!vfd_dec) {
 		mtk_v4l2_err("Failed to allocate video device");
 		ret = -ENOMEM;
-		goto err_dec_alloc;
+		goto err_res;
 	}
 	vfd_dec->fops           = &mtk_vcodec_fops;
 	vfd_dec->ioctl_ops      = &mtk_vdec_ioctl_ops;
@@ -576,12 +574,6 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 		goto err_event_workq;
 	}
 
-	ret = video_register_device(vfd_dec, VFL_TYPE_VIDEO, -1);
-	if (ret) {
-		mtk_v4l2_err("Failed to register video device");
-		goto err_dec_reg;
-	}
-
 	for (i = 0; i < NUM_MAX_VDEC_M4U_PORT; i++)
 		dev->dec_m4u_ports[i] = 0;
 	for (i = 0; !of_property_read_string_index(
@@ -589,14 +581,16 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 		reg_index = mtk_vdec_m4u_port_name_to_index(name);
 		if (reg_index < 0) {
 			dev_info(&pdev->dev, "invalid m4u port name: %s, index: %d", name, i);
-			return -EINVAL;
+			ret = -EINVAL;
+			goto err_dec_reg;
 		}
 		ret = of_property_read_u32_index(pdev->dev.of_node,
 			"m4u-ports", i, &port_id);
 		if (ret) {
 			dev_info(&pdev->dev, "get m4u port name: %s (%d), index: %d fail %d",
 				name, reg_index, i, ret);
-			return -EINVAL;
+			ret = -EINVAL;
+			goto err_dec_reg;
 		}
 		dev->dec_m4u_ports[reg_index] = (int)port_id;
 		mtk_v4l2_debug(2, "dec_m4u_ports[%d]=0x%x",
@@ -607,7 +601,8 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 	dev->io_domain = iommu_get_domain_for_dev(&pdev->dev);
 	if (dev->io_domain == NULL) {
 		mtk_v4l2_err("Failed to get io_domain\n");
-		return -EPROBE_DEFER;
+		ret = -EPROBE_DEFER;
+		goto err_dec_reg;
 	}
 
 	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(34));
@@ -615,14 +610,11 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(34));
 		if (ret) {
 			dev_info(&pdev->dev, "64-bit DMA enable failed\n");
-			return ret;
+			goto err_dec_reg;
 		}
 	}
 	mtk_vdec_translation_fault_callback_setting(dev);
 #endif
-	mtk_v4l2_debug(0, "decoder registered as /dev/video%d",
-				   vfd_dec->num);
-
 
 	mtk_prepare_vdec_dvfs(dev);
 	mtk_prepare_vdec_emi_bw(dev);
@@ -643,16 +635,44 @@ static int mtk_vcodec_dec_probe(struct platform_device *pdev)
 	INIT_LIST_HEAD(&dev->prop_param_list);
 	dev_ptr = dev;
 
+#if IS_ENABLED(CONFIG_VIDEO_MEDIATEK_VCU_MT8395)
+	/*add device link to vcu dev to make sure open order is correct*/
+	if (dev->vcu_plat_dev) {
+		link = device_link_add(&pdev->dev, &dev->vcu_plat_dev->dev,
+					DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
+		if (!link) {
+			mtk_v4l2_err("link failed\n");
+			ret = -ENODEV;
+			goto err_dec_reg;
+		}
+	}
+#endif
+
+	ret = v4l2_device_register(&pdev->dev, &dev->v4l2_dev);
+	if (ret) {
+		mtk_v4l2_err("v4l2_device_register err=%d", ret);
+		goto err_dec_reg;
+	}
+
+	ret = video_register_device(vfd_dec, VFL_TYPE_VIDEO, -1);
+	if (ret) {
+		mtk_v4l2_err("Failed to register video device");
+		goto err_video_reg_dev;
+	}
+
+	mtk_v4l2_debug(0, "decoder registered as /dev/video%d",
+		       vfd_dec->num);
+
 	return 0;
 
+err_video_reg_dev:
+	v4l2_device_unregister(&dev->v4l2_dev);
 err_dec_reg:
 	destroy_workqueue(dev->decode_workqueue);
 err_event_workq:
 	v4l2_m2m_release(dev->m2m_dev_dec);
 err_dec_mem_init:
-	video_unregister_device(vfd_dec);
-err_dec_alloc:
-	v4l2_device_unregister(&dev->v4l2_dev);
+	video_device_release(vfd_dec);
 err_res:
 	mtk_vcodec_release_dec_pm(dev);
 	return ret;
