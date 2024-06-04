@@ -3253,7 +3253,7 @@ int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
 	v4l2_ctrl_handler_init(handler, MTK_MAX_CTRLS_HINT);
 	ctx->enc_params.bitrate = 5000000;
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_BITRATE,
-			  0, 400000000, 1, ctx->enc_params.bitrate);
+			  0, 100000000, 1, ctx->enc_params.bitrate);
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_B_FRAMES,
 			  0, 3, 1, 0);
 	ctx->enc_params.rc_frame = 1;
