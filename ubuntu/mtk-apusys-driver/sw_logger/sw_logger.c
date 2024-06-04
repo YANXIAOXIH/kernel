@@ -1020,6 +1020,11 @@ static int sw_logger_remove(struct platform_device *pdev)
 
 	sw_logger_remove_procfs(dev);
 	sw_logger_remove_sysfs(dev);
+
+	/* No need to unmap or free dma addr if it is invalid */
+	if (!handle)
+		return 0;
+
 	if (!BYPASS_IOMMU) {
 		dma_unmap_single(dev, handle, APU_LOG_SIZE, DMA_FROM_DEVICE);
 		kfree(sw_log_buf);
