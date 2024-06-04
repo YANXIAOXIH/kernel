@@ -1025,6 +1025,7 @@ static int mtk_star_enable(struct net_device *ndev)
 		ret = -ENODEV;
 		goto err_free_irq;
 	}
+	priv->phydev->mac_managed_pm = true;
 
 	mtk_star_dma_start(priv);
 	phy_start(priv->phydev);
