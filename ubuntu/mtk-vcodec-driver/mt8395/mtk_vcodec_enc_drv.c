@@ -337,6 +337,7 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 	int port_args_num = 0, port_data_len = 0, total_port_num = 0;
 	unsigned int offset = 0;
 	unsigned int core_id = 0, ram_type = 0, port_id = 0;
+	struct device_link *link;
 
 	if (!pdev)
 		return -ENODEV;
@@ -351,9 +352,12 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 	if (VCU_FPTR(vcu_get_plat_device)) {
 		dev->vcu_plat_dev = VCU_FPTR(vcu_get_plat_device)(dev->plat_dev);
 		if (dev->vcu_plat_dev == NULL) {
-			mtk_v4l2_err("[VCU] vcu device in not ready");
+			mtk_v4l2_err("[VCU] vcu device in not ready dev->vcu_plat_dev == NULL");
 			return -EPROBE_DEFER;
 		}
+	} else {
+		mtk_v4l2_err("[VCU] vcu device in not ready");
+		return -EPROBE_DEFER;
 	}
 #endif
 	ret = of_property_read_string(pdev->dev.of_node, "mediatek,platform", &dev->platform);
@@ -385,7 +389,8 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 			reg_index = VENC_GCON;
 		} else {
 			dev_info(&pdev->dev, "invalid reg name: %s, index: %d", name, reg_num);
-			return -EINVAL;
+			ret = -EINVAL;
+			goto err_res;
 		}
 
 		res = platform_get_resource(pdev, IORESOURCE_MEM, reg_num);
@@ -483,18 +488,12 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 	snprintf(dev->v4l2_dev.name, sizeof(dev->v4l2_dev.name), "%s",
 			 "[MTK_V4L2_VENC]");
 
-	ret = v4l2_device_register(&pdev->dev, &dev->v4l2_dev);
-	if (ret) {
-		mtk_v4l2_err("v4l2_device_register err=%d", ret);
-		goto err_res;
-	}
-
 	/* allocate video device for encoder and register it */
 	vfd_enc = video_device_alloc();
 	if (!vfd_enc) {
 		mtk_v4l2_err("Failed to allocate video device");
 		ret = -ENOMEM;
-		goto err_enc_alloc;
+		goto err_res;
 	}
 	vfd_enc->fops           = &mtk_vcodec_fops;
 	vfd_enc->ioctl_ops      = &mtk_venc_ioctl_ops;
@@ -528,17 +527,12 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 		goto err_event_workq;
 	}
 
-	ret = video_register_device(vfd_enc, VFL_TYPE_VIDEO, -1);
-	if (ret) {
-		mtk_v4l2_err("Failed to register video device");
-		goto err_enc_reg;
-	}
-
 #if IS_ENABLED(CONFIG_MTK_IOMMU)
 	dev->io_domain = iommu_get_domain_for_dev(&pdev->dev);
 	if (dev->io_domain == NULL) {
 		mtk_v4l2_err("Failed to get io_domain\n");
-		return -EPROBE_DEFER;
+		ret = -EPROBE_DEFER;
+		goto err_enc_reg;
 	}
 
 	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(34));
@@ -546,12 +540,23 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(34));
 		if (ret) {
 			dev_info(&pdev->dev, "64-bit DMA enable failed\n");
-			return ret;
+			goto err_enc_reg;
 		}
 	}
 #endif
-	mtk_v4l2_debug(0, "encoder registered as /dev/video%d",
-				   vfd_enc->num);
+
+#if IS_ENABLED(CONFIG_VIDEO_MEDIATEK_VCU_MT8395)
+	/*add delink to vcu dev to make sure open oder is corect*/
+	if (dev->vcu_plat_dev) {
+		link = device_link_add(&pdev->dev, &dev->vcu_plat_dev->dev,
+					DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
+		if (!link) {
+			mtk_v4l2_err("link failed\n");
+			ret = -ENODEV;
+			goto err_enc_reg;
+		}
+	}
+#endif
 
 #if IS_ENABLED(CONFIG_MTK_IOMMU)
 	mtk_venc_translation_fault_callback_setting(dev);
@@ -570,20 +575,37 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 
 	INIT_LIST_HEAD(&dev->log_param_list);
 	INIT_LIST_HEAD(&dev->prop_param_list);
+
+	ret = v4l2_device_register(&pdev->dev, &dev->v4l2_dev);
+	if (ret) {
+		mtk_v4l2_err("v4l2_device_register err=%d", ret);
+		goto err_enc_reg;
+	}
+
+	ret = video_register_device(vfd_enc, VFL_TYPE_VIDEO, -1);
+	if (ret) {
+		mtk_v4l2_err("Failed to register video device");
+		goto err_v4l2_dev_reg;
+	}
+
+	mtk_v4l2_debug(0, "encoder registered as /dev/video%d",
+				   vfd_enc->num);
+
 	dev_ptr = dev;
 
 	return 0;
 
+err_v4l2_dev_reg:
+	v4l2_device_unregister(&dev->v4l2_dev);
 err_enc_reg:
 	destroy_workqueue(dev->encode_workqueue);
 err_event_workq:
 	v4l2_m2m_release(dev->m2m_dev_enc);
 err_enc_mem_init:
-	video_unregister_device(vfd_enc);
-err_enc_alloc:
-	v4l2_device_unregister(&dev->v4l2_dev);
+	video_device_release(vfd_enc);
 err_res:
 	mtk_vcodec_release_enc_pm(dev);
+
 	return ret;
 }
 
