@@ -10,6 +10,7 @@ no_dumpfile = true
 
 loader		= grub
 vdso		= vdso_install
+uefi_signed     = true
 
 do_extras_package = false
 do_tools_usbip  = true
