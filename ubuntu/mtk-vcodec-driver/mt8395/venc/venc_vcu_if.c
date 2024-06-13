@@ -441,30 +441,30 @@ int vcu_enc_query_cap(struct venc_vcu_inst *vcu, unsigned int id, void *out)
 	int err = 0;
 
 	if (sizeof(msg) > SHARE_BUF_SIZE) {
-		mtk_vcodec_err(vcu, "venc_ap_ipi_query_cap cannot be large than %d",
+		pr_info("venc_ap_ipi_query_cap cannot be large than %d",
 					   SHARE_BUF_SIZE);
 		return -EINVAL;
 	}
 
-	mtk_vcodec_debug(vcu, "+ id=%X", vcu->id);
-
 	if (vcu->ctx == NULL)
 	{
-		mtk_vcodec_err(vcu, "vcu ctx is NULL");
+		pr_info("vcu ctx is NULL");
 		return -EINVAL;
 	}
 
 	if (vcu->ctx->dev == NULL)
 	{
-		mtk_vcodec_err(vcu, "vcu->ctx->dev is NULL");
+		pr_info("vcu->ctx->dev is NULL");
 		return -EINVAL;
 	}
 
 	vcu->dev = VCU_FPTR(vcu_get_plat_device)(vcu->ctx->dev->plat_dev);
 	if (vcu->dev  == NULL) {
-		mtk_vcodec_err(vcu, "vcu device in not ready");
+		pr_info("vcu device in not ready");
 		return -EINVAL;
 	}
+
+	mtk_vcodec_debug(vcu, "+ id=%X", vcu->id);
 
 	vcu->id = (vcu->id == IPI_VCU_INIT) ? IPI_VENC_COMMON : vcu->id;
 	vcu->handler = vcu_enc_ipi_handler;
