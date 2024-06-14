@@ -212,6 +212,11 @@
 		num-channels = <2>;
 		wakeup-delay-ms = <30>;
 	};
+
+	mtk_fsource: fsource {
+		compatible = "mtk-fsource";
+		vfsource-supply = <&mt6359_vefuse_ldo_reg>;
+	};
 };
 
 &afe {
