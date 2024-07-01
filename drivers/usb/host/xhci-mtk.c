@@ -8,6 +8,7 @@
  */
 
 #include <linux/bitfield.h>
+#include <linux/delay.h>
 #include <linux/dma-mapping.h>
 #include <linux/iopoll.h>
 #include <linux/kernel.h>
@@ -300,6 +301,9 @@ static int xhci_mtk_host_disable(struct xhci_hcd_mtk *mtk)
 	if (ret) {
 		dev_err(mtk->dev, "ip sleep failed!!!\n");
 		return ret;
+	} else {
+		/* avoid wrong wakeup signal latch for some soc */
+		usleep_range(100, 200);
 	}
 	return 0;
 }
