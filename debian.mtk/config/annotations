@@ -205,7 +205,7 @@ CONFIG_DRM_PANEL_EDP                            policy<{'arm64': 'm'}>
 CONFIG_DRM_PANEL_KOE_TX18D204VM0BAA             policy<{'arm64': 'y'}>
 CONFIG_DRM_PANEL_RPI_PUMPKIN_TOUCHSCREEN        policy<{'arm64': 'n'}>
 CONFIG_DRM_PANEL_SHARP_NT35532                  policy<{'arm64': 'n'}>
-CONFIG_DRM_PANEL_STARTEK_KD070FHFID015          policy<{'arm64': 'y'}>
+CONFIG_DRM_PANEL_STARTEK_KD070FHFID015          policy<{'arm64': 'm'}>
 CONFIG_DRM_PANEL_STARTEK_KD070FHFID078          policy<{'arm64': 'y'}>
 CONFIG_DRM_PANEL_TPV_OTM1901A                   policy<{'arm64': 'n'}>
 CONFIG_DRM_PANEL_TRULY_R63350A                  policy<{'arm64': 'n'}>
