@@ -143,7 +143,7 @@ int mtk_vcodec_init_dec_pm(struct mtk_vcodec_dev *mtkdev)
 		memset(pm->vdec_racing_info, 0, sizeof(pm->vdec_racing_info));
 		mutex_init(&pm->dec_racing_info_mutex);
 	}
-
+	mutex_init(&pm->dec_power_mutex);
 	pm_runtime_enable(&pdev->dev);
 #endif
 
@@ -164,6 +164,7 @@ void mtk_vcodec_dec_pw_on(struct mtk_vcodec_pm *pm, int hw_id)
 	int ret;
 	int i;
 
+	mutex_lock(&pm->dec_power_mutex);
 	ret = pm_runtime_resume_and_get(pm->dev);
 	if (ret < 0)
 		mtk_v4l2_err("pm_runtime_get_sync fail");
@@ -175,6 +176,7 @@ void mtk_vcodec_dec_pw_on(struct mtk_vcodec_pm *pm, int hw_id)
 				mtk_v4l2_err(" %d fail ret =  %d\n", hw_id, ret);
 		}
 	}
+	mutex_unlock(&pm->dec_power_mutex);
 }
 
 void mtk_vcodec_dec_pw_off(struct mtk_vcodec_pm *pm, int hw_id)
@@ -182,18 +184,21 @@ void mtk_vcodec_dec_pw_off(struct mtk_vcodec_pm *pm, int hw_id)
 	int ret;
 	int i;
 
-	ret = pm_runtime_put_sync(pm->dev);
-	if (ret < 0)
-		mtk_v4l2_err("pm_runtime_put_sync fail");
+	mutex_lock(&pm->dec_power_mutex);
+	/* From the usage of pm_runtime_put_sync(), the runtime PM
+	   usage counter of @dev remains decremented in all cases,
+	   even if it returns an error code.
+	   There is no need to handle the error returns, e.g. -EAGAIN.
+	   Just bypass these kinds of cases.*/
+	pm_runtime_put_sync(pm->dev);
 
 	for (i = 0; i < MTK_VDEC_MAX_LARB_COUNT; i++) {
-		if (vdec_pm_dev[i]) {
-			ret = pm_runtime_put_sync(&vdec_pm_dev[i]->dev);
-			if (ret < 0)
-				mtk_v4l2_err(" %d fail ret =  %d\n", hw_id, ret);
-		}
+		if (vdec_pm_dev[i])
+			pm_runtime_put_sync(&vdec_pm_dev[i]->dev);
 	}
+	mutex_unlock(&pm->dec_power_mutex);
 }
+
 void mtk_vcodec_dec_clock_on(struct mtk_vcodec_pm *pm, int hw_id)
 {
 
