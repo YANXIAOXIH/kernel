@@ -71,11 +71,14 @@ static enum drm_gpu_sched_stat etnaviv_sched_timedout_job(struct drm_sched_job
 
 	drm_sched_resubmit_jobs(&gpu->sched);
 
-	drm_sched_start(&gpu->sched, true);
+	drm_sched_start(&gpu->sched);
 	return DRM_GPU_SCHED_STAT_NOMINAL;
 
 out_no_timeout:
 	list_add(&sched_job->list, &sched_job->sched->pending_list);
+
+	/* restart scheduler after GPU is usable again */
+	drm_sched_start(&gpu->sched);
 	return DRM_GPU_SCHED_STAT_NOMINAL;
 }
 
