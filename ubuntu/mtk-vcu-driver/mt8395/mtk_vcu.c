@@ -1345,7 +1345,7 @@ static int vcu_gce_cmd_flush(struct mtk_vcu *vcu,
 	if (cmds->cmd_cnt >= VCODEC_CMDQ_CMD_MAX) {
 		pr_info("[VCU] cmd_cnt (%d) overflow!!\n", cmds->cmd_cnt);
 		cmds->cmd_cnt = VCODEC_CMDQ_CMD_MAX;
-		ret = -EINVAL;
+		/* it might performs with error, but keep going */
 	}
 
 #if IS_ENABLED(CONFIG_MTK_SEC_VIDEO_PATH_SUPPORT)
@@ -1394,6 +1394,7 @@ static int vcu_gce_cmd_flush(struct mtk_vcu *vcu,
 
 	ret = down_interruptible(&vcu->gce_info[gce_idx].buff_sem[gce_order]);
 	if (ret < 0) {
+		cmdq_pkt_destroy(pkt_ptr);
 		mutex_unlock(&vcu->gce_cmds_mutex[codec_type]);
 		return -ERESTARTSYS;
 	}
@@ -1416,6 +1417,7 @@ static int vcu_gce_cmd_flush(struct mtk_vcu *vcu,
 	if (ret < 0) {
 		pr_info("[VCU] cmdq flush fail pkt %p\n", pkt_ptr);
 		vcu_gce_release_used_pages(&vcu->gce_info[gce_idx].used_pages[gce_order]);
+		cmdq_pkt_destroy(pkt_ptr);
 		up(&vcu->gce_info[gce_idx].buff_sem[gce_order]);
 	} else
 		atomic_inc(&vcu->gce_info[gce_idx].flush_pending);
