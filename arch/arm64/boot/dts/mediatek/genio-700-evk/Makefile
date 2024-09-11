@@ -6,6 +6,7 @@ DTC_FLAGS += -@
 #dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-csi1.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += display-dp.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += display-dsi.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += display-dsi-p1v4.dtbo
 #dtb-$(CONFIG_ARCH_MEDIATEK) += display-dsi2lvds.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += display-dsidp.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += display-dsiedp.dtbo
