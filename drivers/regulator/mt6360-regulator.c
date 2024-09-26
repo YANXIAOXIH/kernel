@@ -377,6 +377,62 @@ static const struct mt6360_regulator_desc mt6360_regulator_descs[] =  {
 			      ldo_vout_ranges3, 128, 100, ldo5_irq_tbls),
 };
 
+/* device tree compatibility for mediatek's downstream patch */
+static const struct mt6360_regulator_desc mt6360_regulator_downstream_descs[] =  {
+	MT6360_REGULATOR_DESC("BUCK1", BUCK1, BUCK1_VIN,
+			      0x117, 0x40, 0x110, 0xff, 0x117, 0x30, 0x117, 0x04,
+			      buck_vout_ranges, 256, 0, buck1_irq_tbls),
+	MT6360_REGULATOR_DESC("BUCK2", BUCK2, BUCK2_VIN,
+			      0x127, 0x40, 0x120, 0xff, 0x127, 0x30, 0x127, 0x04,
+			      buck_vout_ranges, 256, 0, buck2_irq_tbls),
+	MT6360_REGULATOR_DESC("LDO6", LDO6, LDO_VIN3,
+			      0x137, 0x40, 0x13B, 0xff, 0x137, 0x30, 0x137, 0x04,
+			      ldo_vout_ranges1, 256, 0, ldo6_irq_tbls),
+	MT6360_REGULATOR_DESC("LDO7", LDO7, LDO_VIN3,
+			      0x131, 0x40, 0x135, 0xff, 0x131, 0x30, 0x131, 0x04,
+			      ldo_vout_ranges1, 256, 0, ldo7_irq_tbls),
+	MT6360_REGULATOR_DESC("LDO1", LDO1, LDO_VIN1,
+			      0x217, 0x40, 0x21B, 0xff, 0x217, 0x30, 0x217, 0x04,
+			      ldo_vout_ranges2, 256, 0, ldo1_irq_tbls),
+	MT6360_REGULATOR_DESC("LDO2", LDO2, LDO_VIN1,
+			      0x211, 0x40, 0x215, 0xff, 0x211, 0x30, 0x211, 0x04,
+			      ldo_vout_ranges2, 256, 0, ldo2_irq_tbls),
+	MT6360_REGULATOR_DESC("LDO3", LDO3, LDO_VIN1,
+			      0x205, 0x40, 0x209, 0xff, 0x205, 0x30, 0x205, 0x04,
+			      ldo_vout_ranges2, 256, 100, ldo3_irq_tbls),
+	MT6360_REGULATOR_DESC("LDO5", LDO5, LDO_VIN2,
+			      0x20B, 0x40, 0x20F, 0x7f, 0x20B, 0x30, 0x20B, 0x04,
+			      ldo_vout_ranges3, 128, 100, ldo5_irq_tbls),
+};
+
+static bool mt6360_descs_is_using_downstream(struct device *dev)
+{
+	const char *target = mt6360_regulator_downstream_descs[0].desc.of_match;
+	struct device_node *np, *child;
+	bool matched = false;
+	const char *name;
+
+	np = of_find_compatible_node(NULL, NULL, "mediatek,mt6360-regulator");
+	if (!np) {
+		dev_err(dev, "not found mt6360-regulator\n");
+		return false;
+	}
+
+	for_each_available_child_of_node(np, child) {
+		name = of_get_property(child, "regulator-compatible", NULL);
+		/* check only one is enough */
+		if (!strcmp(target, name)) {
+			dev_info(dev, "assign downstream regulator desc\n");
+			matched = true;
+			break;
+		}
+	}
+
+	of_node_put(np);
+	of_node_put(child);
+	return matched;
+}
+
 static int mt6360_regulator_irq_register(struct platform_device *pdev,
 					 struct regulator_dev *rdev,
 					 const struct mt6360_irq_mapping *tbls,
@@ -404,8 +460,10 @@ static int mt6360_regulator_irq_register(struct platform_device *pdev,
 
 static int mt6360_regulator_probe(struct platform_device *pdev)
 {
+	const struct mt6360_regulator_desc *sel_descs;
 	struct mt6360_regulator_data *mrd;
 	struct regulator_config config = {};
+	u32 regulator_num;
 	int i, ret;
 
 	mrd = devm_kzalloc(&pdev->dev, sizeof(*mrd), GFP_KERNEL);
@@ -424,8 +482,17 @@ static int mt6360_regulator_probe(struct platform_device *pdev)
 	config.driver_data = mrd;
 	config.regmap = mrd->regmap;
 
-	for (i = 0; i < ARRAY_SIZE(mt6360_regulator_descs); i++) {
-		const struct mt6360_regulator_desc *rdesc = mt6360_regulator_descs + i;
+	sel_descs = mt6360_regulator_descs;
+	regulator_num = ARRAY_SIZE(mt6360_regulator_descs);
+
+	/* check if the device tree contains downstream compatibility string */
+	if (mt6360_descs_is_using_downstream(&pdev->dev)) {
+		sel_descs = mt6360_regulator_downstream_descs;
+		regulator_num = ARRAY_SIZE(mt6360_regulator_downstream_descs);
+	}
+
+	for (i = 0; i < regulator_num; i++) {
+		const struct mt6360_regulator_desc *rdesc = sel_descs + i;
 		struct regulator_dev *rdev;
 
 		rdev = devm_regulator_register(&pdev->dev, &rdesc->desc, &config);
