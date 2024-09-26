@@ -605,6 +605,48 @@ static const struct regulator_desc mt6360_otg_rdesc = {
 	.enable_mask = MT6360_OPA_MODE_MASK,
 };
 
+static const struct regulator_desc mt6360_otg_downstream_rdesc = {
+	.of_match = "usb-otg-vbus",
+	.name = "usb-otg-vbus",
+	.ops = &mt6360_chg_otg_ops,
+	.owner = THIS_MODULE,
+	.type = REGULATOR_VOLTAGE,
+	.min_uV = 4425000,
+	.uV_step = 25000,
+	.n_voltages = 57,
+	.vsel_reg = MT6360_PMU_CHG_CTRL5,
+	.vsel_mask = MT6360_VOBST_MASK,
+	.enable_reg = MT6360_PMU_CHG_CTRL1,
+	.enable_mask = MT6360_OPA_MODE_MASK,
+};
+
+static bool mt6360_descs_is_using_downstream(struct device *dev)
+{
+	const char *target = mt6360_otg_downstream_rdesc.of_match;
+	struct device_node *np, *child;
+	bool matched = false;
+	const char *name;
+
+	np = of_find_compatible_node(NULL, NULL, "mediatek,mt6360-chg");
+	if (!np) {
+		dev_err(dev, "not found mt6360-chg\n");
+		return false;
+	}
+
+	for_each_available_child_of_node(np, child) {
+		name = of_get_property(child, "regulator-compatible", NULL);
+		if (!strcmp(target, name)) {
+			dev_info(dev, "assign downstream regulator desc\n");
+			matched = true;
+			break;
+		}
+	}
+
+	of_node_put(np);
+	of_node_put(child);
+	return matched;
+}
+
 static irqreturn_t mt6360_pmu_attach_i_handler(int irq, void *data)
 {
 	struct mt6360_chg_info *mci = data;
@@ -788,6 +830,7 @@ static int mt6360_charger_probe(struct platform_device *pdev)
 {
 	struct mt6360_chg_info *mci;
 	struct power_supply_config charger_cfg = {};
+	const struct regulator_desc *sel_otg_rdesc;
 	struct regulator_config config = { };
 	int ret;
 
@@ -830,9 +873,13 @@ static int mt6360_charger_probe(struct platform_device *pdev)
 	if (ret)
 		return dev_err_probe(&pdev->dev, ret, "Failed to register irqs\n");
 
+	sel_otg_rdesc = &mt6360_otg_rdesc;
+	if (mt6360_descs_is_using_downstream(&pdev->dev))
+		sel_otg_rdesc = &mt6360_otg_downstream_rdesc;
+
 	config.dev = &pdev->dev;
 	config.regmap = mci->regmap;
-	mci->otg_rdev = devm_regulator_register(&pdev->dev, &mt6360_otg_rdesc,
+	mci->otg_rdev = devm_regulator_register(&pdev->dev, sel_otg_rdesc,
 						&config);
 	if (IS_ERR(mci->otg_rdev))
 		return PTR_ERR(mci->otg_rdev);
