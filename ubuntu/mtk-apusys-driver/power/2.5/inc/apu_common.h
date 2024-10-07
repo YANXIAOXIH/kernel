@@ -8,8 +8,8 @@
 #include "apu_devfreq.h"
 #include "apu_gov.h"
 
-#define	KHZ	(1000)
-#define	MHZ	(1000*KHZ)
+#define	KHZ	(1000ul)
+#define	MHZ	(1000ul*KHZ)
 
 #define	TOMHZ(x)	(x / MHZ)
 #define	TOKHZ(x)	(x / KHZ)
