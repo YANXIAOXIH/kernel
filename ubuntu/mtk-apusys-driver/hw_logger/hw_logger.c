@@ -22,6 +22,7 @@
 #include <linux/timer.h>
 #include <linux/delay.h>
 #include <linux/iommu.h>
+#include <linux/kstrtox.h>
 #include <linux/proc_fs.h>
 #include <linux/sysfs.h>
 #include <linux/spinlock.h>
@@ -733,24 +734,13 @@ static ssize_t set_debuglv(struct file *flip,
 						   const char __user *buffer,
 						   size_t count, loff_t *f_pos)
 {
-	char tmp[16] = {0};
 	int ret;
 	unsigned int input = 0;
 
-	if (count == 0 || count + 1 >= 16)
-		return -EINVAL;
-
-	ret = copy_from_user(tmp, buffer, count);
-	if (ret) {
-		HWLOGR_ERR("copy_from_user failed (%d)\n", ret);
-		goto out;
-	}
-
-	tmp[count] = '\0';
-	ret = kstrtouint(tmp, 16, &input);
-	if (ret) {
-		HWLOGR_ERR("kstrtouint failed (%d)\n", ret);
-		goto out;
+	ret = kstrtouint_from_user(buffer, count, 0, &input);
+	if (ret < 0) {
+		HWLOGR_ERR("kstrtouint_from_user failed (%d)\n", ret);
+		return ret;
 	}
 
 	HWLOGR_INFO("set uP debug lv = 0x%x\n", input);
@@ -761,7 +751,6 @@ static ssize_t set_debuglv(struct file *flip,
 			&hw_ipi_loglv_data, sizeof(hw_ipi_loglv_data), 1000);
 	if (ret)
 		HWLOGR_ERR("Failed for hw_logger log level send.\n");
-out:
 
 	return count;
 }
@@ -861,29 +850,17 @@ static ssize_t set_debugAttr(struct file *flip,
 							const char __user *buffer,
 							size_t count, loff_t *f_pos)
 {
-	char tmp[16] = {0};
 	int ret;
 	unsigned int input = 0;
 
-	if (count == 0 || count + 1 >= 16)
-		return -EINVAL;
-
-	ret = copy_from_user(tmp, buffer, count);
-	if (ret) {
-		HWLOGR_ERR("copy_from_user failed (%d)\n", ret);
-		goto out;
-	}
-
-	tmp[count] = '\0';
-	ret = kstrtouint(tmp, 10, &input);
-	if (ret) {
-		HWLOGR_ERR("kstrtouint failed (%d)\n", ret);
-		goto out;
+	ret = kstrtouint_from_user(buffer, count, 0, &input);
+	if (ret < 0) {
+		HWLOGR_ERR("kstrtouint_from_user failed (%d)\n", ret);
+		return ret;
 	}
 
 	if (input <= DBG_LOG_DEBUG)
 		g_hw_logger_log_lv = input;
-out:
 
 	return count;
 }

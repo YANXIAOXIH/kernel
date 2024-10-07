@@ -262,24 +262,13 @@ static ssize_t set_debuglv(struct file *flip,
 						   const char __user *buffer,
 						   size_t count, loff_t *f_pos)
 {
-	char tmp[16] = {0};
 	int ret;
 	unsigned int input = 0;
 
-	if (count == 0 || count + 1 >= 16)
-		return -EINVAL;
-
-	ret = copy_from_user(tmp, buffer, count);
-	if (ret) {
-		LOGGER_ERR("copy_from_user failed (%d)\n", ret);
-		goto out;
-	}
-
-	tmp[count] = '\0';
-	ret = kstrtouint(tmp, 16, &input);
-	if (ret) {
-		LOGGER_ERR("kstrtouint failed (%d)\n", ret);
-		goto out;
+	ret = kstrtouint_from_user(buffer, count, 0, &input);
+	if (ret < 0) {
+		LOGGER_ERR("kstrtouint_from_user failed (%d)\n", ret);
+		return ret;
 	}
 
 	LOGGER_INFO("set uP debug lv = 0x%x\n", input);
@@ -291,7 +280,6 @@ static ssize_t set_debuglv(struct file *flip,
 
 	if (ret)
 		LOGGER_ERR("Failed for sw_logger log level send.\n");
-out:
 
 	return count;
 }
@@ -340,31 +328,19 @@ static ssize_t set_debugAttr(struct file *flip,
 						     const char __user *buffer,
 						     size_t count, loff_t *f_pos)
 {
-	char tmp[16] = {0};
 	int ret;
 	unsigned int input = 0;
 
-	if (count == 0 || count + 1 >= 16)
-		return -EINVAL;
-
-	ret = copy_from_user(tmp, buffer, count);
-	if (ret) {
-		LOGGER_ERR("copy_from_user failed (%d)\n", ret);
-		goto out;
-	}
-
-	tmp[count] = '\0';
-	ret = kstrtouint(tmp, 10, &input);
-	if (ret) {
-		LOGGER_ERR("kstrtouint failed (%d)\n", ret);
-		goto out;
+	ret = kstrtouint_from_user(buffer, count, 0, &input);
+	if (ret < 0) {
+		LOGGER_ERR("kstrtouint_from_user failed (%d)\n", ret);
+		return ret;
 	}
 
 	LOGGER_INFO("set debug lv = %d\n", input);
 
 	if (input <= DEBUG_LOG_DEBUG)
 		g_sw_logger_log_lv = input;
-out:
 
 	return count;
 }
