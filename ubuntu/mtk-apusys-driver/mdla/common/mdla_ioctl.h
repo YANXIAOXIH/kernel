@@ -6,10 +6,10 @@
 #ifndef __MDLA_IOCTL__
 #define __MDLA_IOCTL__
 
-#include <stdbool.h>
 #include <linux/ioctl.h>
 #include <linux/types.h>
 #ifndef __KERNEL__
+#include <stdbool.h>
 #include <stdint.h>
 #endif
 
