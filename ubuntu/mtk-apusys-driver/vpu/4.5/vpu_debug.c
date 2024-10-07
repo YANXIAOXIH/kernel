@@ -16,6 +16,8 @@
 #include "apu_tags.h"
 #include "vpu_reg.h"
 
+#include "apusys_ver_compat.h"
+
 u32 vpu_klog;
 
 const char *g_vpu_prop_type_names[VPU_NUM_PROP_TYPES] = {

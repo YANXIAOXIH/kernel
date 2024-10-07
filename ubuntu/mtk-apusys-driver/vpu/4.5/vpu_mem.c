@@ -20,6 +20,8 @@
 #include "vpu_mem.h"
 #include "vpu_debug.h"
 
+#include "apusys_ver_compat.h"
+
 static void vpu_iova_free(struct device *dev, struct vpu_iova *i);
 
 static int vpu_iova_cmp(void *priv, const struct list_head *a, const struct list_head *b)
@@ -306,7 +308,7 @@ vpu_map_sg_to_iova_v2(
 		dev_info(dev, "%s: iommu_map_sg fail because domain is NULL\n", __func__);
 		goto err;
 	}
-	size = iommu_map_sg(domain, iova, sg, nents, prot);
+	size = iommu_map_sg_compat(domain, iova, sg, nents, prot);
 
 	if (size == 0) {
 		dev_info(dev,

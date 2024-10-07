@@ -18,6 +18,8 @@
 #include "reviser_mem.h"
 #include "reviser_drv.h"
 
+#include "apusys_ver_compat.h"
+
 static struct reviser_mem g_mem_sys;
 
 static int __reviser_free_iova(struct device *dev, size_t len,
@@ -121,7 +123,7 @@ static dma_addr_t __reviser_get_iova(
 	boundary_mask = (dma_addr_t) rdv->plat.boundary << 32;
 	iova |= boundary_mask;
 
-	iova_size = iommu_map_sg(domain, iova, sg, nents, prot);
+	iova_size = iommu_map_sg_compat(domain, iova, sg, nents, prot);
 
 	if (iova_size == 0) {
 		LOG_ERR("iommu_map_sg: len: %zx, iova: %llx, failed\n",

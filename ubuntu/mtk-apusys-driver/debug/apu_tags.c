@@ -9,6 +9,7 @@
 #include <linux/seq_file.h>
 #include <linux/sched/clock.h>
 #include "apu_tags.h"
+#include "apusys_ver_compat.h"
 
 #define APU_TAGS_PROC_FS_NAME "aputag"
 

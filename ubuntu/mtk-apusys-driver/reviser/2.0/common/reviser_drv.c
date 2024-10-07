@@ -41,6 +41,9 @@
 #include "reviser_hw_mgt.h"
 #include "reviser_remote.h"
 #include "reviser_remote_cmd.h"
+
+#include "apusys_ver_compat.h"
+
 /* define */
 #define APUSYS_DRV_NAME "apusys_drv_reviser"
 #define APUSYS_DEV_NAME "apusys_reviser"
@@ -445,7 +448,7 @@ static int reviser_create_node(struct platform_device *pdev)
 	}
 
 	/* Create class register */
-	reviser_class = class_create(THIS_MODULE, APUSYS_DRV_NAME);
+	reviser_class = class_create_compat(THIS_MODULE, APUSYS_DRV_NAME);
 	if (IS_ERR(reviser_class)) {
 		ret = PTR_ERR(reviser_class);
 		LOG_ERR("Unable to create class, err = %d\n", ret);

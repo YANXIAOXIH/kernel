@@ -33,6 +33,7 @@
 #include "apu_regdump.h"
 #include "apu_loadimage.h"
 
+#include "apusys_ver_compat.h"
 
 struct mtk_apu *g_apu_struct;
 uint32_t g_apu_log;
@@ -209,13 +210,13 @@ static int apu_dram_boot_init(struct mtk_apu *apu)
 		if (apu->platdata->flags & F_MT8195_PLAT) {
 			apu->code_da = APU_SEC_FW_IOVA_MT8195;
 			dev_info(dev, "%s: iommu_map\n", __func__);
-			ret = iommu_map(domain, APU_SEC_FW_IOVA_MT8195,
+			ret = iommu_map_compat(domain, APU_SEC_FW_IOVA_MT8195,
 					apu->apusys_sec_mem_start,
 					apu->apusys_sec_mem_size, IOMMU_READ|IOMMU_WRITE);
 		} else {
 			apu->code_da = APU_SEC_FW_IOVA;
 			/* Map reserved code buffer to APU_SEC_FW_IOVA */
-			ret = iommu_map(domain, APU_SEC_FW_IOVA,
+			ret = iommu_map_compat(domain, APU_SEC_FW_IOVA,
 					apu->apusys_sec_mem_start,
 					apu->apusys_sec_mem_size, IOMMU_READ|IOMMU_WRITE);
 		}
@@ -255,7 +256,7 @@ static int apu_dram_boot_init(struct mtk_apu *apu)
 		dev_info(dev, "%s: sgt.nents = %d, sgt.orig_nents = %d\n",
 			__func__, sgt.nents, sgt.orig_nents);
 		/* Map sg_list to MD32_BOOT_ADDR */
-		map_sg_sz = iommu_map_sg(domain, iova, sgt.sgl,
+		map_sg_sz = iommu_map_sg_compat(domain, iova, sgt.sgl,
 			sgt.nents, IOMMU_READ|IOMMU_WRITE);
 		dev_info(dev, "%s: sgt.nents = %d, sgt.orig_nents = %d\n",
 			__func__, sgt.nents, sgt.orig_nents);
