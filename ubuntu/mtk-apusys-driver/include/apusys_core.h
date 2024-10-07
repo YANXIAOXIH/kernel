@@ -44,57 +44,5 @@ void aov_exit(void);
 int apu_power_top_on(void);
 void apu_power_top_off(void);
 
-/*
- * init function at other modulses
- * call init function in order at apusys.ko init stage
- */
-static int (*apusys_init_func[])(struct apusys_core_info *) = {
-	sw_logger_init,
-	hw_logger_init,
-//	apupwr_init_tags,
-	apu_power_drv_init,
-	devapc_init,
-	mnoc_init,
-	reviser_init,
-	apumem_init,
-	mdw_init,
-	edma_init,
-	aps_init,
-	mdla_init,
-#if IS_ENABLED(CONFIG_MTK_APUSYS_VPU)
-	vpu_init,
-#endif
-#if IS_ENABLED(CONFIG_MTK_APUSYS_DEBUG)
-	debug_init,
-#endif
-	apu_rproc_init,
-	//aov_init,
-};
 
-/*
- * exit function at other modulses
- * call exit function in order at apusys.ko exit stage
- */
-static void (*apusys_exit_func[])(void) = {
-	//aov_exit,
-	apu_rproc_exit,
-#if IS_ENABLED(CONFIG_MTK_APUSYS_DEBUG)
-	debug_exit,
-#endif
-#if IS_ENABLED(CONFIG_MTK_APUSYS_VPU)
-	vpu_exit,
-#endif
-	mdla_exit,
-	edma_exit,
-	aps_exit,
-	mdw_exit,
-	apumem_exit,
-	reviser_exit,
-	mnoc_exit,
-	devapc_exit,
-	apu_power_drv_exit,
-//	apupwr_exit_tags,
-	hw_logger_exit,
-	sw_logger_exit,
-};
 #endif
