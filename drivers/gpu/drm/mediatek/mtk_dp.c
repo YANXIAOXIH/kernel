@@ -2920,11 +2920,6 @@ static int mtk_dp_audio_hw_params(struct device *dev, void *data,
 	struct mtk_dp *mtk_dp = dev_get_drvdata(dev);
 	struct mtk_dp_audio_cfg cfg;
 
-	if (!mtk_dp->enabled) {
-		pr_err("%s, DP is not ready!\n", __func__);
-		return -ENODEV;
-	}
-
 	mtk_dp->info.audio_cur_cfg.channels = params->cea.channels;
 	mtk_dp->info.audio_cur_cfg.sample_rate = params->sample_rate;
 	mtk_dp->info.audio_cur_cfg.word_length_bits = 24;
