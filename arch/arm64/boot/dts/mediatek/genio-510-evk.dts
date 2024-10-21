@@ -225,6 +225,11 @@
 		regulator-always-on;
 	};
 
+	mtk_fsource: fsource {
+		compatible = "mtk-fsource";
+		vfsource-supply = <&mt6359_vefuse_ldo_reg>;
+	};
+
 	dsi0_en: dsi0-en {
 		compatible = "regulator-fixed";
 		regulator-name = "lcm1_en";
