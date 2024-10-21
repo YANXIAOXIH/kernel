@@ -226,6 +226,11 @@
 		pinctrl-0 = <&dsi0_en_pins_default>;
 	};
 
+	mtk_fsource: fsource {
+		compatible = "mtk-fsource";
+		vfsource-supply = <&mt6359_vefuse_ldo_reg>;
+	};
+
 	amic_codec: amic-codec {
 		#sound-dai-cells = <0>;
 		compatible = "dmic-codec";
