@@ -9,6 +9,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/regulator/machine.h>
 #include <linux/regulator/driver.h>
+#include <linux/sched/clock.h>
 #include <linux/pm_runtime.h>
 #include <linux/debugfs.h>
 #include <linux/devfreq.h>
