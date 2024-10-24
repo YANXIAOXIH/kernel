@@ -479,6 +479,8 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8188[] = {
 		.ctl_offs = 0x3A4,
 		.pwr_sta_offs = 0x16C,
 		.pwr_sta2nd_offs = 0x170,
+		.ext_buck_iso_mask = BIT(12),
+		.ext_buck_iso_offs = 0x3EC,
 		.bp_infracfg = {
 			BUS_PROT_WR(MT8188_TOP_AXI_PROT_EN_MM_IMG_VCORE_STEP1,
 				MT8188_TOP_AXI_PROT_EN_MM_SET,
@@ -493,7 +495,7 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8188[] = {
 				MT8188_TOP_AXI_PROT_EN_MM_2_CLR,
 				MT8188_TOP_AXI_PROT_EN_MM_2_STA),
 		},
-		.caps = MTK_SCPD_KEEP_DEFAULT_OFF | MTK_SCPD_DOMAIN_SUPPLY,
+		.caps = MTK_SCPD_KEEP_DEFAULT_OFF | MTK_SCPD_DOMAIN_SUPPLY | MTK_SCPD_EXT_BUCK_ISO,
 	},
 	[MT8188_POWER_DOMAIN_IMG_MAIN] = {
 		.name = "img_main",
@@ -573,6 +575,8 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8188[] = {
 		.ctl_offs = 0x3A0,
 		.pwr_sta_offs = 0x16C,
 		.pwr_sta2nd_offs = 0x170,
+		.ext_buck_iso_mask = BIT(11),
+		.ext_buck_iso_offs = 0x3EC,
 		.bp_infracfg = {
 			BUS_PROT_WR(MT8188_TOP_AXI_PROT_EN_MM_CAM_VCORE_STEP1,
 				MT8188_TOP_AXI_PROT_EN_MM_SET,
@@ -595,7 +599,7 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8188[] = {
 				MT8188_TOP_AXI_PROT_EN_MM_2_CLR,
 				MT8188_TOP_AXI_PROT_EN_MM_2_STA),
 		},
-		.caps = MTK_SCPD_KEEP_DEFAULT_OFF | MTK_SCPD_DOMAIN_SUPPLY,
+		.caps = MTK_SCPD_KEEP_DEFAULT_OFF | MTK_SCPD_DOMAIN_SUPPLY | MTK_SCPD_EXT_BUCK_ISO,
 	},
 	[MT8188_POWER_DOMAIN_CAM_MAIN] = {
 		.name = "cam_main",
