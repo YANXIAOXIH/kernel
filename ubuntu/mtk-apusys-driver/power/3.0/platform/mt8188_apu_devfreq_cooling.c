@@ -59,9 +59,14 @@ static int _plat_opp_table_add(struct device *dev,
 		rate = opp_tbl->opp[i].pll_freq[pll_idx] * 1000;
 		volt = opp_tbl->opp[i].vapu;
 
-		ret = dev_pm_opp_add(dev, rate, volt);
 		pr_debug("[%s][%d] dvfs_dev_id = %d, rate = %ld, volt = %ld\n",
 			__func__, __LINE__, dvfs_dev_id, rate, volt);
+		ret = dev_pm_opp_add(dev, rate, volt);
+
+		if (ret == -EEXIST) {
+			dev_info(dev, "Expected duplicated opp entry and continue.\n");
+			ret = 0;
+		}
 
 		if (ret)
 			break;
