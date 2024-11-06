@@ -21,7 +21,7 @@ static int mdp_vpu_shared_mem_alloc(struct mdp_vpu_dev *vpu)
 	struct device *dev;
 	int i;
 
-	if (IS_ERR_OR_NULL(vpu))
+	if (IS_ERR_OR_NULL(vpu->scp))
 		goto err_return;
 
 	dev = scp_get_device(vpu->scp);
@@ -72,7 +72,7 @@ void mdp_vpu_shared_mem_free(struct mdp_vpu_dev *vpu)
 	struct device *dev;
 	int i;
 
-	if (IS_ERR_OR_NULL(vpu))
+	if (IS_ERR_OR_NULL(vpu->scp))
 		return;
 
 	dev = scp_get_device(vpu->scp);
