@@ -3263,9 +3263,9 @@ int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_H264_MAX_QP,
 			  0, 51, 1, ctx->enc_params.h264_max_qp);
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_H264_I_PERIOD,
-			  0, 65535, 1, 0);
+			  0, 1023, 1, 0);
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_GOP_SIZE,
-			  0, 65535, 1, 0);
+			  0, 1023, 1, 0);
 #ifdef __ANDROID__
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_MB_RC_ENABLE,
 			  0, 1, 1, 0);
