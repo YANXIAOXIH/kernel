@@ -488,9 +488,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
 	plat->en_tx_lpi_clockgating =
 		of_property_read_bool(np, "snps,en-tx-lpi-clockgating");
 
-	plat->rx_clk_runs_in_lpi=
-		of_property_read_bool(np, "snps,en-rx-lpi-clockgating");
-
 	/* Set the maxmtu to a default of JUMBO_LEN in case the
 	 * parameter is not present in the device tree.
 	 */
