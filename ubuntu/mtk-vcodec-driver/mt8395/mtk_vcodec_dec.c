@@ -26,6 +26,7 @@
 #define DFT_CFG_HEIGHT  MTK_VDEC_MIN_H
 #define MTK_VDEC_MAX_W  mtk_vdec_max_width
 #define MTK_VDEC_MAX_H  mtk_vdec_max_heigh
+#define MTK_VDEC_DEFAULT_BS_SIZE  (4 * 1024 * 1024) // 4MB for 4K video
 
 static unsigned int mtk_vdec_max_width;
 static unsigned int mtk_vdec_max_heigh;
@@ -2082,6 +2083,7 @@ static int vidioc_try_fmt(struct v4l2_format *f, struct mtk_video_fmt *fmt)
 	if (f->type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE) {
 		pix_fmt_mp->num_planes = 1;
 		pix_fmt_mp->plane_fmt[0].bytesperline = 0;
+		pix_fmt_mp->plane_fmt[0].sizeimage = MTK_VDEC_DEFAULT_BS_SIZE;
 	} else if (f->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
 		int tmp_w, tmp_h;
 
