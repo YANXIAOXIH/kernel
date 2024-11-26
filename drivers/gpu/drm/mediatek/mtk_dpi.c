@@ -93,6 +93,7 @@ struct mtk_dpi {
 	struct clk *tvd_clk;
 	struct clk *hdmi_cg;
 	struct clk *pclk_src[5];
+	struct clk *dpix;
 	int irq;
 	struct drm_display_mode mode;
 	const struct mtk_dpi_conf *conf;
@@ -504,6 +505,7 @@ static void mtk_dpi_power_off(struct mtk_dpi *dpi)
 
 	reset_control_rearm(dpi->reset_ctl);
 
+	clk_disable_unprepare(dpi->dpix);
 	clk_disable_unprepare(dpi->pixel_clk);
 	clk_disable_unprepare(dpi->engine_clk);
 	clk_disable_unprepare(dpi->dpi_sel_clk);
@@ -555,6 +557,12 @@ static int mtk_dpi_power_on(struct mtk_dpi *dpi)
 		goto err_pixel;
 	}
 
+	ret = clk_prepare_enable(dpi->dpix);
+	if (ret) {
+		dev_err(dpi->dev, "Failed to enable dpix clock: %d\n", ret);
+		goto err_dpix;
+	}
+
 	reset_control_reset(dpi->reset_ctl);
 
 	if (dpi->pinctrl && dpi->pins_dpi)
@@ -562,6 +570,8 @@ static int mtk_dpi_power_on(struct mtk_dpi *dpi)
 
 	return 0;
 
+err_dpix:
+	clk_disable_unprepare(dpi->dpix);
 err_pixel:
 	clk_disable_unprepare(dpi->dpi_ck_cg);
 err_ck_cg:
@@ -1298,6 +1308,14 @@ static int mtk_dpi_probe(struct platform_device *pdev)
 	if (IS_ERR(dpi->dpi_sel_clk)) {
 		ret = PTR_ERR(dpi->dpi_sel_clk);
 		dev_err_probe(dev, ret, "Failed to get dpi_Sel_clk clock: %d\n", ret);
+
+		return ret;
+	}
+
+	dpi->dpix = devm_clk_get_optional(dev, "dpix");
+	if (IS_ERR(dpi->dpix)) {
+		ret = PTR_ERR(dpi->dpix);
+		dev_err(dev, "Failed to get vpll_dpix clock: %d\n", ret);
 
 		return ret;
 	}
