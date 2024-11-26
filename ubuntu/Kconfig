@@ -48,7 +48,7 @@ source "ubuntu/mtk-vcu-driver/Kconfig"
 ##
 ##
 ##
-source "ubuntu/mtk-mali-gpu-driver-r43/Mconfig"
+source "ubuntu/mtk-mali-gpu-driver-r48/Mconfig"
 ##
 ##
 ##

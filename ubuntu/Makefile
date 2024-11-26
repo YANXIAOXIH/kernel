@@ -39,7 +39,7 @@ obj-y += mtk-vcodec-driver/
 ##
 ##
 ##
-obj-y += mtk-mali-gpu-driver-r43/
+obj-y += mtk-mali-gpu-driver-r48/
 ##
 ##
 ##
