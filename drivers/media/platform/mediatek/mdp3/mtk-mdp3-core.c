@@ -222,6 +222,7 @@ void mdp_video_device_release(struct video_device *vdev)
 	}
 
 	v4l2_m2m_release(mdp->m2m_dev);
+	video_device_release(mdp->m2m_vdev);
 	kfree(mdp);
 }
 
@@ -398,10 +399,13 @@ static int mdp_remove(struct platform_device *pdev)
 
 	if (mdp->comp[MDP_COMP_SPLIT])
 		mdp_cap_deinit();
+	if (mdp->m2m_dev)
+		v4l2_m2m_unregister_media_controller(mdp->m2m_dev);
+	media_device_unregister(&mdp->mdev);
+	media_device_cleanup(&mdp->mdev);
+	v4l2_device_unregister(&mdp->v4l2_dev);
 	if (mdp->m2m_vdev)
 		video_unregister_device(mdp->m2m_vdev);
-
-	v4l2_device_unregister(&mdp->v4l2_dev);
 
 	dev_dbg(&pdev->dev, "%s driver unloaded\n", pdev->name);
 
