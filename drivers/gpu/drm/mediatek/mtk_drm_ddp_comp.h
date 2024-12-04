@@ -11,6 +11,8 @@
 #include <linux/soc/mediatek/mtk-mmsys.h>
 #include <linux/soc/mediatek/mtk-mutex.h>
 
+#include <drm/drm_modes.h>
+
 struct device;
 struct device_node;
 struct drm_crtc;
