@@ -12,7 +12,7 @@
 #include "mt8195_apupwr.h"
 #include "mt8195_apupwr_prot.h"
 
-#define LOCAL_DBG	(1)
+#define LOCAL_DBG	(0)
 
 static void __iomem *spare_reg_base;
 
