@@ -71,6 +71,7 @@ void mtk_merge_stop(struct device *dev);
 void mtk_merge_advance_config(struct device *dev, unsigned int l_w, unsigned int r_w,
 			      unsigned int h, unsigned int vrefresh, unsigned int bpc,
 			      struct cmdq_pkt *cmdq_pkt);
+void mtk_merge_br_swap_config(struct device *dev, struct cmdq_pkt *cmdq_pkt, bool swap);
 void mtk_merge_start_cmdq(struct device *dev, struct cmdq_pkt *cmdq_pkt);
 void mtk_merge_stop_cmdq(struct device *dev, struct cmdq_pkt *cmdq_pkt);
 
@@ -151,6 +152,7 @@ void mtk_mdp_rdma_start(struct device *dev, struct cmdq_pkt *cmdq_pkt);
 void mtk_mdp_rdma_stop(struct device *dev, struct cmdq_pkt *cmdq_pkt);
 void mtk_mdp_rdma_config(struct device *dev, struct mtk_mdp_rdma_cfg *cfg,
 			 struct cmdq_pkt *cmdq_pkt);
+bool mtk_mdp_rdma_need_br_swap(struct device *dev, unsigned int fmt);
 
 int mtk_disp_padding_clk_enable(struct device *dev);
 void mtk_disp_padding_clk_disable(struct device *dev);
