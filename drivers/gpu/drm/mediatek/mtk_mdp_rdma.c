@@ -77,10 +77,15 @@ enum rdma_format {
 	RDMA_INPUT_FORMAT_Y410 = 14
 };
 
+struct mtk_mdp_rdma_data {
+	bool need_br_swap;
+};
+
 struct mtk_mdp_rdma {
 	void __iomem		*regs;
 	struct clk		*clk;
 	struct cmdq_client_reg	cmdq_reg;
+	const struct mtk_mdp_rdma_data *data;
 };
 
 static unsigned int rdma_fmt_convert(unsigned int fmt)
@@ -234,6 +239,16 @@ void mtk_mdp_rdma_clk_disable(struct device *dev)
 	clk_disable_unprepare(rdma->clk);
 }
 
+bool mtk_mdp_rdma_need_br_swap(struct device *dev, unsigned int fmt)
+{
+	struct mtk_mdp_rdma *rdma = dev_get_drvdata(dev);
+
+	if (fmt == DRM_FORMAT_ABGR8888 && rdma->data)
+		return rdma->data->need_br_swap;
+
+	return false;
+}
+
 static int mtk_mdp_rdma_bind(struct device *dev, struct device *master,
 			     void *data)
 {
@@ -279,6 +294,7 @@ static int mtk_mdp_rdma_probe(struct platform_device *pdev)
 	if (ret)
 		dev_dbg(dev, "get mediatek,gce-client-reg fail!\n");
 #endif
+	priv->data = of_device_get_match_data(dev);
 	platform_set_drvdata(pdev, priv);
 
 	pm_runtime_enable(dev);
@@ -298,8 +314,14 @@ static int mtk_mdp_rdma_remove(struct platform_device *pdev)
 	return 0;
 }
 
+static const struct mtk_mdp_rdma_data mt8195_mdp_rdma_data = {
+	.need_br_swap = true,
+};
+
 static const struct of_device_id mtk_mdp_rdma_driver_dt_match[] = {
-	{ .compatible = "mediatek,mt8195-vdo1-rdma", },
+	{ .compatible = "mediatek,mt8195-vdo1-rdma",
+	  .data = &mt8195_mdp_rdma_data},
+	{ .compatible = "mediatek,mt8188-vdo1-rdma", },
 	{},
 };
 MODULE_DEVICE_TABLE(of, mtk_mdp_rdma_driver_dt_match);

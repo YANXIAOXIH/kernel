@@ -20,6 +20,8 @@
 #define DISP_REG_MERGE_CFG_0		0x010
 #define DISP_REG_MERGE_CFG_1		0x014
 #define DISP_REG_MERGE_CFG_4		0x020
+#define DISP_REG_MERGE_CFG_8		0x030
+#define BR_SWAP				0x4
 #define DISP_REG_MERGE_CFG_10		0x038
 /* no swap */
 #define SWAP_MODE				0
@@ -194,6 +196,18 @@ void mtk_merge_advance_config(struct device *dev, unsigned int l_w, unsigned int
 			   DISP_REG_MERGE_CFG_10, FLD_SWAP_MODE);
 	mtk_ddp_write_mask(cmdq_pkt, mode, &priv->cmdq_reg, priv->regs,
 			   DISP_REG_MERGE_CFG_12, FLD_CFG_MERGE_MODE);
+}
+
+void mtk_merge_br_swap_config(struct device *dev, struct cmdq_pkt *cmdq_pkt, bool swap)
+{
+	struct mtk_disp_merge *priv = dev_get_drvdata(dev);
+
+	if (swap)
+		mtk_ddp_write_mask(cmdq_pkt, BR_SWAP, &priv->cmdq_reg, priv->regs,
+			   DISP_REG_MERGE_CFG_8, BR_SWAP);
+	else
+		mtk_ddp_write_mask(cmdq_pkt, 0, &priv->cmdq_reg, priv->regs,
+			   DISP_REG_MERGE_CFG_8, BR_SWAP);
 }
 
 int mtk_merge_clk_enable(struct device *dev)

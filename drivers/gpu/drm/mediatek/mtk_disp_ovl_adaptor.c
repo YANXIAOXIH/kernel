@@ -153,6 +153,10 @@ void mtk_ovl_adaptor_layer_config(struct device *dev, unsigned int idx,
 		l_w = align_width;
 	}
 	mtk_merge_advance_config(merge, l_w, r_w, pending->height, 0, 0, cmdq_pkt);
+
+	mtk_merge_br_swap_config(merge, cmdq_pkt,
+		mtk_mdp_rdma_need_br_swap(rdma_l, pending->format));
+
 	mtk_mmsys_merge_async_config(ovl_adaptor->mmsys_dev, idx, align_width / 2,
 				     pending->height, cmdq_pkt);
 
@@ -479,6 +483,8 @@ static const struct of_device_id mtk_ovl_adaptor_comp_dt_ids[] = {
 	{ .compatible = "mediatek,mt8188-vdo1-padding",
 	  .data = (void *)OVL_ADAPTOR_TYPE_PADDING, },
 	{ .compatible = "mediatek,mt8195-vdo1-rdma",
+	  .data = (void *)OVL_ADAPTOR_TYPE_RDMA, },
+	{ .compatible = "mediatek,mt8188-vdo1-rdma",
 	  .data = (void *)OVL_ADAPTOR_TYPE_RDMA, },
 	{ .compatible = "mediatek,mt8195-disp-merge",
 	  .data = (void *)OVL_ADAPTOR_TYPE_MERGE, },
