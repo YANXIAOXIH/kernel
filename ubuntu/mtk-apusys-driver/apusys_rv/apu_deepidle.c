@@ -199,7 +199,7 @@ wait_for_warm_boot:
 			dev_info(dev, "%s: warm boot done (%lldns)\n",
 				__func__, t);
 		else
-			apu_info_ratelimited(dev,
+			dev_info_ratelimited(dev,
 				"%s: warm boot done\n", __func__);
 	}
 
@@ -269,7 +269,7 @@ static void __apu_deepidle(struct mtk_apu *apu)
 
 		hw_logger_deep_idle_enter_post();
 		apu_ipi_unlock(apu);
-		apu_info_ratelimited(apu->dev, "power off done\n");
+		dev_info_ratelimited(apu->dev, "power off done\n");
 		break;
 
 	default:

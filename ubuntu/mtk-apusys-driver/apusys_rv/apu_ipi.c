@@ -145,7 +145,7 @@ int apu_ipi_send(struct mtk_apu *apu, u32 id, void *data, u32 len,
 	    apu->ipi_inbound_locked == IPI_LOCKED && !bypass_check(id)) {
 		/* remove to reduce log */
 		/*
-		 * apu_ipi_info_ratelimited(dev, "%s: ipi locked, ipi=%d\n",
+		 * dev_dbg_ratelimited(dev, "%s: ipi locked, ipi=%d\n",
 		 *	__func__, id);
 		 */
 		mutex_unlock(&apu->send_lock);
@@ -211,7 +211,7 @@ unlock_mutex:
 	ktime_get_ts64(&te);
 	ts = timespec64_sub(te, ts);
 
-	apu_info_ratelimited(dev,
+	dev_dbg_ratelimited(dev,
 		 "%s: ipi_id=%d, len=%d, csum=%x, serial_no=%d, elapse=%lld\n",
 		 __func__, id, len, hdr.csum, hdr.serial_no,
 		 timespec64_to_ns(&ts));
@@ -366,7 +366,7 @@ out:
 	ktime_get_ts64(&te);
 	ts = timespec64_sub(te, ts);
 
-	apu_info_ratelimited(dev,
+	dev_dbg_ratelimited(dev,
 		 "%s: ipi_id=%d, len=%d, csum=%x, serial_no=%d, latency=%lld, elapse=%lld\n",
 		 __func__, id, len, apu->hdr.csum, apu->hdr.serial_no,
 		 timespec64_to_ns(&tl),
