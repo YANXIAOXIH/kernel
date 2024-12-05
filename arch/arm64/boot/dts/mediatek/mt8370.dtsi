@@ -2301,7 +2301,7 @@
 		};
 
 		vdo1_rdma0: vdo1-rdma@1c104000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c104000 0 0x1000>;
 			interrupts = <GIC_SPI 495 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA0>;
@@ -2312,7 +2312,7 @@
 		};
 
 		vdo1_rdma1: vdo1-rdma@1c105000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c105000 0 0x1000>;
 			interrupts = <GIC_SPI 496 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA1>;
@@ -2323,7 +2323,7 @@
 		};
 
 		vdo1_rdma2: vdo1-rdma@1c106000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c106000 0 0x1000>;
 			interrupts = <GIC_SPI 497 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA2>;
@@ -2334,7 +2334,7 @@
 		};
 
 		vdo1_rdma3: vdo1-rdma@1c107000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c107000 0 0x1000>;
 			interrupts = <GIC_SPI 498 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA3>;
@@ -2345,7 +2345,7 @@
 		};
 
 		vdo1_rdma4: vdo1-rdma@1c108000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c108000 0 0x1000>;
 			interrupts = <GIC_SPI 499 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA4>;
@@ -2356,7 +2356,7 @@
 		};
 
 		vdo1_rdma5: vdo1-rdma@1c109000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c109000 0 0x1000>;
 			interrupts = <GIC_SPI 500 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA5>;
@@ -2367,7 +2367,7 @@
 		};
 
 		vdo1_rdma6: vdo1-rdma@1c10a000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c10a000 0 0x1000>;
 			interrupts = <GIC_SPI 501 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA6>;
@@ -2378,7 +2378,7 @@
 		};
 
 		vdo1_rdma7: vdo1-rdma@1c10b000 {
-			compatible = "mediatek,mt8195-vdo1-rdma";
+			compatible = "mediatek,mt8188-vdo1-rdma";
 			reg = <0 0x1c10b000 0 0x1000>;
 			interrupts = <GIC_SPI 502 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&vdosys1 CLK_VDO1_MDP_RDMA7>;
