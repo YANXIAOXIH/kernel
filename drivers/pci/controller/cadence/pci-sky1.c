@@ -1021,10 +1021,10 @@ static int sky1_pcie_parse_mem(struct sky1_pcie *pcie)
 	void __iomem *base;
 	int ret = 0;
 
-	/*app*/
-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "app");
+	/*rcsu*/
+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "rcsu");
 	if (!res) {
-		dev_err(dev, "Parse \"app\" resource err\n");
+		dev_err(dev, "Parse \"rcsu\" resource err\n");
 		return (-ENXIO);
 	}
 	pcie->rcsu_base = devm_ioremap(dev, res->start, resource_size(res));
@@ -1032,7 +1032,7 @@ static int sky1_pcie_parse_mem(struct sky1_pcie *pcie)
 		dev_err(dev, "ioremap failed for resource %pR\n", res);
 		ret = -ENOMEM;
 	}
-	dev_info(dev, "ioremap %s, paddr:%pR, vaddr:%px\n", "app", res,
+	dev_info(dev, "ioremap %s, paddr:%pR, vaddr:%px\n", "rcsu", res,
 		 pcie->rcsu_base);
 
 	/*reg*/
