@@ -541,14 +541,6 @@ int vcu_enc_set_param(struct venc_vcu_inst *vcu,
 		out.data_item = 1;
 		out.data[0] = enc_param->scenario;
 		break;
-	case VENC_SET_PARAM_NONREFP:
-		out.data_item = 1;
-		out.data[0] = enc_param->nonrefp;
-		break;
-	case VENC_SET_PARAM_NONREFPFREQ:
-		out.data_item = 1;
-		out.data[0] = enc_param->nonrefpfreq;
-		break;
 	case VENC_SET_PARAM_DETECTED_FRAMERATE:
 		out.data_item = 1;
 		out.data[0] = enc_param->detectframerate;
