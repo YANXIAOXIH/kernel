@@ -11,7 +11,7 @@
 /dts-v1/;
 /plugin/;
 
-#include "isp71.dtsi"
+#include <arm64/mediatek/mt8390/isp71.dtsi>
 
 / {
 	fragment@4 {

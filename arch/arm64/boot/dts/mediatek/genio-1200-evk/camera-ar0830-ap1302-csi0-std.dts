@@ -11,7 +11,7 @@
 /dts-v1/;
 /plugin/;
 
-#include "isp70.dtsi"
+#include <arm64/mediatek/mt8395/isp70.dtsi>
 
 / {
 	fragment@4 {
