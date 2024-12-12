@@ -13,6 +13,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi0-ar0830-ap1302-csi1-ar0830-ap13
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-imx214-csi0-imx214-csi2.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ag190c-max9286-csi0-std.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-csi0-ar0830-ap1302-csi2.dtbo
+dtb-$(CONFIG_ARCH_MEDIATEK) += camera-ar0830-ap1302-csi0-std.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += camera-lt6911uxe-csi0-std.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += display-dp.dtbo
 dtb-$(CONFIG_ARCH_MEDIATEK) += display-dsiedp.dtbo
