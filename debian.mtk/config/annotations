@@ -583,6 +583,7 @@ CONFIG_V4L2_CCI                                 policy<{'arm64': 'm'}>
 CONFIG_V4L2_CCI_I2C                             policy<{'arm64': 'm'}>
 CONFIG_VIDEO_AP1302                             policy<{'arm64': 'm'}>
 CONFIG_VIDEO_AR0330                             policy<{'arm64': 'm'}>
+CONFIG_VIDEO_AR0430                             policy<{'arm64': 'm'}>
 CONFIG_VIDEO_IT6510                             policy<{'arm64': 'm'}>
 CONFIG_VIDEO_MEDIATEK_JPEG                      policy<{'arm64': 'm'}>
 CONFIG_VIDEO_MEDIATEK_MDP                       policy<{'arm64': 'n'}>
