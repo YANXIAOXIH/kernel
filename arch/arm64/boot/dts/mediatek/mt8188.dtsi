@@ -1727,7 +1727,7 @@
 		};
 
 		mdp3-wrot0@1400c000 {
-			compatible = "mediatek,mt8183-mdp3-wrot";
+			compatible = "mediatek,mt8195-mdp3-wrot", "mediatek,mt8183-mdp3-wrot";
 			reg = <0 0x1400c000 0 0x1000>;
 			mediatek,gce-client-reg = <&gce1 SUBSYS_1400XXXX 0xc000 0x1000>;
 			mediatek,gce-events = <CMDQ_EVENT_VPP0_MDP_WROT_SOF>,
@@ -1997,7 +1997,7 @@
 		};
 
 		mdp3-wrot2@14f24000 {
-			compatible = "mediatek,mt8183-mdp3-wrot";
+			compatible = "mediatek,mt8195-mdp3-wrot", "mediatek,mt8183-mdp3-wrot";
 			reg = <0 0x14f24000 0 0x1000>;
 			mediatek,gce-client-reg = <&gce1 SUBSYS_14f2XXXX 0x4000 0x1000>;
 			mediatek,gce-events = <CMDQ_EVENT_VPP1_SVPP2_MDP_WROT_SOF>,
@@ -2008,7 +2008,7 @@
 		};
 
 		mdp3-wrot3@14f25000 {
-			compatible = "mediatek,mt8183-mdp3-wrot";
+			compatible = "mediatek,mt8195-mdp3-wrot", "mediatek,mt8183-mdp3-wrot";
 			reg = <0 0x14f25000 0 0x1000>;
 			mediatek,gce-client-reg = <&gce1 SUBSYS_14f2XXXX 0x5000 0x1000>;
 			mediatek,gce-events = <CMDQ_EVENT_VPP1_SVPP3_MDP_WROT_SOF>,
