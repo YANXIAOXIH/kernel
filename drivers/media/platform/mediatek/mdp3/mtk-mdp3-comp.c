@@ -2217,16 +2217,6 @@ static int mdp_comp_init(struct mdp_dev *mdp, struct device_node *node,
 	comp->ops = mdp_comp_ops[comp->type];
 	__mdp_comp_init(mdp, node, comp);
 
-	/*
-	 * Due to only RDMA dev has pm function, use corresponding RDMA dev id
-	 * to enable IOMMU Larb based on which WROT id is used.
-	 */
-	if (comp->public_id >= MDP_COMP_WROT0 &&
-	    comp->public_id <= MDP_COMP_WROT3) {
-		i = comp->public_id - MDP_COMP_WROT0;
-		comp->comp_dev = mdp->comp[MDP_COMP_RDMA0 + i]->comp_dev;
-	}
-
 	comp->clk_num = mdp->mdp_data->comp_data[id].info.clk_num;
 	comp->clks = devm_kzalloc(dev, sizeof(struct clk *) * comp->clk_num,
 				  GFP_KERNEL);
