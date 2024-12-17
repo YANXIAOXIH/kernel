@@ -987,6 +987,7 @@ static int sky1_link_status_show(struct seq_file *s, void *v)
 	ltssm = (val >> PCIE_LTSSM_STATUS_SHIFT) & 0x3f;
 	dev_info(pcie->dev, "sky1 status = 0x%08x ltssm = %d\n", val, ltssm);
 
+	sky1_link_l1sub_sta(pcie, val);
 	seq_printf(s, "sky1 link status is 6'd%d %s\n", ltssm,
 		   sky1_ltssm_sts_name(ltssm));
 	return 0;
