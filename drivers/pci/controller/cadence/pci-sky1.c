@@ -1956,6 +1956,16 @@ static void sky1_pcie_get_linkctrl_offset(struct sky1_pcie *pcie)
 		PCI_EXP_LNKCTL;
 }
 
+static void sky1_pcie_set_linksta_slc(struct sky1_pcie *pcie)
+{
+	u32 val;
+
+	/* Slot Clock Configuration: our design is common clock */
+	val = sky1_pcie_ctrl_readl_reg(pcie, pcie->linkctrl_offset);
+	val |= PCI_EXP_LNKSTA_SLC << 16;
+	sky1_pcie_ctrl_writel_reg(pcie, pcie->linkctrl_offset, val);
+}
+
 static void sky1_pcie_set_link_disable(struct sky1_pcie *pcie)
 {
 	void __iomem *status_addr;
@@ -2041,6 +2051,7 @@ static void sky1_pcie_really_probe(struct work_struct *work)
 
 	sky1_pcie_init(pcie);
 	sky1_pcie_get_linkctrl_offset(pcie);
+	sky1_pcie_set_linksta_slc(pcie);
 
 	ret = sky1_pcie_request_irq(pcie);
 	if (ret < 0) {
