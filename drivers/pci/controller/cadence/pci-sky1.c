@@ -2071,6 +2071,7 @@ err_ecam_free:
 	phy_exit(pcie->pcie_phy);
 	sky1_pcie_ctrl_set_axi_clk_en(pcie, false);
 	sky1_pcie_ctrl_set_apb_clk_en(pcie, false);
+	sky1_pcie_ctrl_set_refclk_b_en(pcie, false);
 }
 
 static int sky1_pcie_probe(struct platform_device *pdev)
