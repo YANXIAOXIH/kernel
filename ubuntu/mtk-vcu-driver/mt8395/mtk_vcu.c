@@ -1031,8 +1031,10 @@ int vcu_cmdq_pkt_write(struct cmdq_pkt *pkt, dma_addr_t addr, u32 value, u32 mas
 		return ret;
 	}
 
-	if(mask != 0xFFFFFFFF)
-		ret = cmdq_pkt_write_s_mask_value(pkt, CMDQ_ADDR_HIGH(addr), CMDQ_ADDR_LOW(addr), value, mask);
+	if(mask != 0xFFFFFFFF) {
+		ret |= cmdq_pkt_assign(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_HIGH(addr));
+		ret |= cmdq_pkt_write_s_mask_value(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_LOW(addr), value, mask);
+	}
 	else {
 		ret |= cmdq_pkt_assign(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_HIGH(addr));
 		ret != cmdq_pkt_write_s_value(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_LOW(addr), value);
