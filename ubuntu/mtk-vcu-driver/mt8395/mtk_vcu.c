@@ -1023,21 +1023,20 @@ int vcu_cmdq_pkt_read_addr(struct cmdq_pkt *pkt, dma_addr_t addr, u16 dst_reg_id
 
 int vcu_cmdq_pkt_write(struct cmdq_pkt *pkt, dma_addr_t addr, u32 value, u32 mask)
 {
-	int ret = -1;
+	int ret = 0;
 
-	if (!pkt) {
+	if (pkt) {
+		if(mask != 0xFFFFFFFF) {
+			cmdq_pkt_assign(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_HIGH(addr));
+			cmdq_pkt_write_s_mask_value(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_LOW(addr), value, mask);
+		}
+		else {
+			cmdq_pkt_assign(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_HIGH(addr));
+			cmdq_pkt_write_s_value(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_LOW(addr), value);
+		}
+	} else {
 		pr_info("%s Error: pkt is NULL !", __func__);
 		ret = -EINVAL;
-		return ret;
-	}
-
-	if(mask != 0xFFFFFFFF) {
-		ret |= cmdq_pkt_assign(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_HIGH(addr));
-		ret |= cmdq_pkt_write_s_mask_value(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_LOW(addr), value, mask);
-	}
-	else {
-		ret |= cmdq_pkt_assign(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_HIGH(addr));
-		ret != cmdq_pkt_write_s_value(pkt, CMDQ_THR_SPR_IDX0, CMDQ_ADDR_LOW(addr), value);
 	}
 
 	return ret;
