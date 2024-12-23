@@ -624,6 +624,14 @@ struct venc_larb_port {
 	unsigned int ram_type[MTK_VENC_PORT_NUM];
 };
 
+/**
+ * struct mtk_vcodec_enc_pdata - compatible data for each IC
+ *
+ * @max_b_frame_num: maximum number of b frames between p-frame
+ */
+struct mtk_vcodec_enc_pdata {
+	unsigned int	max_b_frame_num;
+};
 
 /**
  * struct mtk_vcodec_dev - driver data
@@ -640,6 +648,7 @@ struct venc_larb_port {
  * @curr_ctx: The context that is waiting for codec hardware
  *
  * @reg_base: Mapped address of MTK Vcodec registers.
+ * @venc_pdata: The venc platform data
  *
  * @id_counter: used to identify current opened instance
  *
@@ -682,6 +691,7 @@ struct mtk_vcodec_dev {
 	struct mtk_vcodec_ctx *curr_enc_ctx[MTK_VENC_HW_NUM];
 	void __iomem *dec_reg_base[NUM_MAX_VDEC_REG_BASE];
 	void __iomem *enc_reg_base[NUM_MAX_VENC_REG_BASE];
+	const struct mtk_vcodec_enc_pdata *venc_pdata;
 
 	bool dec_is_power_on[MTK_VDEC_HW_NUM];
 	bool enc_is_power_on[MTK_VENC_HW_NUM];

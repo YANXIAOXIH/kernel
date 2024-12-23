@@ -3254,8 +3254,9 @@ int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
 	ctx->enc_params.bitrate = 5000000;
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_BITRATE,
 			  0, 100000000, 1, ctx->enc_params.bitrate);
-	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_B_FRAMES,
-			  0, 1, 1, 0);
+	if (ctx->dev->venc_pdata->max_b_frame_num)
+		v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_B_FRAMES,
+			  0, ctx->dev->venc_pdata->max_b_frame_num, 1, 0);
 	ctx->enc_params.rc_frame = 1;
 	v4l2_ctrl_new_std(handler, ops, V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE,
 			  0, 1, 1, ctx->enc_params.rc_frame);
@@ -3504,17 +3505,19 @@ int mtk_vcodec_enc_ctrls_setup(struct mtk_vcodec_ctx *ctx)
 	mtk_vcodec_enc_custom_ctrls_check(handler, &cfg, NULL);
 
 	ctx->enc_params.b_qp = 51;
-	memset(&cfg, 0, sizeof(cfg));
-	cfg.id = V4L2_CID_MPEG_MTK_ENCODE_RC_B_FRAME_QP;
-	cfg.type = V4L2_CTRL_TYPE_INTEGER;
-	cfg.flags = V4L2_CTRL_FLAG_WRITE_ONLY;
-	cfg.name = "B-Frame QP Value";
-	cfg.min = 0;
-	cfg.max = 51;
-	cfg.step = 1;
-	cfg.def = ctx->enc_params.b_qp;
-	cfg.ops = ops;
-	mtk_vcodec_enc_custom_ctrls_check(handler, &cfg, NULL);
+	if (ctx->dev->venc_pdata->max_b_frame_num) {
+		memset(&cfg, 0, sizeof(cfg));
+		cfg.id = V4L2_CID_MPEG_MTK_ENCODE_RC_B_FRAME_QP;
+		cfg.type = V4L2_CTRL_TYPE_INTEGER;
+		cfg.flags = V4L2_CTRL_FLAG_WRITE_ONLY;
+		cfg.name = "B-Frame QP Value";
+		cfg.min = 0;
+		cfg.max = 51;
+		cfg.step = 1;
+		cfg.def = ctx->enc_params.b_qp;
+		cfg.ops = ops;
+		mtk_vcodec_enc_custom_ctrls_check(handler, &cfg, NULL);
+	}
 
 #ifdef __ANDROID__
 	memset(&cfg, 0, sizeof(cfg));

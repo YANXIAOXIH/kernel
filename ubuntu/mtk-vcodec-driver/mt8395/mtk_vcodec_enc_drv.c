@@ -374,6 +374,7 @@ static int mtk_vcodec_enc_probe(struct platform_device *pdev)
 	}
 	mtk_v4l2_debug(0, "hw ipm: %d", dev->venc_hw_ipm);
 
+	dev->venc_pdata = of_device_get_match_data(&pdev->dev);
 	ret = mtk_vcodec_init_enc_pm(dev);
 	if (ret < 0) {
 		dev_info(&pdev->dev, "Failed to get mt vcodec clock source!");
@@ -609,11 +610,17 @@ err_res:
 	return ret;
 }
 
+static const struct mtk_vcodec_enc_pdata mt8195_pdata = {
+	.max_b_frame_num = 1,
+};
+
+static const struct mtk_vcodec_enc_pdata mt8188_pdata = {
+	.max_b_frame_num = 0,
+};
+
 static const struct of_device_id mtk_vcodec_enc_match[] = {
-	{ .compatible = "mediatek,mt8195-vcodec-enc",
-	},
-	{ .compatible = "mediatek,mt8188-vcodec-enc",
-	},
+	{ .compatible = "mediatek,mt8195-vcodec-enc", .data = &mt8195_pdata},
+	{ .compatible = "mediatek,mt8188-vcodec-enc", .data = &mt8188_pdata},
 	{},
 };
 MODULE_DEVICE_TABLE(of, mtk_vcodec_enc_match);
