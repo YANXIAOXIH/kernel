@@ -1189,6 +1189,27 @@ static void sky1_pcie_parse_ep_pwr_supply(struct sky1_pcie *pcie)
 	}
 }
 
+static void sky1_pcie_parse_slot_power_gpio(struct sky1_pcie *pcie)
+{
+	struct device *dev = pcie->dev;
+
+	pcie->power = devm_gpiod_get_optional(dev, "power", GPIOD_OUT_HIGH);
+	if (IS_ERR(pcie->power)) {
+		dev_err(dev, "Failed to get power gpio\n");
+		pcie->power = NULL;
+	}
+}
+
+static void sky1_pcie_en_slot_power(struct sky1_pcie *pcie, int value)
+{
+	if (!pcie->power)
+		return;
+
+	gpiod_set_value_cansleep(pcie->power, value);
+	if (value > 0)
+		msleep(100);	/* wait for the power output to stabilize */
+}
+
 static int sky1_pcie_parse_reset_gpio(struct sky1_pcie *pcie)
 {
 	struct device *dev = pcie->dev;
@@ -1228,7 +1249,7 @@ static int sky1_pcie_parse_wake_gpio(struct sky1_pcie *pcie)
 }
 
 
-static int sky1_pcie_en_ep_power(struct sky1_pcie *pcie)
+static int sky1_pcie_en_ep_power(struct sky1_pcie *pcie, bool en)
 {
 	int ret = 0;
 	struct device *dev = pcie->dev;
@@ -1236,29 +1257,18 @@ static int sky1_pcie_en_ep_power(struct sky1_pcie *pcie)
 	if (!pcie->vsupply)
 		return ret;
 
-	ret = regulator_enable(pcie->vsupply);
+	if (en)
+		ret = regulator_enable(pcie->vsupply);
+	else
+		ret = regulator_disable(pcie->vsupply);
 	if (ret)
-		dev_err(dev, "fail to enable vcc-pcie regulator\n");
+		dev_err(dev, "fail to %s vcc-pcie regulator\n",
+			en ? "enable" : "disable");
 
 	return ret;
 }
 
-static int sky1_pcie_dis_ep_power(struct sky1_pcie *pcie)
-{
-	int ret = 0;
-	struct device *dev = pcie->dev;
-
-	if (!pcie->vsupply)
-		return ret;
-
-	ret = regulator_disable(pcie->vsupply);
-	if (ret)
-		dev_err(dev, "fail to disable vcc-pcie regulator\n");
-
-	return ret;
-}
-
-static int sky1_pcie_en_ep_on(struct sky1_pcie *pcie)
+static int sky1_pcie_en_ep_on(struct sky1_pcie *pcie, bool en)
 {
 	int ret = 0;
 	struct device *dev = pcie->dev;
@@ -1266,25 +1276,13 @@ static int sky1_pcie_en_ep_on(struct sky1_pcie *pcie)
 	if (!pcie->epsupply)
 		return ret;
 
-	ret = regulator_enable(pcie->epsupply);
+	if (en)
+		ret = regulator_enable(pcie->epsupply);
+	else
+		ret = regulator_disable(pcie->epsupply);
 	if (ret)
-		dev_err(dev, "fail to enable wlan-en regulator\n");
-
-	return ret;
-}
-
-static int sky1_pcie_dis_ep_on(struct sky1_pcie *pcie)
-{
-	int ret = 0;
-	struct device *dev = pcie->dev;
-
-	if (!pcie->epsupply)
-		return ret;
-
-	ret = regulator_disable(pcie->epsupply);
-	if (ret)
-		dev_err(dev, "fail to disable wlan-en regulator\n");
-
+		dev_err(dev, "fail to %s wlan-en regulator\n",
+			en ? "enable" : "disable");
 	return ret;
 }
 
@@ -1399,6 +1397,7 @@ static int sky1_pcie_parse_property(struct platform_device *pdev,
 {
 	int ret = 0;
 
+	sky1_pcie_parse_slot_power_gpio(pcie);
 	sky1_pcie_parse_ep_pwr_supply(pcie);
 	ret = sky1_pcie_parse_plat(pcie);
 	if (ret < 0)
@@ -2076,13 +2075,15 @@ err_ecam_free:
 	pm_runtime_put(dev);
 	pm_runtime_disable(dev);
 	sky1_pcie_debugfs_exit(pcie);
-	sky1_pcie_dis_ep_on(pcie);
-	sky1_pcie_dis_ep_power(pcie);
+	sky1_pcie_en_ep_on(pcie, false);
+	sky1_pcie_en_ep_power(pcie, false);
+	sky1_pcie_en_slot_power(pcie, 0);
 	phy_power_off(pcie->pcie_phy);
 	phy_exit(pcie->pcie_phy);
 	sky1_pcie_ctrl_set_axi_clk_en(pcie, false);
 	sky1_pcie_ctrl_set_apb_clk_en(pcie, false);
 	sky1_pcie_ctrl_set_refclk_b_en(pcie, false);
+	sky1_pcie_reset_ep_deassert(pcie);
 }
 
 static int sky1_pcie_probe(struct platform_device *pdev)
@@ -2133,15 +2134,14 @@ static int sky1_pcie_probe(struct platform_device *pdev)
 	if (ret < 0)
 		return -EINVAL;
 
-	ret = sky1_pcie_en_ep_power(pcie);
+	sky1_pcie_en_slot_power(pcie, 1);
+	ret = sky1_pcie_en_ep_power(pcie, true);
 	if (ret < 0)
-		return -EINVAL;
+		goto err_vsupply_12v;
 
-	ret = sky1_pcie_en_ep_on(pcie);
-	if (ret < 0) {
-		goto err_vsupply;
-		return -EINVAL;
-	}
+	ret = sky1_pcie_en_ep_on(pcie, true);
+	if (ret < 0)
+		goto err_vsupply_3v3;
 
 	sky1_pcie_ctrl_set_refclk_b_en(pcie, true);
 	sky1_pcie_reset_ep_assert(pcie);
@@ -2219,9 +2219,13 @@ err_get_sync:
 	pm_runtime_put(dev);
 	pm_runtime_disable(dev);
 err_epsupply:
-	sky1_pcie_dis_ep_on(pcie);
-err_vsupply:
-	sky1_pcie_dis_ep_power(pcie);
+	sky1_pcie_en_ep_on(pcie, false);
+	sky1_pcie_ctrl_set_refclk_b_en(pcie, false);
+	sky1_pcie_reset_ep_deassert(pcie);
+err_vsupply_3v3:
+	sky1_pcie_en_ep_power(pcie, false);
+err_vsupply_12v:
+	sky1_pcie_en_slot_power(pcie, 0);
 	sky1_pcie_debugfs_exit(pcie);
 	return ret;
 }
@@ -2241,8 +2245,8 @@ static int sky1_pcie_remove(struct platform_device *pdev)
 	sky1_pcie_debugfs_exit(pcie);
 	phy_power_off(pcie->pcie_phy);
 	phy_exit(pcie->pcie_phy);
-	sky1_pcie_dis_ep_power(pcie);
-	sky1_pcie_dis_ep_on(pcie);
+	sky1_pcie_en_ep_power(pcie, false);
+	sky1_pcie_en_ep_on(pcie, false);
 	destroy_workqueue(pcie->wk);
 
 	return 0;
@@ -2293,6 +2297,7 @@ static int sky1_pcie_suspend_noirq(struct device *dev)
 	phy_exit(pcie->pcie_phy);
 	sky1_pcie_ctrl_set_axi_clk_en(pcie, false);
 	sky1_pcie_ctrl_set_apb_clk_en(pcie, false);
+	sky1_pcie_en_slot_power(pcie, 0);
 	sky1_pcie_clear_atomic_var();
 	dev_info(dev, "%s\n", __func__);
 	return ret;
@@ -2308,6 +2313,7 @@ static int sky1_pcie_resume_noirq(struct device *dev)
 
 	if (!pcie->is_probe)
 		return 0;
+	sky1_pcie_en_slot_power(pcie, 1);
 	sky1_pcie_ctrl_set_axi_clk_en(pcie, true);
 	sky1_pcie_ctrl_set_apb_clk_en(pcie, true);
 	dev_info(dev, "Read STRAP_REG0 = :0x%x\n",
@@ -2345,6 +2351,9 @@ static void sky1_pcie_shutdown(struct platform_device *pdev)
 	phy_exit(pcie->pcie_phy);
 	sky1_pcie_ctrl_set_axi_clk_en(pcie, false);
 	sky1_pcie_ctrl_set_apb_clk_en(pcie, false);
+	sky1_pcie_en_ep_power(pcie, false);
+	sky1_pcie_en_ep_on(pcie, false);
+	sky1_pcie_en_slot_power(pcie, 0);
 	sky1_pcie_clear_atomic_var();
 }
 
