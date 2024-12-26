@@ -23,8 +23,8 @@
 
 #define IMG_MAX_WIDTH                  5376
 #define IMG_MAX_HEIGHT                 4032
-#define IMG_MIN_WIDTH                  80
-#define IMG_MIN_HEIGHT                 60
+#define IMG_MIN_WIDTH                  64
+#define IMG_MIN_HEIGHT                 64
 
 static struct v4l2_frmsize_stepwise mdp_frmsize_stepwise = {
        .max_width = IMG_MAX_WIDTH,
@@ -60,7 +60,7 @@ static struct mtk_mdp_pix_align mtk_mdp_size_align = {
 	.target_h		= 2,
 };
 
-static struct mtk_mdp_pix_align mtk_mdp_size_align_mt21 = {
+static struct mtk_mdp_pix_align mtk_mdp_size_align_block = {
 	.org_w			= 16,
 	.org_h			= 32,
 	.target_w		= 2,
@@ -79,79 +79,87 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_MM21,
 		.depth		= { 8, 4 },
-		.row_depth	= { 8, 4 },
+		.row_depth	= { 8, 8 },
 		.num_planes	= 2,
 		.num_comp	= 2,
-		.align		= &mtk_mdp_size_align_mt21,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV12M,
 		.depth		= { 8, 4 },
-		.row_depth	= { 8, 4 },
+		.row_depth	= { 8, 8 },
 		.num_planes	= 2,
 		.num_comp	= 2,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV12,
 		.depth		= { 12 },
-		.row_depth	= { 8, 4 },
+		.row_depth	= { 8 },
 		.num_planes	= 1,
 		.num_comp	= 2,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV21M,
 		.depth		= { 8, 4 },
-		.row_depth	= { 8, 4 },
+		.row_depth	= { 8, 8 },
 		.num_planes	= 2,
 		.num_comp	= 2,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV21,
 		.depth		= { 12 },
-		.row_depth	= { 8, 4 },
+		.row_depth	= { 8 },
 		.num_planes	= 1,
 		.num_comp	= 2,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YVU420M,
 		.depth		= { 8, 2, 2 },
-		.row_depth	= { 8, 2, 2 },
+		.row_depth	= { 8, 4, 4 },
 		.num_planes	= 3,
 		.num_comp	= 3,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YUV420M,
 		.depth		= { 8, 2, 2 },
-		.row_depth	= { 8, 2, 2 },
+		.row_depth	= { 8, 4, 4 },
 		.num_planes	= 3,
 		.num_comp	= 3,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YVU420,
 		.depth		= { 12 },
-		.row_depth	= { 8, 2, 2 },
+		.row_depth	= { 8 },
 		.num_planes	= 1,
 		.num_comp	= 3,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YUV420,
 		.depth		= { 12 },
-		.row_depth	= { 8, 2, 2 },
+		.row_depth	= { 8 },
 		.num_planes	= 1,
 		.num_comp	= 3,
+		.align		= &mtk_mdp_size_align_block,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
 				  MTK_MDP_FMT_FLAG_CAPTURE,
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YUV422P,
 		.depth		= { 16 },
-		.row_depth	= { 8, 4, 4 },
+		.row_depth	= { 16 },
 		.num_planes	= 1,
 		.num_comp	= 3,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
@@ -159,7 +167,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV16,
 		.depth		= { 16 },
-		.row_depth	= { 8, 8 },
+		.row_depth	= { 8 },
 		.num_planes	= 1,
 		.num_comp	= 2,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
