@@ -23,6 +23,10 @@ obj-y += mtk-apusys-driver/
 ##
 ##
 ##
+obj-$(CONFIG_MTK_FSOURCE) += mtk-fsource-driver/
+##
+##
+##
 obj-y += mtk-mdp-driver/
 ##
 ##

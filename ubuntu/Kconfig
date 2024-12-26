@@ -26,6 +26,10 @@ source "ubuntu/mtk-apusys-driver/Kconfig"
 ##
 ##
 ##
+source "ubuntu/mtk-fsource-driver/Kconfig"
+##
+##
+##
 source "ubuntu/mtk-mdp-driver/Kconfig"
 ##
 ##

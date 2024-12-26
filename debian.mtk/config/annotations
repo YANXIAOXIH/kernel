@@ -364,6 +364,7 @@ CONFIG_MTK_CMDQ                                 policy<{'arm64': 'y'}>
 CONFIG_MTK_CMDQ_MBOX                            policy<{'arm64': 'y'}>
 CONFIG_MTK_DPTX_SUPPORT                         policy<{'arm64': 'y'}>
 CONFIG_MTK_EFUSE                                policy<{'arm64': 'y'}>
+CONFIG_MTK_FSOURCE                              policy<{'arm64': 'm'}>
 CONFIG_MTK_HDMI_RX                              policy<{'arm64': 'm'}>
 CONFIG_MTK_IOMMU                                policy<{'arm64': 'y'}>
 CONFIG_MTK_LVDS_SUPPORT                         policy<{'arm64': 'y'}>
