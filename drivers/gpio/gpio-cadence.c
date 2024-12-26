@@ -20,6 +20,7 @@
 #include <linux/acpi.h>
 #include <linux/reset.h>
 #include <linux/pm.h>
+#include <linux/of_irq.h>
 
 #define CDNS_GPIO_BYPASS_MODE		0x00
 #define CDNS_GPIO_DIRECTION_MODE	0x04
@@ -33,6 +34,10 @@
 #define CDNS_GPIO_IRQ_TYPE		0x24
 #define CDNS_GPIO_IRQ_VALUE		0x28
 #define CDNS_GPIO_IRQ_ANY_EDGE		0x2c
+
+#define SKY1_SIP_GPIO_PDC               0xC2000009
+#define SKY1_SIP_GPIO_PDC_SET_WAKE      0x02
+#define GPIO_ENABLE_WAKE                1
 
 struct cdns_gpio_reg_saved {
 	u32 bypass_mode;
@@ -56,6 +61,7 @@ struct cdns_gpio_chip {
 	u32 bypass_orig;
 	struct reset_control *apb_reset;
 	struct cdns_gpio_reg_saved gpio_saved_reg;
+	u32 hw_irq;
 };
 
 static unsigned int cdns_gpio_base = 0;
@@ -196,6 +202,7 @@ static struct irq_chip cdns_gpio_irqchip = {
 static int cdns_gpio_probe(struct platform_device *pdev)
 {
 	struct cdns_gpio_chip *cgpio;
+	struct of_phandle_args of_irq;
 	int ret, irq;
 	u32 dir_prev;
 	u32 num_gpios = 32;
@@ -310,6 +317,12 @@ static int cdns_gpio_probe(struct platform_device *pdev)
 		girq->handler = handle_level_irq;
 	}
 
+	ret = of_irq_parse_one(pdev->dev.of_node, 0, &of_irq);
+	if (ret) {
+		pr_err("%pOF: failed to parse interrupt\n", pdev->dev.of_node);
+	}
+	cgpio->hw_irq = of_irq.args[1];
+
 	ret = devm_gpiochip_add_data(&pdev->dev, &cgpio->gc, cgpio);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Could not register gpiochip, %d\n", ret);
@@ -350,11 +363,16 @@ static int cdns_gpio_remove(struct platform_device *pdev)
 static void cdns_gpio_shutdown(struct platform_device *pdev)
 {
         struct cdns_gpio_chip *cgpio = platform_get_drvdata(pdev);
+        struct arm_smccc_res res;
+        u32 gpio_wake_en;
 
         if (cgpio->pclk) {
 		/* Mask out interrupts */
 		iowrite32(~cgpio->gpio_saved_reg.wake_en, cgpio->regs + CDNS_GPIO_IRQ_DIS);
-		iowrite32(cgpio->gpio_saved_reg.wake_en, cgpio->regs + CDNS_GPIO_IRQ_EN);
+		gpio_wake_en = cgpio->gpio_saved_reg.wake_en;
+		arm_smccc_smc(SKY1_SIP_GPIO_PDC, SKY1_SIP_GPIO_PDC_SET_WAKE,
+			cgpio->hw_irq, GPIO_ENABLE_WAKE, gpio_wake_en, 0, 0, 0, &res);
+
                 clk_disable_unprepare(cgpio->pclk);
         }
 }
@@ -398,10 +416,16 @@ static void cdns_gpio_restore_regs(struct cdns_gpio_chip *cgpio)
 static int __maybe_unused cdns_gpio_suspend(struct device *dev)
 {
 	struct cdns_gpio_chip *cgpio = dev_get_drvdata(dev);
+	struct arm_smccc_res res;
+	u32 gpio_wake_en;
+
 	if (cgpio->pclk) {
 		cdns_gpio_save_regs(cgpio);
 		iowrite32(~cgpio->gpio_saved_reg.wake_en, cgpio->regs + CDNS_GPIO_IRQ_DIS);
-		iowrite32(cgpio->gpio_saved_reg.wake_en, cgpio->regs + CDNS_GPIO_IRQ_EN);
+
+		gpio_wake_en = cgpio->gpio_saved_reg.wake_en;
+		arm_smccc_smc(SKY1_SIP_GPIO_PDC, SKY1_SIP_GPIO_PDC_SET_WAKE,
+			cgpio->hw_irq, GPIO_ENABLE_WAKE, gpio_wake_en, 0, 0, 0, &res);
 		clk_disable_unprepare(cgpio->pclk);
 	}
 
