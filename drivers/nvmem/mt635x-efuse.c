@@ -285,6 +285,7 @@ static const struct of_device_id mt635x_efuse_of_match[] = {
 		/* sentinel */
 	}
 };
+MODULE_DEVICE_TABLE(of, mt635x_efuse_of_match);
 
 static struct platform_driver mt635x_efuse_driver = {
 	.probe = mt635x_efuse_probe,
