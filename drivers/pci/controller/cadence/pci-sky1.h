@@ -173,7 +173,6 @@ struct sky1_pcie {
 	struct clk *pcie_apb_clk;
 	struct clk *pcie_pm_clk;
 	struct clk *pcie_refclk_b;
-	struct gpio_desc *power;
 	struct gpio_desc *reset;
 	struct gpio_desc *wake;
 	struct regulator *vsupply;
