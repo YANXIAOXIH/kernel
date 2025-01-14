@@ -2874,7 +2874,7 @@
 		gpu: gpu@15010000 {
 			compatible = "arm,mali-valhall";
 			reg = <0x0 0x15000000 0x0 0x10000>,
-				<0x0 0x15010000 0x0 0xFF0000>;
+				<0x0 0x15010000 0x0 0x480000>;
 			reg-names = "gpu_rcsu", "gpu";
 			interrupts = <GIC_SPI 237 IRQ_TYPE_LEVEL_HIGH>,
 					<GIC_SPI 238 IRQ_TYPE_LEVEL_HIGH>,
