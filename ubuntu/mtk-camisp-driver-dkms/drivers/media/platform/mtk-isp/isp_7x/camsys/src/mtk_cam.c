@@ -6086,7 +6086,8 @@ struct mtk_cam_ctx *mtk_cam_start_ctx(struct mtk_cam_device *cam,
 	struct media_pipeline *pipeline;
 	struct v4l2_subdev **target_sd;
 	int ret, i, is_first_ctx;
-	struct media_entity *entity = &node->vdev.entity;
+	struct media_entity *vdev_entity = &node->vdev.entity;
+	struct media_entity *entity = NULL;
 	struct media_entity *remote_entity = NULL;
 	struct media_pad *pad = entity->pads;
 	struct media_pad *local_pad = NULL;
@@ -6094,6 +6095,7 @@ struct mtk_cam_ctx *mtk_cam_start_ctx(struct mtk_cam_device *cam,
 	struct mtk_cam_media_pipeline *pipe_node;
 	bool connect_bridge = false;
 
+	entity = vdev_entity;
 	dev_info(cam->dev, "%s:ctx(%d): triggered by %s\n",
 		 __func__, ctx->stream_id, entity->name);
 
@@ -6216,7 +6218,7 @@ struct mtk_cam_ctx *mtk_cam_start_ctx(struct mtk_cam_device *cam,
 
 	pipeline = &pipe_node->pipeline;
 
-	ret = media_pipeline_start(entity->pads, pipeline);
+	ret = media_pipeline_start(vdev_entity->pads, pipeline);
 	if (ret) {
 		dev_info(cam->dev,
 			 "%s:pipe(%d):failed in media_pipeline_start:%d\n",
@@ -6246,6 +6248,11 @@ struct mtk_cam_ctx *mtk_cam_start_ctx(struct mtk_cam_device *cam,
 			}
 			break;
 		}
+	}
+
+	if (!entity) {
+		dev_err(cam->dev, "Failed to find the linked seninf entity\n");
+		goto fail_stop_pipeline;
 	}
 
 	/* traverse to update used subdevs & number of nodes */
@@ -6316,7 +6323,7 @@ add_node_to_ctx:
 	return ctx;
 
 fail_stop_pipeline:
-	media_pipeline_stop(entity->pads);
+	media_pipeline_stop(vdev_entity->pads);
 fail_uninit_sv_wq:
 	kfree(pipe_node);
 	destroy_workqueue(ctx->sv_wq);
