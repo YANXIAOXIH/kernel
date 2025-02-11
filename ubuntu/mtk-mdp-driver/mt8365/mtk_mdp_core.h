@@ -174,6 +174,12 @@ struct mtk_mdp_dev {
 	struct notifier_block		pm_notifier;
 };
 
+enum {
+	MDP_M2M_SRC = 0,
+	MDP_M2M_DST = 1,
+	MDP_M2M_MAX,
+};
+
 /**
  * struct mtk_mdp_ctx - the device context data
  * @list:		link to ctx_list of mtk_mdp_dev
@@ -227,6 +233,8 @@ struct mtk_mdp_ctx {
 	struct mutex			slock;
 	struct work_struct		work;
 	struct cmdq_pkt			*cmdq_handle;
+
+	u32				frame_count[MDP_M2M_MAX];
 };
 
 extern int mtk_mdp_dbg_level;

@@ -608,6 +608,12 @@ static int mtk_mdp_m2m_start_streaming(struct vb2_queue *q, unsigned int count)
 	struct mtk_mdp_ctx *ctx = q->drv_priv;
 	int ret;
 
+	if (V4L2_TYPE_IS_OUTPUT(q->type))
+		ctx->frame_count[MDP_M2M_SRC] = 0;
+
+	if (V4L2_TYPE_IS_CAPTURE(q->type))
+		ctx->frame_count[MDP_M2M_DST] = 0;
+
 	ret = pm_runtime_resume_and_get(&ctx->mdp_dev->pdev->dev);
 	if (ret < 0)
 		mtk_mdp_dbg(1, "[%d] pm_runtime_resume_and_get failed:%d",
@@ -734,6 +740,8 @@ static void mtk_mdp_process_done(void *priv, int vb_state)
 		return;
 	}
 
+	src_vbuf->sequence = ctx->frame_count[MDP_M2M_SRC]++;
+	dst_vbuf->sequence = ctx->frame_count[MDP_M2M_DST]++;
 	dst_vbuf->vb2_buf.timestamp = src_vbuf->vb2_buf.timestamp;
 	dst_vbuf->timecode = src_vbuf->timecode;
 	dst_vbuf->flags &= ~V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
