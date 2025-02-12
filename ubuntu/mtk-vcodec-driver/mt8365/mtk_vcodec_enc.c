@@ -134,13 +134,13 @@ static struct mtk_video_fmt mtk_video_formats_mt8167[] = {
 #define NUM_FORMATS_MT8167 ARRAY_SIZE(mtk_video_formats_mt8167)
 
 static const struct v4l2_frmsize_stepwise mtk_venc_framesizes = {
-	MTK_VENC_MIN_W, MTK_VENC_MAX_W, 8,
-	MTK_VENC_MIN_H, MTK_VENC_MAX_H, 8,
+	MTK_VENC_MIN_W, MTK_VENC_MAX_W, 2,
+	MTK_VENC_MIN_H, MTK_VENC_MAX_H, 2,
 };
 
 static const struct v4l2_frmsize_stepwise mtk_venc_fhd_framesizes = {
-	MTK_VENC_MIN_W, MTK_VENC_FHD_MAX_W, 8,
-	MTK_VENC_MIN_H, MTK_VENC_FHD_MAX_H, 8,
+	MTK_VENC_MIN_W, MTK_VENC_FHD_MAX_W, 2,
+	MTK_VENC_MIN_H, MTK_VENC_FHD_MAX_H, 2,
 };
 
 static int vidioc_venc_s_ctrl(struct v4l2_ctrl *ctrl)
