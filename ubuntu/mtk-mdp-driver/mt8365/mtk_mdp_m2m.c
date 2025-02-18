@@ -79,7 +79,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_MM21,
 		.depth		= { 8, 4 },
-		.row_depth	= { 8, 8 },
+		.row_depth	= { 8, 4 },
 		.num_planes	= 2,
 		.num_comp	= 2,
 		.align		= &mtk_mdp_size_align_block,
@@ -87,7 +87,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV12M,
 		.depth		= { 8, 4 },
-		.row_depth	= { 8, 8 },
+		.row_depth	= { 8, 4 },
 		.num_planes	= 2,
 		.num_comp	= 2,
 		.align		= &mtk_mdp_size_align_block,
@@ -105,7 +105,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_NV21M,
 		.depth		= { 8, 4 },
-		.row_depth	= { 8, 8 },
+		.row_depth	= { 8, 4 },
 		.num_planes	= 2,
 		.num_comp	= 2,
 		.align		= &mtk_mdp_size_align_block,
@@ -123,7 +123,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YVU420M,
 		.depth		= { 8, 2, 2 },
-		.row_depth	= { 8, 4, 4 },
+		.row_depth	= { 8, 2, 2 },
 		.num_planes	= 3,
 		.num_comp	= 3,
 		.align		= &mtk_mdp_size_align_block,
@@ -132,7 +132,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YUV420M,
 		.depth		= { 8, 2, 2 },
-		.row_depth	= { 8, 4, 4 },
+		.row_depth	= { 8, 2, 2 },
 		.num_planes	= 3,
 		.num_comp	= 3,
 		.align		= &mtk_mdp_size_align_block,
@@ -159,7 +159,7 @@ static const struct mtk_mdp_fmt mtk_mdp_formats[] = {
 	}, {
 		.pixelformat	= V4L2_PIX_FMT_YUV422P,
 		.depth		= { 16 },
-		.row_depth	= { 16 },
+		.row_depth	= { 8 },
 		.num_planes	= 1,
 		.num_comp	= 3,
 		.flags		= MTK_MDP_FMT_FLAG_OUTPUT |
