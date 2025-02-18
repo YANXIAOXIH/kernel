@@ -1298,6 +1298,22 @@ static int seninf_s_stream(struct v4l2_subdev *sd, int enable)
 		ret = v4l2_subdev_call(ctx->sensor_sd, video, s_stream, 1);
 		if (ret) {
 			dev_info(ctx->dev, "sensor stream-on ret %d\n", ret);
+#ifdef SENSOR_SECURE_MTEE_SUPPORT
+			if (ctx->is_secure == 1) {
+				dev_info(ctx->dev, "sensor kernel ca_free");
+				seninf_ca_free();
+
+				dev_info(ctx->dev, "close seninf_ca");
+				ret_gz = seninf_ca_close_session();
+				ctx->is_secure = 0;
+			}
+#endif
+			g_seninf_ops->_set_idle(ctx);
+			mtk_cam_seninf_release_mux(ctx);
+			seninf_dfs_set(ctx, 0);
+			g_seninf_ops->_poweroff(ctx);
+			pm_runtime_put_sync(ctx->dev);
+			ctx->streaming = 0;
 			return  ret;
 		}
 #ifdef SENINF_UT_DUMP

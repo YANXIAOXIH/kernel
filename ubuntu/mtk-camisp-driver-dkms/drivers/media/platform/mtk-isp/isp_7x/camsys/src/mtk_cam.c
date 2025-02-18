@@ -6825,6 +6825,15 @@ int mtk_cam_ctx_stream_on(struct mtk_cam_ctx *ctx)
 			dev_info(cam->dev, "failed to stream on seninf %s:%d\n",
 				 ctx->seninf->name, ret);
 			mutex_unlock(&cam->streaming_lock);
+			for (i = 0 ; i < ctx->used_sv_num ; i++) {
+				camsv_dev = get_camsv_dev(cam, ctx->sv_pipe[i]);
+				camsv_dev->is_enqueued = 0;
+				pm_runtime_put_sync(camsv_dev->dev);
+				if (ret)
+					dev_info(cam->dev,
+						"%s:failed to power off camsv(%d)\n",
+						__func__, i);
+			}
 			goto fail_img_buf_release;
 		}
 		mutex_unlock(&cam->streaming_lock);
