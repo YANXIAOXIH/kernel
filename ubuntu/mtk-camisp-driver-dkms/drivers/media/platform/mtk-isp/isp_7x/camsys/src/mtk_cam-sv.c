@@ -1550,6 +1550,7 @@ int mtk_cam_sv_top_disable(struct mtk_camsv_device *dev)
 		CAMSV_WRITE_BITS(dev->base + REG_CAMSV_TG_VF_CON,
 			CAMSV_TG_VF_CON, VFDATA_EN, 0);
 		mtk_cam_sv_toggle_tg_db(dev);
+		reset_msgfifo(dev);
 		sv_reset(dev);
 	}
 	CAMSV_WRITE_BITS(dev->base + REG_CAMSV_MODULE_EN,
