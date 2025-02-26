@@ -1636,21 +1636,26 @@ int mtk_cam_sv_enquehwbuf(
 
 	reg.Raw = 0;
 
+	CAMSV_WRITE_REG(dev->base + REG_CAMSV_FRAME_SEQ_NO, seq_no);
+	if (ba & 0xFFFFFFFFF) {
 #ifdef ISP7_1
-	CAMSV_WRITE_REG(dev->base + REG_CAMSV_FRAME_SEQ_NO, seq_no);
-	CAMSV_WRITE_REG(dev->base + REG_CAMSV_IMGO_BASE_ADDR, ba & 0xFFFFFFFF);
-	CAMSV_WRITE_REG(dev->base + REG_CAMSV_IMGO_BASE_ADDR_MSB, (ba >> 32) & 0xF);
-	reg.Bits.RCNT_INC1 = 1;
-	CAMSV_WRITE_REG(dev->base + REG_CAMSV_TOP_FBC_CNT_SET, reg.Raw);
-#else
-	CAMSV_WRITE_REG(dev->base + REG_CAMSV_FRAME_SEQ_NO, seq_no);
-	CAMSV_WRITE_REG(dev->base + REG_CAMSV_IMGO_BASE_ADDR, ba);
-	if (dev->id % 2)
-		reg.Bits.RCNT_INC3 = 1;
-	else
+		CAMSV_WRITE_REG(dev->base + REG_CAMSV_IMGO_BASE_ADDR, ba & 0xFFFFFFFF);
+		CAMSV_WRITE_REG(dev->base + REG_CAMSV_IMGO_BASE_ADDR_MSB, (ba >> 32) & 0xF);
 		reg.Bits.RCNT_INC1 = 1;
-	CAMSV_WRITE_REG(top_dev->base + REG_CAMSV_TOP_FBC_CNT_SET, reg.Raw);
+		CAMSV_WRITE_REG(dev->base + REG_CAMSV_TOP_FBC_CNT_SET, reg.Raw);
+#else
+		CAMSV_WRITE_REG(dev->base + REG_CAMSV_IMGO_BASE_ADDR, ba);
+		if (dev->id % 2)
+			reg.Bits.RCNT_INC3 = 1;
+		else
+			reg.Bits.RCNT_INC1 = 1;
+		CAMSV_WRITE_REG(top_dev->base + REG_CAMSV_TOP_FBC_CNT_SET, reg.Raw);
 #endif
+	} else {
+		dev_warn(dev->dev, "%s: imgo_addr is 0, skip RCNT_INC\n", __func__);
+		return -EINVAL;
+	}
+
 	return ret;
 }
 
