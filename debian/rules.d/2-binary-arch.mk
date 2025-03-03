@@ -82,7 +82,7 @@ define build_dkms_sign =
 	)
 endef
 define build_dkms =
-	CROSS_COMPILE=$(CROSS_COMPILE) $(SHELL) $(DROOT)/scripts/dkms-build $(dkms_dir) $(abi_release)-$* '$(call build_dkms_sign,$(builddir)/build-$*)' $(1) $(2) $(3) $(4) $(5)
+	CROSS_COMPILE=$(CROSS_COMPILE) $(6) $(SHELL) $(DROOT)/scripts/dkms-build $(dkms_dir) $(abi_release)-$* '$(call build_dkms_sign,$(builddir)/build-$*)' $(1) $(2) $(3) $(4) $(5)
 endef
 
 define install_control =
@@ -443,7 +443,7 @@ endif
 
 	$(foreach _m,$(all_dkms_modules), \
 	  $(if $(enable_$(_m)), \
-	    $(call build_dkms,$(dkms_$(_m)_pkg_name)-$*,$(dkms_$(_m)_pkgdir)/lib/modules/$(abi_release)-$*/$(dkms_$(_m)_subdir),$(dbgpkgdir_dkms),$(_m),$(dkms_$(_m)_debpath)); \
+	    $(call build_dkms,$(dkms_$(_m)_pkg_name)-$*,$(dkms_$(_m)_pkgdir)/lib/modules/$(abi_release)-$*/$(dkms_$(_m)_subdir),$(dbgpkgdir_dkms),$(_m),$(dkms_$(_m)_debpath),$(dkms_$(_m)_env)); \
 	  ) \
 	)
 
