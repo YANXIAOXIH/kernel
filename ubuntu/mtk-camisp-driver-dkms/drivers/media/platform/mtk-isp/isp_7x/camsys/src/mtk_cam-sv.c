@@ -333,7 +333,7 @@ static int mtk_camsv_call_set_fmt(struct v4l2_subdev *sd,
 		return -EINVAL;
 	}
 
-	if (!mtk_camsv_try_fmt(sd, fmt)) {
+	if (mtk_camsv_try_fmt(sd, fmt) == MTKCAM_IPI_IMG_FMT_UNKNOWN) {
 		mf = get_sv_fmt(pipe, sd_state, fmt->pad, fmt->which);
 		fmt->format = *mf;
 	} else {
