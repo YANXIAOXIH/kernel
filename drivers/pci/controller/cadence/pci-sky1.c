@@ -89,6 +89,8 @@
 		       | LOCAL_ERR_UNEXPCPL | LOCAL_ERR_FCERR | LOCAL_ERR_CPLTO)
 #define LOCAL_ERR_LTSSTTRAN (31)
 #define LOCAL_ERR_PME (5)
+#define LOCAL_ERR_NETTO BIT(26)
+
 
 #define PCIE_LTSSM_DISABLED 32
 #define SKY1_PHY_DELAY_US_MIN (200)
@@ -200,6 +202,7 @@ static void sky1_pcie_enable_local_irq(struct sky1_pcie *pcie, bool en)
 	if (en) {
 		/* mask aer error local interrupt */
 		enanle_err_0 |= LOCAL_INT_AER;
+		enanle_err_0 |= LOCAL_ERR_NETTO;
 		writel(enanle_err_0, reg_base + I_LOCAL_ERR_MASK_REG0);
 		writel(enanle_err_1, reg_base + I_LOCAL_ERR_MASK_REG1);
 	} else {
