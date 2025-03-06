@@ -871,6 +871,14 @@ unsigned int mtk_cam_get_sensor_fmt(unsigned int fmt)
 	case MEDIA_BUS_FMT_SGRBG14_1X14:
 	case MEDIA_BUS_FMT_SRGGB14_1X14:
 		return MTKCAM_IPI_IMG_FMT_BAYER14;
+	case MEDIA_BUS_FMT_YUYV8_1X16:
+		return MTKCAM_IPI_IMG_FMT_YUYV;
+	case MEDIA_BUS_FMT_YVYU8_1X16:
+		return MTKCAM_IPI_IMG_FMT_YVYU;
+	case MEDIA_BUS_FMT_UYVY8_1X16:
+		return MTKCAM_IPI_IMG_FMT_UYVY;
+	case MEDIA_BUS_FMT_VYUY8_1X16:
+		return MTKCAM_IPI_IMG_FMT_VYUY;
 	default:
 		return MTKCAM_IPI_IMG_FMT_UNKNOWN;
 	}
