@@ -215,7 +215,7 @@ if [ -n "$dbgpkgdir" ]; then
 
 		# Just 'strip -g' as '/usr/sbin/dkms' does.
 		echo "stripping $vmodule"
-		strip -g "$module"
+		${CROSS_COMPILE}strip -g "$module"
 	done
 fi
 
