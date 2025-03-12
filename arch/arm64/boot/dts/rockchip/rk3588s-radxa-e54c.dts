@@ -164,6 +164,13 @@
 			linux,default-trigger = "netdev";
 		};
 	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		#cooling-cells = <2>;
+		cooling-levels = <0 64 128 192 255>;
+		pwms = <&pwm3 0 10000 0>;
+	};
 };
 
 &i2c0 {
@@ -203,13 +210,6 @@
 		regulator-state-mem {
 			regulator-off-in-suspend;
 		};
-	};
-
-	fan0: pwm-fan {
-		compatible = "pwm-fan";
-		#cooling-cells = <2>;
-		cooling-levels = <0 64 128 192 255>;
-		pwms = <&pwm3 0 10000 0>;
 	};
 
 	eeprom:	bl24c16@50 {
