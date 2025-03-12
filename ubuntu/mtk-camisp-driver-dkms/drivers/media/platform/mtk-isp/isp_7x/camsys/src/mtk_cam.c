@@ -3590,6 +3590,8 @@ void mtk_cam_dev_req_try_queue(struct mtk_cam_device *cam)
 				stream_ctx = mtk_cam_find_ctx(cam,
 					&cam->sv.pipelines[i -
 					MTKCAM_SUBDEV_CAMSV_START].subdev.entity);
+				s_data_cnt =
+					atomic_inc_return(&ctx->running_s_data_cnt);
 			}
 			if (is_raw_subdev(i) && ctx->sensor) {
 				previous_feature = ctx->pipe->feature_pending;
