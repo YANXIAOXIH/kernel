@@ -21,6 +21,7 @@
 #include <linux/regmap.h>
 #include <linux/mfd/syscon.h>
 #include <linux/of_address.h>
+#include <linux/of_gpio.h>
 #include <linux/device.h>
 
 #include "core.h"
@@ -787,6 +788,30 @@ static const struct acpi_device_id cdnsp_sky1_acpi_match[] = {
 };
 MODULE_DEVICE_TABLE(acpi, cdnsp_sky1_acpi_match);
 
+static void cdnsp_sky1_power_off_vbus(struct device *dev)
+{
+	struct device_node *np = dev->of_node;
+	enum of_gpio_flags flags;
+	int gpio;
+	int index = 0;
+
+	if (!of_find_property(np, "pinctrl-assert-gpios", NULL))
+		return; /* Missing the property, so nothing to be done */
+
+	for (;; index++) {
+		gpio = of_get_named_gpio_flags(np, "pinctrl-assert-gpios",
+					       index, &flags);
+		if (gpio < 0)
+			return;
+
+		/* GPIO has already requested by drivers/pinctrl/devicetree.c */
+		if (gpio_cansleep(gpio))
+			gpio_set_value_cansleep(gpio, 0);
+		else
+			gpio_set_value(gpio, 0);
+	}
+}
+
 static void cdnsp_sky1_shutdown(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
@@ -794,6 +819,11 @@ static void cdnsp_sky1_shutdown(struct platform_device *pdev)
 
 	if (!device_may_wakeup(dev)) {
 		dev_dbg(dev, "at %s, reset controller\n", __func__);
+		/*
+		 * Workaround: it is only used to power off vbus
+		 * which has pinctrl-assert-gpios property.
+		 */
+		cdnsp_sky1_power_off_vbus(dev);
 		reset_control_assert(data->reset);
 		reset_control_assert(data->preset);
 		sky1_usb_clk_disable_all(dev);
