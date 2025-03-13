@@ -1,5 +1,5 @@
 config AIC_WLAN_AIC8800_USB
-	bool "AIC wireless Support"
+	bool "AIC8800 USB Support"
 	default n
 	help
 	  This is support for aic wireless chip.
