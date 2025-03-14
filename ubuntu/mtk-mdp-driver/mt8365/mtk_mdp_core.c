@@ -383,6 +383,8 @@ static int mtk_mdp_remove(struct platform_device *pdev)
 	unregister_pm_notifier(&mdp->pm_notifier);
 	cmdq_mbox_destroy(mdp->cmdq_client);
 
+	platform_driver_unregister(&mtk_mdp_comp);
+
 	dev_dbg(&pdev->dev, "%s driver unloaded\n", pdev->name);
 	return 0;
 }
