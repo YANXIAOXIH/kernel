@@ -1915,7 +1915,7 @@
 		cooling-levels = <0 150 200 255>;
 		#cooling-cells = <2>;
 		pwms = <&cros_ec_pwm 0>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	cix_ec_light {
