@@ -20,6 +20,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/delay.h>
 #include <linux/reset.h>
+#include <linux/syscore_ops.h>
 
 #include "../../pci.h"
 #include "pcie-cadence.h"
@@ -102,6 +103,8 @@ static atomic_t phy_rst0_cnt = ATOMIC_INIT(0);
 static atomic_t phy_rst1_cnt = ATOMIC_INIT(0);
 static atomic_t pwr_en0_cnt = ATOMIC_INIT(0);
 static atomic_t pwr_en1_cnt = ATOMIC_INIT(0);
+
+static LIST_HEAD(sky1_pcie_list);
 
 static const struct sky1_pcie_ctrl_desc sky1_pcie_desc[] = {
 	{
@@ -2016,6 +2019,32 @@ static u32 sky1_pcie_set_probe_delay(struct sky1_pcie *pcie)
 	return probe_delay;
 }
 
+static int _sky1_pcie_syscore_op_shutdown(struct sky1_pcie *pcie)
+{
+	if (!pcie->is_probe)
+		return 0;
+
+	sky1_pcie_disable_irq(pcie);
+	sky1_pcie_reset_ep_assert(pcie);
+	sky1_pcie_en_ep_power(pcie, false);
+	sky1_pcie_en_ep_on(pcie, false);
+
+	return 0;
+}
+
+static void sky1_pcie_syscore_op_shutdown(void)
+{
+	struct sky1_pcie *pcie;
+
+	list_for_each_entry(pcie, &sky1_pcie_list, list) {
+		_sky1_pcie_syscore_op_shutdown(pcie);
+	}
+}
+
+static struct syscore_ops sky1_pcie_syscore_ops = {
+	.shutdown = sky1_pcie_syscore_op_shutdown,
+};
+
 static void sky1_pcie_really_probe(struct work_struct *work)
 {
 	struct sky1_pcie *pcie = container_of(work, struct sky1_pcie,
@@ -2047,6 +2076,19 @@ static void sky1_pcie_really_probe(struct work_struct *work)
 	pcie->cfg_base = rc->cfg_base;
 	pcie->reg_base = cdns_pcie->reg_base;
 	pcie->is_probe = true;
+
+	mutex_lock(&sky1_init_mutex);
+	/* Register for syscore ops only when first instance probed */
+	if (list_empty(&sky1_pcie_list))
+		register_syscore_ops(&sky1_pcie_syscore_ops);
+
+	/*
+	 * Add the qcom_pcie list of each PCIe instance probed to
+	 * the global list so that we use it iterate through each PCIe
+	 * instance in the syscore ops.
+	 */
+	list_add_tail(&pcie->list, &sky1_pcie_list);
+	mutex_unlock(&sky1_init_mutex);
 	dev_info(dev, "%s end!\n", __func__);
 	return;
 
@@ -2225,6 +2267,9 @@ static int sky1_pcie_remove(struct platform_device *pdev)
 	sky1_pcie_en_ep_power(pcie, false);
 	sky1_pcie_en_ep_on(pcie, false);
 	destroy_workqueue(pcie->wk);
+	list_del(&pcie->list);
+	if (list_empty(&sky1_pcie_list))
+		unregister_syscore_ops(&sky1_pcie_syscore_ops);
 
 	return 0;
 }
@@ -2313,24 +2358,6 @@ static int sky1_pcie_resume_noirq(struct device *dev)
 const struct dev_pm_ops sky1_pcie_pm_ops = { SET_NOIRQ_SYSTEM_SLEEP_PM_OPS(
 	sky1_pcie_suspend_noirq, sky1_pcie_resume_noirq) };
 
-static void sky1_pcie_shutdown(struct platform_device *pdev)
-{
-	struct sky1_pcie *pcie = platform_get_drvdata(pdev);
-
-	if (!pcie->is_probe)
-		return;
-
-	sky1_pcie_disable_irq(pcie);
-	sky1_pcie_reset_ep_assert(pcie);
-	phy_power_off(pcie->pcie_phy);
-	phy_exit(pcie->pcie_phy);
-	sky1_pcie_ctrl_set_axi_clk_en(pcie, false);
-	sky1_pcie_ctrl_set_apb_clk_en(pcie, false);
-	sky1_pcie_en_ep_power(pcie, false);
-	sky1_pcie_en_ep_on(pcie, false);
-	sky1_pcie_clear_atomic_var();
-}
-
 static struct platform_driver sky1_pcie_driver = {
 	.probe  = sky1_pcie_probe,
 	.remove = sky1_pcie_remove,
@@ -2341,6 +2368,5 @@ static struct platform_driver sky1_pcie_driver = {
 		.suppress_bind_attrs = true,
 		.pm	= &sky1_pcie_pm_ops,
 	},
-	.shutdown = sky1_pcie_shutdown,
 };
 builtin_platform_driver(sky1_pcie_driver);

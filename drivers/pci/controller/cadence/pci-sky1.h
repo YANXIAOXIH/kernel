@@ -144,6 +144,7 @@ struct sky1_aer_stats {
 };
 
 struct sky1_pcie {
+	struct list_head list;	/* list to probed instances */
 	const struct sky1_pcie_data *data;
 	const struct sky1_pcie_ctrl_desc *desc;
 	struct reset_control *rst;
