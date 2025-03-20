@@ -29,6 +29,8 @@
 #include "mali_memory_virtual.h"
 #include "mali_pp_job.h"
 
+MODULE_IMPORT_NS(DMA_BUF);
+
 /*
  * Map DMA buf attachment \a mem into \a session at virtual address \a virt.
  */
