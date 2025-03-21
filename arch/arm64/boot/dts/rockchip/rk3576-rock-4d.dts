@@ -424,7 +424,7 @@
 };
 
 &i2c2 {
-	status = "disabled";
+	status = "okay";
 
 	hym8563: hym8563@51 {
 		compatible = "haoyu,hym8563";
