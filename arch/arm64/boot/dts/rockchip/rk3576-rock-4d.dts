@@ -22,6 +22,13 @@
 	model = "ROCK 4D";
 	compatible = "radxa,rock-4d", "rockchip,rk3576";
 
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		#cooling-cells = <2>;
+		cooling-levels = <0 64 128 192 255>;
+		pwms = <&pwm2_8ch_5 0 60000 0>;
+	};
+
 	vcc_sys: vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc_sys";
