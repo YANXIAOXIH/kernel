@@ -220,6 +220,8 @@
 
 &i2c2 {
 	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c2m1_xfer>;
 	hym8563: hym8563@51 {
 		compatible = "haoyu,hym8563";
 		status = "okay";
