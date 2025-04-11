@@ -26,7 +26,7 @@
 		compatible = "pwm-fan";
 		#cooling-cells = <2>;
 		cooling-levels = <0 64 128 192 255>;
-		pwms = <&pwm2_8ch_5 0 60000 0>;
+		pwms = <&pwm2_8ch_5 0 10000 0>;
 	};
 
 	vcc_sys: vcc5v0-sys {
@@ -313,6 +313,28 @@
 
 &tsadc {
 	status = "okay";
+};
+
+&threshold {
+	temperature = <60000>;
+};
+
+&little_core_thermal {
+	sustainable-power = <5000>; /* milliwatts */
+	cooling-maps {
+		map3 {
+			trip = <&target>;
+			cooling-device =
+				<&fan0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+			contribution = <8192>;
+		};
+		map4 {
+			trip = <&threshold>;
+			cooling-device =
+				<&fan0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+			contribution = <8192>;
+		};
+	};
 };
 
 &sdhci {
