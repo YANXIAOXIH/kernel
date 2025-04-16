@@ -11,9 +11,6 @@ CONFIG_DEVFREQ_THERMAL                          note<'LP: #2028926'>
 CONFIG_DRM_LEGACY                               policy<{'arm64': 'y'}>
 CONFIG_DRM_LEGACY                               note<'Consider re-enabling but not signing the modules'>
 
-CONFIG_DRM_MEDIATEK_HDMI                        policy<{'arm64': 'y'}>
-CONFIG_DRM_MEDIATEK_HDMI                        note<'LP: #2078763'>
-
 CONFIG_EXT2_FS                                  policy<{'arm64': 'y'}>
 CONFIG_EXT2_FS                                  note<'ext4 handling via EXT4_USE_FOR_EXT23'>
 
@@ -43,9 +40,6 @@ CONFIG_OSNOISE_TRACER                           note<'This enables the osnoise t
 
 CONFIG_PCIE_EDR                                 policy<{'arm64': 'n'}>
 CONFIG_PCIE_EDR                                 note<'LP: #1965241'>
-
-CONFIG_PHY_MTK_HDMI                             policy<{'arm64': 'y'}>
-CONFIG_PHY_MTK_HDMI                             note<'LP: #2078763'>
 
 CONFIG_REGULATOR_FIXED_VOLTAGE                  policy<{'arm64': 'y'}>
 CONFIG_REGULATOR_FIXED_VOLTAGE                  note<'boot essential on arm'>
