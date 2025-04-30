@@ -423,7 +423,7 @@ static unsigned int cppc_cpufreq_fast_switch(struct cpufreq_policy *policy,
 
 	if (ret) {
 		pr_debug("Failed to set target on CPU:%d. ret:%d\n",
-			 cpu, ret);
+		         cpu, ret);
 		return 0;
 	}
 
@@ -797,6 +797,12 @@ static int cppc_cpufreq_cpu_exit(struct cpufreq_policy *policy)
 	struct cppc_perf_caps *caps = &cpu_data->perf_caps;
 	unsigned int cpu = policy->cpu;
 	int ret;
+	struct device *dev;
+	struct acpi_device *device;
+	struct acpi_processor *pr = per_cpu(processors, cpu);
+
+	dev = get_cpu_device(pr->id);
+	device = ACPI_COMPANION(dev);
 
 	cppc_cpufreq_cpu_fie_exit(policy);
 
@@ -808,6 +814,10 @@ static int cppc_cpufreq_cpu_exit(struct cpufreq_policy *policy)
 			 caps->lowest_perf, cpu, ret);
 
 	cppc_cpufreq_put_cpu_data(policy);
+
+#ifdef CONFIG_ARM64
+	acpi_processor_thermal_exit(pr, device);
+#endif
 	return 0;
 }
 
@@ -840,6 +850,28 @@ static int cppc_perf_from_fbctrs(struct cppc_cpudata *cpu_data,
 	return (reference_perf * delta_delivered) / delta_reference;
 }
 
+#ifdef CONFIG_ARCH_CIX
+/*
+ * On CIX platform, perf calculation is inaccurate from delivered performance
+ * counter and reference performance counter. We reuse the desired performance
+ * register to store the real performance calculated by the platform.
+ */
+ static unsigned int cix_cppc_cpufreq_get_rate(unsigned int cpu)
+ {
+	struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+	struct cppc_cpudata *cpu_data = policy->driver_data;
+	u64 desired_perf;
+	int ret;
+
+	cpufreq_cpu_put(policy);
+
+	ret = cppc_get_desired_perf(cpu, &desired_perf);
+	if (ret < 0)
+		return -EIO;
+
+	return cppc_cpufreq_perf_to_khz(cpu_data, desired_perf);
+}
+#else
 static unsigned int cppc_cpufreq_get_rate(unsigned int cpu)
 {
 	struct cppc_perf_fb_ctrs fb_ctrs_t0 = {0}, fb_ctrs_t1 = {0};
@@ -865,6 +897,7 @@ static unsigned int cppc_cpufreq_get_rate(unsigned int cpu)
 
 	return cppc_cpufreq_perf_to_khz(cpu_data, delivered_perf);
 }
+#endif
 
 static int cppc_cpufreq_set_boost(struct cpufreq_policy *policy, int state)
 {
@@ -909,7 +942,11 @@ static struct cpufreq_driver cppc_cpufreq_driver = {
 	.flags = CPUFREQ_CONST_LOOPS,
 	.verify = cppc_verify_policy,
 	.target = cppc_cpufreq_set_target,
+#ifdef CONFIG_ARCH_CIX
+	.get = cix_cppc_cpufreq_get_rate,
+#else
 	.get = cppc_cpufreq_get_rate,
+#endif
 	.fast_switch = cppc_cpufreq_fast_switch,
 	.init = cppc_cpufreq_cpu_init,
 	.exit = cppc_cpufreq_cpu_exit,

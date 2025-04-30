@@ -1155,7 +1155,6 @@ static int set_dmic_clk(struct snd_soc_dapm_widget *w,
 	return 0;
 }
 
-
 static int rt5682s_set_pllb_power(struct rt5682s_priv *rt5682s, int on)
 {
 	struct snd_soc_component *component = rt5682s->component;
@@ -1698,7 +1697,7 @@ static const struct snd_soc_dapm_widget rt5682s_dapm_widgets[] = {
 	SND_SOC_DAPM_SUPPLY_S("DA ASRC", 1, RT5682S_PLL_TRACK_1,
 		RT5682S_DA_ASRC_SFT, 0, NULL, 0),
 	SND_SOC_DAPM_SUPPLY_S("DMIC ASRC", 1, RT5682S_PLL_TRACK_1,
-		RT5682S_DMIC_ASRC_SFT, 0, NULL, 0),
+		RT5682S_DMIC_ASRC_SFT, 1, NULL, 0),
 
 	/* Input Side */
 	SND_SOC_DAPM_SUPPLY("MICBIAS1", RT5682S_PWR_ANLG_2,
@@ -2911,6 +2910,9 @@ static int rt5682s_resume(struct snd_soc_component *component)
 	regcache_sync(rt5682s->regmap);
 
 	if (rt5682s->hs_jack) {
+		regmap_update_bits(rt5682s->regmap, RT5682S_CBJ_CTRL_2,
+			RT5682S_EXT_JD_SRC, RT5682S_EXT_JD_SRC_MANUAL);
+
 		mod_delayed_work(system_power_efficient_wq,
 			&rt5682s->jack_detect_work, msecs_to_jiffies(0));
 	}
