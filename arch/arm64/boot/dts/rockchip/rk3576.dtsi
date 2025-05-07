@@ -2822,7 +2822,7 @@
 				opp-microvolt-L0 = <775000 775000 950000>;
 				opp-microvolt-L1 = <762500 762500 950000>;
 			};
-			gpu_opp_j_m_800000000: opp-j-m-800000000 {
+			opp-j-m-800000000 {
 				opp-supported-hw = <0x06 0xffff>;
 				opp-hz = /bits/ 64 <800000000>;
 				opp-microvolt = <850000 850000 875000>;

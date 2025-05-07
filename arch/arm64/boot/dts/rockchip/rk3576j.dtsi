@@ -55,6 +55,12 @@
 	status = "disabled";
 };
 
+&gpu_opp_table {
+	opp-j-m-800000000 {
+		status = "disabled";
+	};
+};
+
 /*
  * The Max frequency of NPU is 700MHz in default normal mode.
  * The Max frequency of NPU is 850MHz in overdrive mode,
