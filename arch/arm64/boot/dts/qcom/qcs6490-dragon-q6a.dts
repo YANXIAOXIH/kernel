@@ -909,6 +909,22 @@
 	status = "okay";
 };
 
+&qupv3_id_1 {
+	status = "okay";
+};
+
+&i2c10 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/* RTC RS4C411ZAE */
+	rtc_m41t11: m41t11@68 {
+		compatible = "st,m41t11";
+		reg = <0x68>;
+	};
+};
+
 &remoteproc_adsp {
 	firmware-name = "qcom/qcs6490/radxa/dragon-q6a/adsp.mbn";
 	status = "okay";
