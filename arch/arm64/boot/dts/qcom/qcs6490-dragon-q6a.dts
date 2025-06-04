@@ -1050,8 +1050,6 @@
 };
 
 &tlmm {
-	gpio-reserved-ranges = <32 2>, /* ADSP */
-			       <48 4>; /* NFC */
 
 	wcd_default: wcd-reset-n-active-state {
 		pins = "gpio83";
