@@ -25,8 +25,10 @@
 		compatible = "pwm-backlight";
 		pwms = <&pm8350c_pwm 3 50000>;
 		enable-gpios = <&pm8350c_gpios 8 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&lcd_bl_pwm>;
 		brightness-levels = <255 0>;
-		num-interpolated-steps = <256>;
+		num-interpolated-steps = <255>;
 		default-brightness-level = <250>;
 	};
 };
@@ -122,7 +124,5 @@
 };
 
 &pm8350c_pwm {
-	pinctrl-name = "default";
-	pinctrl-0 = <&lcd_bl_pwm>;
 	status = "okay";
 };
