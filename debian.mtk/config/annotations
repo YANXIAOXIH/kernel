@@ -11,12 +11,6 @@ CONFIG_DEVFREQ_THERMAL                          note<'LP: #2028926'>
 CONFIG_DRM_LEGACY                               policy<{'arm64': 'y'}>
 CONFIG_DRM_LEGACY                               note<'Consider re-enabling but not signing the modules'>
 
-CONFIG_EXT2_FS                                  policy<{'arm64': 'y'}>
-CONFIG_EXT2_FS                                  note<'ext4 handling via EXT4_USE_FOR_EXT23'>
-
-CONFIG_EXT3_FS                                  policy<{'arm64': 'y'}>
-CONFIG_EXT3_FS                                  note<'ext4 handling via EXT4_USE_FOR_EXT23'>
-
 CONFIG_HOTPLUG_PCI_SHPC                         policy<{'arm64': 'n'}>
 CONFIG_HOTPLUG_PCI_SHPC                         note<'LP#1374440'>
 
@@ -227,10 +221,6 @@ CONFIG_DWMAC_SUNXI                              policy<{'arm64': 'm'}>
 CONFIG_EDAC_AL_MC                               policy<{'arm64': 'n'}>
 CONFIG_EDAC_LEGACY_SYSFS                        policy<{'arm64': 'y'}>
 CONFIG_EFI_ARMSTUB_DTB_LOADER                   policy<{'arm64': 'y'}>
-CONFIG_EXT2_FS_XATTR                            policy<{'arm64': 'n'}>
-CONFIG_EXT3_FS_POSIX_ACL                        policy<{'arm64': 'n'}>
-CONFIG_EXT3_FS_SECURITY                         policy<{'arm64': 'n'}>
-CONFIG_EXT4_USE_FOR_EXT2                        policy<{'arm64': '-'}>
 CONFIG_EXYNOS_ADC                               policy<{'arm64': 'm'}>
 CONFIG_EXYNOS_ARM64_COMMON_CLK                  policy<{'arm64': 'y'}>
 CONFIG_EXYNOS_AUDSS_CLK_CON                     policy<{'arm64': 'y'}>
