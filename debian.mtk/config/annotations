@@ -199,6 +199,7 @@ CONFIG_DRM_NOMODESET                            policy<{'arm64': 'y'}>
 CONFIG_DRM_PANEL_AUO_G156XTN010_LVDS            policy<{'arm64': 'y'}>
 CONFIG_DRM_PANEL_AVD_TT70WS_CN_134_A            policy<{'arm64': 'n'}>
 CONFIG_DRM_PANEL_EDP                            policy<{'arm64': 'm'}>
+CONFIG_DRM_PANEL_JADARD_JD9365DA_H3             policy<{'arm64': 'm'}>
 CONFIG_DRM_PANEL_KOE_TX18D204VM0BAA             policy<{'arm64': 'y'}>
 CONFIG_DRM_PANEL_RPI_PUMPKIN_TOUCHSCREEN        policy<{'arm64': 'n'}>
 CONFIG_DRM_PANEL_SHARP_NT35532                  policy<{'arm64': 'n'}>
