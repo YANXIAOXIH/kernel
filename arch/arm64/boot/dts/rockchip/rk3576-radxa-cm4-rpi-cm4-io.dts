@@ -55,6 +55,18 @@
 	};
 };
 
+&leds {
+	activity-led-green {
+		gpios = <&gpio2 RK_PD0 GPIO_ACTIVE_LOW>;
+		linux,default-trigger = "heartbeat";
+	};
+
+	pwr-led-red {
+		gpios = <&gpio2 RK_PC4 GPIO_ACTIVE_LOW>;
+		linux,default-trigger = "default-on";
+	};
+};
+
 &sdmmc {
 	max-frequency = <200000000>;
 	no-sdio;
